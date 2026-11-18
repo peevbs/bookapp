@@ -58,6 +58,17 @@ button,input,select,textarea{font:inherit;color:inherit}
 .search{width:100%;min-width:0;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
 .srow{display:flex;gap:8px;align-items:stretch}
 .srow .search{flex:1}
+.srow.btns .fbtn{flex:1;justify-content:center}
+.fbadge.ok{background:var(--ok)}
+.rtab{display:grid;gap:6px;margin:6px 0 12px}
+.rrow{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font:inherit;color:inherit}
+button.rrow{cursor:pointer}
+.rd{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.rt{display:grid;gap:1px;min-width:0}
+.rt b{font:600 15px/1.25 var(--serif);overflow-wrap:anywhere}
+.rt span{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.rs{color:#c58a00;font-size:12px;white-space:nowrap}
+#yrs{margin-bottom:6px}
 .fbtn{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:15px;white-space:nowrap}
 .fbtn[aria-expanded="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .fbadge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center}
@@ -657,6 +668,7 @@ function cleanBook(raw) {
   for (const f of FIELDS) o[f[0]] = clip(raw[f[0]], 500);
   o.description = clip(raw.description, 3000); o.notes = clip(raw.notes, 8000);
   o.status = Object.prototype.hasOwnProperty.call(STATUS, raw.status) ? raw.status : 'to_read';
+  o.readDate = /^\d{4}-\d{2}-\d{2}$/.test(String(raw.readDate || '')) ? raw.readDate : '';
   o.sources = (Array.isArray(raw.sources) ? raw.sources : []).slice(0, 8)
     .map(x => ({ title: clip(x && x.title, 200), url: safeUrl(x && x.url) })).filter(x => x.url);
   o.confidence = ['high', 'medium', 'low'].includes(raw.confidence) ? raw.confidence : '';
@@ -860,7 +872,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v25)';
+const APP_VERSION = '2026-11-18 (кеш raft-v26)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -925,7 +937,51 @@ function show(v) {
   if (v === 'pick') return renderPick();
   if (v === 'card' && cur) return renderCard();
   if (v === 'settings') return renderSettings();
+  if (v === 'read') return renderRead();
   return renderLibrary();
+}
+
+/* ---------- reading log: Goodreads history + books marked read here ---------- */
+const todayIso = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+let grLog = [];
+try { grLog = (JSON.parse(localStorage.getItem('raft.gr') || '{}').read) || []; } catch (e) { grLog = []; }
+async function loadGrLog() {
+  try {
+    const r = await fetch('data/goodreads-all.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return false;
+    const j = await r.json(); if (!Array.isArray(j.read)) return false;
+    grLog = j.read; try { localStorage.setItem('raft.gr', JSON.stringify(j)); } catch (e) { /* optional */ }
+    return true;
+  } catch (e) { return false; }
+}
+/* One row per read work. A Goodreads entry that is the same work as a read book in the shelf is not counted twice. */
+function readRows() {
+  const libRead = books.filter(b => b.status === 'read');
+  const keys = new Set(libRead.map(keyTA)), grDate = new Map(), rows = [];
+  for (const g of grLog) for (const [t, a] of (g.lib || [])) { const k = keyTA({ title: t, author: a }); if (!grDate.has(k) || (g.date || '') > grDate.get(k)) grDate.set(k, g.date || ''); }
+  for (const b of libRead) rows.push({ id: b.id, title: b.title, author: b.author, date: b.readDate || grDate.get(keyTA(b)) || '', rating: 0, thumb: b.thumb });
+  for (const g of grLog) if (!(g.lib || []).some(([t, a]) => keys.has(keyTA({ title: t, author: a })))) rows.push({ id: '', title: g.title, author: g.author, date: g.date || '', rating: g.rating || 0 });
+  return rows;
+}
+function renderRead() {
+  const rows = readRows(), by = new Map();
+  for (const r of rows) { const y = (r.date || '').slice(0, 4) || 'Без дата'; if (!by.has(y)) by.set(y, []); by.get(y).push(r); }
+  const years = [...by.keys()].sort((a, b) => a === 'Без дата' ? 1 : b === 'Без дата' ? -1 : b.localeCompare(a));
+  let html = '<div class="top"><button class="back" id="bBack">‹ Рафт</button><h1>Прочетени</h1><span class="count">' + plural(rows.length) + '</span></div>';
+  if (!rows.length) html += '<div class="empty">Още няма прочетени книги.</div>';
+  else html += '<div class="chips" id="yrs">' + years.map(y => '<button class="chip" data-y="' + esc(y) + '">' + esc(y) + ' · ' + by.get(y).length + '</button>').join('') + '</div>';
+  for (const y of years) {
+    html += '<h2 class="grp" id="y' + esc(y.replace(/\s/g, '')) + '">' + esc(y) + ' · ' + by.get(y).length + '</h2><div class="rtab">';
+    for (const r of by.get(y).sort((a, b) => (b.date || '').localeCompare(a.date || '') || (a.title || '').localeCompare(b.title || '', 'bg'))) {
+      const d = r.date ? r.date.slice(8, 10) + '.' + r.date.slice(5, 7) + '.' : '';
+      html += '<' + (r.id ? 'button' : 'div') + ' class="rrow" ' + (r.id ? 'data-id="' + esc(r.id) + '"' : '') + '><span class="rd">' + esc(d) + '</span><span class="rt"><b>' + esc(r.title) + '</b><span>' + esc(r.author) + '</span></span><span class="rs">' + (r.rating ? '★'.repeat(r.rating) : '') + '</span></' + (r.id ? 'button' : 'div') + '>';
+    }
+    html += '</div>';
+  }
+  app.innerHTML = html;
+  app.querySelector('#bBack').onclick = back;
+  app.querySelectorAll('#yrs .chip').forEach(c => c.onclick = () => { const el = app.querySelector('#y' + c.dataset.y.replace(/\s/g, '')); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  app.querySelectorAll('button.rrow').forEach(r => r.onclick = () => { const b = books.find(x => x.id === r.dataset.id); if (b) { cur = JSON.parse(JSON.stringify(b)); push('card'); } });
 }
 
 /* ---------- library ---------- */
@@ -944,8 +1000,9 @@ function renderLibrary() {
     if (!bm || age == null || age >= 30) html += '<div class="note warn">' + (bm && age != null ? 'Последният архив е отпреди ' + age + ' дни.' : 'Още нямаш архив.') +
       ' Книгите са само на това устройство. <button class="btn sm" id="bBackupNow">Направи архив</button></div>';
     const nAct = (filter.status ? 1 : 0) + (filter.loc ? 1 : 0) + (filter.sort !== 'new' ? 1 : 0);
-    html += '<div class="tools"><div class="srow"><input class="search" id="q" type="search" placeholder="Търси по заглавие, автор, издателство, ISBN" value="' + esc(filter.q) + '">' +
-      '<button class="fbtn" id="bFilt" aria-expanded="' + filtersOpen + '" aria-controls="fpanel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Филтри' + (nAct ? '<span class="fbadge">' + nAct + '</span>' : '') + '</button></div>' +
+    html += '<div class="tools"><div class="srow"><input class="search" id="q" type="search" placeholder="Търси по заглавие, автор, издателство, ISBN" value="' + esc(filter.q) + '"></div>' +
+      '<div class="srow btns"><button class="fbtn" id="bFilt" aria-expanded="' + filtersOpen + '" aria-controls="fpanel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Филтри' + (nAct ? '<span class="fbadge">' + nAct + '</span>' : '') + '</button>' +
+      '<button class="fbtn" id="bRead"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Прочетени<span class="fbadge ok">' + readRows().length + '</span></button></div>' +
       '<div class="fpanel" id="fpanel"' + (filtersOpen ? '' : ' hidden') + '>' +
       '<div class="flab">Изглед</div><div class="chips" id="vw">' + [['list', '☰ Списък'], ['grid2', '▦ По 2 в ред'], ['grid3', '▩ По 3 в ред']].map(([k, l]) => '<button class="chip" data-v="' + k + '" aria-pressed="' + (view === k) + '">' + l + '</button>').join('') + '</div>' +
       '<div class="flab">Подреди по</div><div class="chips" id="so">' + [['new', 'Последно добавени'], ['title', 'Заглавие А–Я'], ['author', 'Автор'], ['loc', 'Рафт'], ['year', 'Година']].map(([k, l]) => '<button class="chip" data-s="' + k + '" aria-pressed="' + (filter.sort === k) + '">' + l + '</button>').join('') + '</div>' +
@@ -980,6 +1037,7 @@ function renderLibrary() {
   if ($('#bBackupNow')) $('#bBackupNow').onclick = () => push('settings');
   if ($('#q')) {
     $('#q').oninput = e => { filter.q = e.target.value; refreshList(); };
+    $('#bRead').onclick = () => push('read');
     $('#bFilt').onclick = () => { filtersOpen = !filtersOpen; $('#fpanel').hidden = !filtersOpen; $('#bFilt').setAttribute('aria-expanded', String(filtersOpen)); };
     if ($('#bClrF')) $('#bClrF').onclick = () => { filter.status = ''; filter.loc = ''; filter.sort = 'new'; saveUi(); refreshList(); };
     app.querySelectorAll('#vw .chip').forEach(c => c.onclick = () => { view = c.dataset.v; saveUi(); refreshList(); });
@@ -1008,7 +1066,7 @@ function openStatusMenu(b) {
     const bt = e.target.closest('button'); if (!bt) return;
     const k = bt.dataset.k; o.remove();
     if (!k || k === (b.status || 'to_read')) return;
-    try { await dbPut(Object.assign({}, b, { status: k, updatedAt: Date.now() })); books = await dbAll(); refreshList(); toast('Статусът е „' + STATUS[k] + '“.'); }
+    try { await dbPut(Object.assign({}, b, { status: k, updatedAt: Date.now() }, k === 'read' && !b.readDate ? { readDate: todayIso() } : {})); books = await dbAll(); refreshList(); toast('Статусът е „' + STATUS[k] + '“.'); }
     catch (err) { toast('Не успях да запиша. Провери дали има свободно място.'); }
   };
 }
@@ -1693,6 +1751,7 @@ function renderCard() {
   html += '<h3 class="sec">Моите данни</h3><div class="card">' +
     '<div class="f"><label for="f_status">Статус</label><select id="f_status" data-k="status">' +
     Object.entries(STATUS).map(([k, l]) => '<option value="' + k + '"' + (b.status === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
+    '<div class="f"><label for="f_readDate">Прочетена на</label><input type="date" id="f_readDate" data-k="readDate" value="' + esc(b.readDate || '') + '"></div>' +
     '<div class="f wide"><label for="f_notes">Бележки</label><textarea id="f_notes" data-k="notes" placeholder="лични бележки">' + esc(b.notes) + '</textarea></div></div>';
   if ((b.sources || []).length) html += '<h3 class="sec">Източници</h3><div class="srcs">' +
     b.sources.map(s => '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + esc(s.title) + '</a>').join('') + '</div>';
@@ -1767,7 +1826,7 @@ function renderCard() {
   $('#bSave').onclick = async () => {
     readForm();
     if (!(cur.title || cur.author || cur.isbn || cur.notes || cur.thumb)) { toast('Добави поне заглавие, автор или ISBN, или снимка.'); return; }
-    const rec = Object.assign({}, cur, { updatedAt: Date.now() }); if (isNew) setDefaults(rec); delete rec._new; delete rec._check; delete rec._lookup; delete rec.searches;
+    const rec = Object.assign({}, cur, { updatedAt: Date.now() }); if (rec.status === 'read' && !rec.readDate) rec.readDate = todayIso(); if (isNew) setDefaults(rec); delete rec._new; delete rec._check; delete rec._lookup; delete rec.searches;
     try {
       await dbPut(rec);
       books = await dbAll();
@@ -2077,19 +2136,19 @@ function renderSettings() {
   $('#bGr').onclick = async () => {
     const btn = $('#bGr'), out = $('#grOut'); btn.disabled = true; out.innerHTML = '<p class="small">Чета списъка…</p>';
     try {
-      const r = await fetch('data/goodreads-read.json?t=' + Date.now(), { cache: 'no-store' });
-      if (!r.ok) throw new Error('http ' + r.status);
-      const j = await r.json(), cur = await dbAll();
+      if (!(await loadGrLog()) && !grLog.length) throw new Error('no list');
+      const cur = await dbAll();
       /* the work counts, not the edition: title and author decide, ISBN and publisher do not */
-      const want = new Map(j.read.map(x => [keyTA(x), x]));
+      const dateOf = new Map();
+      for (const g of grLog) for (const [t, a] of (g.lib || [])) { const k = keyTA({ title: t, author: a }); if (!dateOf.has(k) || (g.date || '') > dateOf.get(k)) dateOf.set(k, g.date || ''); }
       const todo = [], done = [];
-      for (const b of cur) { const w = want.get(keyTA(b)); if (!w) continue; (b.status === 'read' ? done : todo).push(b); }
-      out.innerHTML = '<div class="note"><b>От Goodreads:</b> ' + j.read.length + ' прочетени произведения, които имаш в Рафта.<ul class="diagl"><li>Ще станат „Прочетена“: ' + todo.length + '</li><li>Вече са „Прочетена“: ' + done.length + '</li>' +
+      for (const b of cur) { const k = keyTA(b); if (!dateOf.has(k)) continue; if (b.status !== 'read' || (!b.readDate && dateOf.get(k))) todo.push(b); else done.push(b); }
+      out.innerHTML = '<div class="note"><b>От Goodreads:</b> ' + grLog.length + ' прочетени произведения общо.<ul class="diagl"><li>Книги от Рафта, които ще се маркират или ще получат дата: ' + todo.length + '</li><li>Вече наред: ' + done.length + '</li>' +
         (todo.length ? '<li>' + esc(todo.map(b => b.title).join('; ')) + '</li>' : '') + '</ul></div>' +
         '<div class="acts2"><button class="btn primary" id="bDoGr"' + (todo.length ? '' : ' disabled') + '>Маркирай</button><button class="btn" id="bNoGr">Отказ</button></div>';
       $('#bNoGr').onclick = () => { out.innerHTML = ''; };
       $('#bDoGr').onclick = async () => {
-        try { for (const b of todo) await dbPut(Object.assign({}, b, { status: 'read', updatedAt: Date.now() })); books = await dbAll(); out.innerHTML = '<div class="note ok">Готово: ' + todo.length + ' книги са „Прочетена“.</div>'; }
+        try { for (const b of todo) await dbPut(Object.assign({}, b, { status: 'read', updatedAt: Date.now(), readDate: b.readDate || dateOf.get(keyTA(b)) || '' })); books = await dbAll(); out.innerHTML = '<div class="note ok">Готово: ' + todo.length + ' книги са „Прочетена“.</div>'; }
         catch (err) { out.innerHTML = '<div class="note bad">Не завърши. Провери дали има свободно място и опитай пак.</div>'; }
       };
     } catch (err) { out.innerHTML = '<div class="note bad">Не успях да взема списъка от сайта. Провери връзката и опитай пак.</div>'; }
@@ -2171,6 +2230,7 @@ function renderSettings() {
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* best effort */ }
   renderLibrary();
   ghFlush(true); checkUpdate(false);
+  loadGrLog().then(ok => { if (ok && document.getElementById('bRead')) { const bf = document.activeElement && document.activeElement.id === 'q'; if (!bf) renderLibrary(); } });
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
