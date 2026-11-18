@@ -823,7 +823,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v14)';
+const APP_VERSION = '2026-11-18 (кеш raft-v15)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '' };
 function getSettings() {
@@ -1837,15 +1837,23 @@ function renderSettings() {
     try {
       await loadXlsx();
       const wb = XLSX.read(await getBuf(), { type: 'array' });
-      /* The book list may not be the first sheet (legend, change log...): take the first sheet with a "Заглавие" column. */
+      /* Books may be on several sheets (Библиотека, Детски, Вероятни дубликати...): read every sheet that has a "Заглавие" column.
+         A row already read from an earlier sheet (same title and author) is not counted twice. */
       const sheetRows = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: '' });
-      const pickName = wb.SheetNames.find(n => (sheetRows(n)[0] || []).some(h => String(h).trim().toLowerCase() === 'заглавие')) || wb.SheetNames[0];
-      const rows = sheetRows(pickName);
-      const pr = rowsToBooks(rows);
+      const names = wb.SheetNames.filter(n => (sheetRows(n)[0] || []).some(h => String(h).trim().toLowerCase() === 'заглавие'));
+      const pr = { books: [], skipped: 0, unknown: [], error: '' }, seenKeys = new Set(); let sheetInfo = [];
+      for (const n of (names.length ? names : [wb.SheetNames[0]])) {
+        const one = rowsToBooks(sheetRows(n));
+        if (one.error) { if (!pr.books.length) { pr.error = one.error; } continue; }
+        const fresh = one.books.filter(b => !seenKeys.has(keyTA(b)));
+        one.books.forEach(b => seenKeys.add(keyTA(b)));
+        pr.books.push(...fresh); pr.skipped += one.skipped; pr.unknown.push(...one.unknown.filter(u => !pr.unknown.includes(u)));
+        sheetInfo.push(n + ': ' + fresh.length + (fresh.length < one.books.length ? ' (още ' + (one.books.length - fresh.length) + ' вече са в предишен лист)' : ''));
+      }
       if (pr.error) { out.innerHTML = '<div class="note bad">' + esc(pr.error) + '</div>'; return; }
       const plan = planImport(await dbAll(), pr.books), tw = tableWarnings(pr.books);
       out.innerHTML = '<div class="note"><b>' + esc(fname) + ':</b> ' + pr.books.length + ' книги.<ul class="diagl">' +
-        '<li>Нови: ' + plan.add.length + '</li><li>Вече в Рафта, ще се попълнят празни полета: ' + plan.fill.length + '</li><li>Вече в Рафта, без промяна: ' + plan.same + '</li>' +
+        '<li>Листове: ' + esc(sheetInfo.join('; ')) + '</li><li>Нови: ' + plan.add.length + '</li><li>Вече в Рафта, ще се попълнят празни полета: ' + plan.fill.length + '</li><li>Вече в Рафта, без промяна: ' + plan.same + '</li>' +
         (tw.dup.length ? '<li>Повтарящи се книги в таблицата (същото заглавие и автор): ' + tw.dup.length + '. Ще се внесат и двете; прегледай ги после.</li>' : '') +
         (tw.clash.length ? '<li>Един ISBN на различни заглавия: ' + esc(tw.clash.join('; ')) + '. Вероятно е грешка в таблицата; внасят се като отделни книги.</li>' : '') +
         (tw.badIsbn.length ? '<li>ISBN с грешна контролна цифра: ' + tw.badIsbn.length + '. Белязани са като непроверени.</li>' : '') +
