@@ -844,7 +844,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v21)';
+const APP_VERSION = '2026-11-18 (кеш raft-v22)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -873,8 +873,8 @@ async function tx(mode, fn) {
   });
 }
 const dbAll = () => tx('readonly', s => s.getAll());
-const dbPut = b => tx('readwrite', s => s.put(b));
-const dbDel = id => tx('readwrite', s => s.delete(id));
+const dbPut = b => tx('readwrite', s => s.put(b)).then(r => { ghMarkBooks(); return r; });
+const dbDel = id => tx('readwrite', s => s.delete(id)).then(r => { ghMarkBooks(); return r; });
 
 /* ---------- state ---------- */
 let books = [];
@@ -1553,32 +1553,47 @@ const ghQueue = () => { try { return JSON.parse(localStorage.getItem(GHQ) || '[]
 const ghSetQueue = q => { try { localStorage.setItem(GHQ, JSON.stringify(q)); } catch (e) { /* optional */ } };
 const ghEnqueue = id => { const q = ghQueue(); if (!q.includes(id)) { q.push(id); ghSetQueue(q); } };
 const b64utf8 = str => { const u = new TextEncoder().encode(str); let bin = ''; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); };
-async function ghPutCover(b, s) {
-  const path = 'covers/new/' + b.id + '.json', url = 'https://api.github.com/repos/' + s.ghRepo + '/contents/' + path;
+async function ghPutFile(path, obj, message, s) {
+  const url = 'https://api.github.com/repos/' + s.ghRepo + '/contents/' + path;
   const H = { Authorization: 'Bearer ' + s.ghToken, Accept: 'application/vnd.github+json' };
   let sha;
   const g = await fetch(url + '?ref=main', { headers: H, cache: 'no-store' });
   if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) return { ok: false, status: g.status };
-  const body = { message: 'Cover: ' + (b.title || b.id), branch: 'main', content: b64utf8(JSON.stringify({ id: b.id, isbn: b.isbn || '', title: b.title || '', author: b.author || '', thumb: b.thumb || '', cover: b.cover || '', at: new Date().toISOString() })) };
+  const body = { message, branch: 'main', content: b64utf8(JSON.stringify(obj)) };
   if (sha) body.sha = sha;
   const r = await fetch(url, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify(body) });
   return { ok: r.ok, status: r.status };
 }
+const ghPutCover = (b, s) => ghPutFile('covers/new/' + b.id + '.json', { id: b.id, isbn: b.isbn || '', title: b.title || '', author: b.author || '', thumb: b.thumb || '', cover: b.cover || '', at: new Date().toISOString() }, 'Cover: ' + (b.title || b.id), s);
+/* The whole list of books (without pictures) is kept in data/books.json, so GitHub always has the phone's latest data. */
+const ghBooksPending = () => { try { return localStorage.getItem('raft.ghbooks') === '1'; } catch (e) { return false; } };
+let ghTimer = null;
+function ghMarkBooks() {
+  try { localStorage.setItem('raft.ghbooks', '1'); } catch (e) { /* optional */ }
+  clearTimeout(ghTimer); ghTimer = setTimeout(() => ghFlush(true), 4000);
+}
+const ghSnapshot = () => ({ app: 'raft', format: 1, exportedAt: new Date().toISOString(), count: books.length,
+  books: books.map(b => { const o = Object.assign({}, b); o.hasCover = !!b.thumb; delete o.thumb; delete o.cover; return o; }) });
 let ghBusy = false;
 async function ghFlush(quiet) {
   const s = getSettings(); let q = ghQueue();
-  if (ghBusy || !q.length || !s.ghToken || !s.ghRepo || navigator.onLine === false) return;
-  ghBusy = true; let done = 0, stop = '';
+  if (ghBusy || !(q.length || ghBooksPending()) || !s.ghToken || !s.ghRepo || navigator.onLine === false) return;
+  ghBusy = true; let done = 0, stop = '', listDone = false;
+  const fail = r => r.status === 401 || r.status === 403 || r.status === 404 ? 'GitHub отказа достъп (провери токена и хранилището в Настройки).' : 'GitHub върна грешка ' + r.status + '.';
   try {
     for (const id of q.slice()) {
       const b = books.find(x => x.id === id);
       if (!b || !b.thumb) { ghSetQueue(ghQueue().filter(x => x !== id)); continue; }
       let r; try { r = await ghPutCover(b, s); } catch (e) { stop = 'Няма връзка. Ще опитам пак, когато си онлайн.'; break; }
-      if (r.ok) { ghSetQueue(ghQueue().filter(x => x !== id)); done++; }
-      else { stop = r.status === 401 || r.status === 403 || r.status === 404 ? 'GitHub отказа достъп (провери токена и хранилището в Настройки).' : 'GitHub върна грешка ' + r.status + '.'; break; }
+      if (r.ok) { ghSetQueue(ghQueue().filter(x => x !== id)); done++; } else { stop = fail(r); break; }
+    }
+    if (!stop && ghBooksPending()) {
+      const snap = ghSnapshot();
+      let r; try { r = await ghPutFile('data/books.json', snap, 'Books snapshot: ' + snap.count + ' books', s); } catch (e) { stop = 'Няма връзка. Ще опитам пак, когато си онлайн.'; }
+      if (r) { if (r.ok) { try { localStorage.setItem('raft.ghbooks', '0'); } catch (e) { /* optional */ } listDone = true; } else stop = fail(r); }
     }
   } finally { ghBusy = false; }
-  if (!quiet) { if (done) toast('Корици, качени в GitHub: ' + done + '.'); else if (stop) toast(stop); }
+  if (!quiet) { if (done || listDone) toast('В GitHub: ' + (listDone ? 'списък с книги' : '') + (done && listDone ? ' и ' : '') + (done ? done + ' корици' : '') + '.'); else if (stop) toast(stop); }
 }
 window.addEventListener('online', () => ghFlush(true));
 async function saveCoverPhoto(file) {
@@ -1714,6 +1729,7 @@ function renderCard() {
     try {
       await dbPut(rec);
       books = await dbAll();
+      if (isNew && rec.thumb) ghEnqueue(rec.id);
       toast(isNew ? 'Книгата е в Рафта.' : 'Промените са запазени.');
       back();
     } catch (e) { toast('Не успях да запиша. Провери дали има свободно място.'); }
@@ -1903,10 +1919,10 @@ function renderSettings() {
     '<label class="field" for="model">Модел<input id="model" value="' + esc(s.model) + '" autocomplete="off" spellcheck="false"></label>' +
     '<label class="field" for="max">Най-много търсения в интернет на книга (1 до 10)<input id="max" type="number" min="1" max="10" value="' + esc(s.maxSearches) + '"></label>' +
     '<div class="acts2"><button class="btn primary" id="bSave">Запази</button><button class="btn" id="bTest">Тествай ключа</button></div><div id="testOut"></div>' +
-    '<h3 class="sec">Корици в GitHub (по избор)</h3><p class="small">Нови корици, които снимаш, се качват в хранилището, когато си онлайн, и не се губят. Нужен е личен токен на GitHub само за хранилището на Рафт с право „Contents: Read and write“. Токенът се пази само в този браузър. Без токен кориците остават на телефона и влизат в пълния архив.</p>' +
+    '<h3 class="sec">Книги и корици в GitHub (по избор)</h3><p class="small">След всяка промяна списъкът с книги (data/books.json) и новите корици (covers/new/) се качват в хранилището, когато си онлайн. Нужен е личен токен на GitHub само за хранилището на Рафт с право „Contents: Read and write“. Токенът се пази само в този браузър. Без токен всичко остава на телефона и влиза в пълния архив.</p>' +
     '<label class="field" for="ghrepo">Хранилище<input id="ghrepo" value="' + esc(s.ghRepo) + '" autocomplete="off" spellcheck="false"></label>' +
     '<label class="field" for="ghtok">Токен на GitHub<input id="ghtok" type="password" value="' + esc(s.ghToken) + '" autocomplete="off" spellcheck="false"></label>' +
-    '<div class="acts2"><button class="btn" id="bGhTest">Тествай и качи чакащите</button></div><div id="ghOut"><p class="small">Чакащи за качване: ' + ghQueue().length + '</p></div>' +
+    '<div class="acts2"><button class="btn" id="bGhTest">Тествай и качи чакащите</button></div><div id="ghOut"><p class="small">Корици за качване: ' + ghQueue().length + '. Списък с книги: ' + (ghBooksPending() ? 'чака' : 'качен или още не е пускан') + '.</p></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
     '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
     '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
@@ -2010,8 +2026,9 @@ function renderSettings() {
       if (!r.ok) { out.innerHTML = '<div class="note bad">GitHub отказа (' + r.status + '). Провери токена и името на хранилището.</div>'; return; }
       const j = await r.json(), can = j.permissions && j.permissions.push;
       if (!can) { out.innerHTML = '<div class="note bad">Токенът вижда хранилището, но няма право за запис (Contents: Read and write).</div>'; return; }
+      try { localStorage.setItem('raft.ghbooks', '1'); } catch (e) { /* optional */ }
       await ghFlush(true);
-      out.innerHTML = '<div class="note ok">Връзката работи. Чакащи за качване: ' + ghQueue().length + '.</div>';
+      out.innerHTML = '<div class="note ' + (ghBooksPending() || ghQueue().length ? 'warn' : 'ok') + '">Връзката работи. ' + (ghBooksPending() || ghQueue().length ? 'Не всичко е качено още: ' + ghQueue().length + ' корици' + (ghBooksPending() ? ', списъкът с книги чака' : '') + '. Опитай пак.' : 'Списъкът с книги и кориците са качени в GitHub.') + '</div>';
     } catch (e) { out.innerHTML = '<div class="note bad">Няма връзка с GitHub.</div>'; }
   };
   $('#bGhCov').onclick = async () => {
