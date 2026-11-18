@@ -874,7 +874,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v27)';
+const APP_VERSION = '2026-11-18 (кеш raft-v28)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -2226,14 +2226,30 @@ function renderSettings() {
           try { const x = await (await fetch('covers/new/' + f.name + '?t=' + Date.now(), { cache: 'no-store' })).json(); if (x && x.thumb) list.unshift(x); } catch (e) { /* skip one */ }
         }
       } catch (e) { /* optional */ }
-      const cur = await dbAll(); let set = 0, had = 0, miss = 0;
-      for (const b of cur) {
-        if (b.thumb) { had++; continue; }
-        const c = list.find(x => x.thumb && sameBook(b, x));
-        if (c) { await dbPut(Object.assign({}, b, { thumb: c.thumb })); set++; } else miss++;
+      const cur = await dbAll(); let set = 0, had = 0, miss = 0, fixed = 0;
+      /* Two editions of one title (same title and author) must not share a cover: match by photo id, then ISBN, then by "no ISBN" with "no ISBN". */
+      const score = (b, x) => {
+        if (x.id && x.id === b.id) return 5;
+        const ib = normIsbn(b.isbn), ix = normIsbn(x.isbn);
+        return ib && ix ? 3 : (!ib && !ix ? 2 : 1);
+      };
+      const cnt = new Map(); cur.forEach(b => cnt.set(keyTA(b), (cnt.get(keyTA(b)) || 0) + 1));
+      const used = new Set();
+      const cand = b => list.filter(x => x.thumb && (x.id === b.id || sameBook(b, x)));
+      const best = b => cand(b).map(x => [x, score(b, x) + (used.has(x) ? -10 : 0)]).sort((m, n) => n[1] - m[1])[0];
+      const order = cur.slice().sort((m, n) => (normIsbn(n.isbn) ? 1 : 0) - (normIsbn(m.isbn) ? 1 : 0));
+      for (const b of order) {
+        const twin = cnt.get(keyTA(b)) > 1;
+        if (b.thumb && !twin) { had++; continue; }
+        const pick = best(b);
+        if (!pick) { if (b.thumb) had++; else miss++; continue; }
+        used.add(pick[0]);
+        if (b.thumb === pick[0].thumb) { had++; continue; }
+        if (b.thumb && twin && pick[1] < 0) { had++; continue; }
+        await dbPut(Object.assign({}, b, { thumb: pick[0].thumb })); if (b.thumb) fixed++; else set++;
       }
       books = await dbAll();
-      out.innerHTML = '<div class="note ok">Готово: корици добавени на ' + set + ' книги. Вече имаха корица: ' + had + '. Без съвпадение в сайта: ' + miss + '.</div>';
+      out.innerHTML = '<div class="note ok">Готово: корици добавени на ' + set + ' книги' + (fixed ? ', поправени при двойни издания: ' + fixed : '') + '. Вече имаха корица: ' + had + '. Без съвпадение в сайта: ' + miss + '.</div>';
     } catch (err) { out.innerHTML = '<div class="note bad">Не успях да взема кориците от сайта. Провери връзката и опитай пак.</div>'; }
     btn.disabled = false;
   };
