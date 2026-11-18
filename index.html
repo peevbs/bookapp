@@ -115,6 +115,8 @@ button.rrow{cursor:pointer}
 .s-to_read{background:var(--accent-soft);color:var(--accent)}
 .s-reading{background:var(--warn-soft);color:var(--warn)}
 .s-read{background:var(--ok-soft);color:var(--ok)}
+.s-partial{background:var(--warn-soft);color:var(--warn)}
+.rt em{font-style:normal;color:var(--muted);font-size:12px;opacity:.85}
 
 .empty{padding:28px 4px;color:var(--muted)}
 .empty h2{color:var(--ink);font-size:20px;margin-bottom:8px}
@@ -217,7 +219,7 @@ h3.sec{font-size:16px;margin:22px 0 6px}
 'use strict';
 
 /* PURE:START — no DOM, no network; covered by tests */
-const STATUS = { to_read: 'За четене', read: 'Прочетена' };   // "currently reading" counts as to read
+const STATUS = { to_read: 'За четене', partial: 'Частично прочетена', read: 'Прочетена' };   // "currently reading" counts as to read
 /* The first 18 are the columns of the owner's spreadsheet, in its order; "Бележки" (notes) follows them. */
 const FIELDS = [
   ['title', 'Заглавие'], ['original_title', 'Оригинално заглавие'], ['author', 'Автор'], ['translator', 'Преводач'], ['isbn', 'ISBN'],
@@ -872,7 +874,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v26)';
+const APP_VERSION = '2026-11-18 (кеш raft-v27)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -960,11 +962,11 @@ function readRows() {
   const keys = new Set(libRead.map(keyTA)), grDate = new Map(), rows = [];
   for (const g of grLog) for (const [t, a] of (g.lib || [])) { const k = keyTA({ title: t, author: a }); if (!grDate.has(k) || (g.date || '') > grDate.get(k)) grDate.set(k, g.date || ''); }
   for (const b of libRead) rows.push({ id: b.id, title: b.title, author: b.author, date: b.readDate || grDate.get(keyTA(b)) || '', rating: 0, thumb: b.thumb });
-  for (const g of grLog) if (!(g.lib || []).some(([t, a]) => keys.has(keyTA({ title: t, author: a })))) rows.push({ id: '', title: g.title, author: g.author, date: g.date || '', rating: g.rating || 0 });
+  for (const g of grLog) if (!(g.lib || []).some(([t, a]) => keys.has(keyTA({ title: t, author: a })))) rows.push({ id: '', title: g.title, author: g.author, orig: g.orig || '', date: g.date || '', rating: g.rating || 0 });
   return rows;
 }
 function renderRead() {
-  const rows = readRows(), by = new Map();
+  const rows = readRows(), by = new Map(), part = books.filter(b => b.status === 'partial').sort((a, b) => (a.title || '').localeCompare(b.title || '', 'bg'));
   for (const r of rows) { const y = (r.date || '').slice(0, 4) || 'Без дата'; if (!by.has(y)) by.set(y, []); by.get(y).push(r); }
   const years = [...by.keys()].sort((a, b) => a === 'Без дата' ? 1 : b === 'Без дата' ? -1 : b.localeCompare(a));
   let html = '<div class="top"><button class="back" id="bBack">‹ Рафт</button><h1>Прочетени</h1><span class="count">' + plural(rows.length) + '</span></div>';
@@ -974,9 +976,12 @@ function renderRead() {
     html += '<h2 class="grp" id="y' + esc(y.replace(/\s/g, '')) + '">' + esc(y) + ' · ' + by.get(y).length + '</h2><div class="rtab">';
     for (const r of by.get(y).sort((a, b) => (b.date || '').localeCompare(a.date || '') || (a.title || '').localeCompare(b.title || '', 'bg'))) {
       const d = r.date ? r.date.slice(8, 10) + '.' + r.date.slice(5, 7) + '.' : '';
-      html += '<' + (r.id ? 'button' : 'div') + ' class="rrow" ' + (r.id ? 'data-id="' + esc(r.id) + '"' : '') + '><span class="rd">' + esc(d) + '</span><span class="rt"><b>' + esc(r.title) + '</b><span>' + esc(r.author) + '</span></span><span class="rs">' + (r.rating ? '★'.repeat(r.rating) : '') + '</span></' + (r.id ? 'button' : 'div') + '>';
+      html += '<' + (r.id ? 'button' : 'div') + ' class="rrow" ' + (r.id ? 'data-id="' + esc(r.id) + '"' : '') + '><span class="rd">' + esc(d) + '</span><span class="rt"><b>' + esc(r.title) + '</b><span>' + esc(r.author) + '</span>' + (r.orig ? '<em>' + esc(r.orig) + '</em>' : '') + '</span><span class="rs">' + (r.rating ? '★'.repeat(r.rating) : '') + '</span></' + (r.id ? 'button' : 'div') + '>';
     }
     html += '</div>';
+  }
+  if (part.length) {
+    html += '<h2 class="grp" id="yчаст">Частично прочетени · ' + part.length + '</h2><div class="rtab">' + part.map(b => '<button class="rrow" data-id="' + esc(b.id) + '"><span class="rd"></span><span class="rt"><b>' + esc(b.title) + '</b><span>' + esc(b.author) + '</span></span><span class="rs"></span></button>').join('') + '</div>';
   }
   app.innerHTML = html;
   app.querySelector('#bBack').onclick = back;
@@ -1006,7 +1011,7 @@ function renderLibrary() {
       '<div class="fpanel" id="fpanel"' + (filtersOpen ? '' : ' hidden') + '>' +
       '<div class="flab">Изглед</div><div class="chips" id="vw">' + [['list', '☰ Списък'], ['grid2', '▦ По 2 в ред'], ['grid3', '▩ По 3 в ред']].map(([k, l]) => '<button class="chip" data-v="' + k + '" aria-pressed="' + (view === k) + '">' + l + '</button>').join('') + '</div>' +
       '<div class="flab">Подреди по</div><div class="chips" id="so">' + [['new', 'Последно добавени'], ['title', 'Заглавие А–Я'], ['author', 'Автор'], ['loc', 'Рафт'], ['year', 'Година']].map(([k, l]) => '<button class="chip" data-s="' + k + '" aria-pressed="' + (filter.sort === k) + '">' + l + '</button>').join('') + '</div>' +
-      '<div class="flab">Статус</div><div class="chips" id="sts">' + [['', 'Всички'], ['to_read', 'За четене'], ['read', 'Прочетени']].map(([k, l]) => '<button class="chip" data-st="' + k + '" aria-pressed="' + (filter.status === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="flab">Статус</div><div class="chips" id="sts">' + [['', 'Всички'], ['to_read', 'За четене'], ['partial', 'Частично'], ['read', 'Прочетени']].map(([k, l]) => '<button class="chip" data-st="' + k + '" aria-pressed="' + (filter.status === k) + '">' + l + '</button>').join('') + '</div>' +
       (locs.length > 1 ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') +
       (nAct ? '<button class="btn sm" id="bClrF">Изчисти филтрите</button>' : '') + '</div></div>';
     const groupOf = b => filter.sort === 'title' ? ((b.title || '?').trim().charAt(0).toUpperCase() || '?') : filter.sort === 'author' ? (b.author || 'Без автор') : filter.sort === 'loc' ? (b.location || 'Без рафт') : '';
@@ -2025,7 +2030,7 @@ function renderSettings() {
     '<label class="field" for="ghtok">Токен на GitHub<input id="ghtok" type="password" value="' + esc(s.ghToken) + '" autocomplete="off" spellcheck="false"></label>' +
     '<div class="acts2"><button class="btn" id="bGhTest">Тествай и качи чакащите</button></div><div id="ghOut"><p class="small">Корици за качване: ' + ghQueue().length + '. Списък с книги: ' + (ghBooksPending() ? 'чака' : 'качен или още не е пускан') + '.</p></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
-    '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div>' +
+    '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bRec">Изравни Рафта с таблицата (махни дублираните)</button><div id="recOut"></div><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div>' +
     '<button class="btn block" id="bGr">Маркирай прочетените по Goodreads</button><div id="grOut"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
     '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
     '<p class="small">Версия на приложението: ' + APP_VERSION + '</p><button class="btn block" id="bUpd">Провери за нова версия</button>';
@@ -2118,6 +2123,54 @@ function renderSettings() {
     } catch (err) { $('#impOut').innerHTML = '<div class="note bad">Не успях да взема таблицата от сайта. Провери връзката и опитай пак.</div>'; }
     btn.disabled = false;
   };
+  /* Make the shelf match the table one to one: every table row keeps exactly one book, leftovers from older imports are listed and removed. */
+  $('#bRec').onclick = async () => {
+    const btn = $('#bRec'), out = $('#recOut'); btn.disabled = true; out.innerHTML = '<p class="small">Сравнявам…</p>';
+    try {
+      await loadXlsx();
+      const r = await fetch('biblioteka.xlsx?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('http ' + r.status);
+      const wb = XLSX.read(await r.arrayBuffer(), { type: 'array' });
+      const sr = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: '' });
+      const names = wb.SheetNames.filter(n => !/дубликат/i.test(n) && (sr(n)[0] || []).some(h => String(h).trim().toLowerCase() === 'заглавие'));
+      const table = []; for (const n of names) table.push(...rowsToBooks(sr(n)).books);
+      const local = await dbAll(), pubN = x => fold(String(x.publisher || '')).replace(/[^a-zа-я0-9]/g, '').replace(/^(ик|издателскакъща|издателство)/, '');
+      const pairs = [];
+      table.forEach((t, ti) => local.forEach((b, bi) => {
+        const te = keyT(t) === keyT(b), ae = keyTA(t) === keyTA(b), ie = normIsbn(t.isbn) && normIsbn(t.isbn) === normIsbn(b.isbn);
+        if (!te || !(ae || ie)) return;
+        pairs.push([ti, bi, 2 + (ae ? 2 : 0) + (ie ? 3 : 0) + (pubN(t) && pubN(t) === pubN(b) ? 1.5 : 0) + (b.thumb ? 0.2 : 0) + (b.status !== 'to_read' ? 0.1 : 0)]);
+      }));
+      pairs.sort((x, y) => y[2] - x[2]);
+      const tUsed = new Set(), bUsed = new Set();
+      for (const [ti, bi] of pairs) if (!tUsed.has(ti) && !bUsed.has(bi)) { tUsed.add(ti); bUsed.add(bi); }
+      const extra = local.filter((b, i) => !bUsed.has(i) && /^imp/.test(b.id)), kept = local.filter((b, i) => !bUsed.has(i) && !/^imp/.test(b.id));
+      const add = table.filter((t, i) => !tUsed.has(i));
+      out.innerHTML = '<div class="note"><b>Таблицата:</b> ' + table.length + ' книги. В Рафта: ' + local.length + '.<ul class="diagl"><li>Съвпадат: ' + tUsed.size + '</li><li>Излишни (няма ги в таблицата, от стари внасяния): ' + extra.length + (extra.length ? ' — ' + esc(extra.map(b => b.title + (b.publisher ? ' (' + b.publisher + ')' : '')).join('; ')) : '') + '</li><li>Липсват в Рафта: ' + add.length + (add.length ? ' — ' + esc(add.map(b => b.title).join('; ')) : '') + '</li>' + (kept.length ? '<li>Добавени от теб и извън таблицата (остават): ' + kept.length + '</li>' : '') + '</ul><p class="small">Статус, дата на четене и корица на излишните се прехвърлят върху останалото копие, ако там липсват.</p></div>' +
+        '<div class="acts2"><button class="btn primary" id="bDoRec"' + (extra.length + add.length ? '' : ' disabled') + '>Изравни</button><button class="btn" id="bNoRec">Отказ</button></div>';
+      $('#bNoRec').onclick = () => { out.innerHTML = ''; };
+      $('#bDoRec').onclick = async () => {
+        try {
+          const cur = await dbAll();
+          for (const x of extra) {
+            const twin = cur.find(b => b.id !== x.id && keyT(b) === keyT(x) && !extra.includes(b) && (keyTA(b) === keyTA(x) || (normIsbn(b.isbn) && normIsbn(b.isbn) === normIsbn(x.isbn))));
+            if (twin) {
+              const patch = {};
+              if (!twin.thumb && x.thumb) patch.thumb = x.thumb;
+              if (twin.status === 'to_read' && x.status && x.status !== 'to_read') patch.status = x.status;
+              if (!twin.readDate && x.readDate) patch.readDate = x.readDate;
+              if (!twin.notes && x.notes) patch.notes = x.notes;
+              if (Object.keys(patch).length) await dbPut(Object.assign({}, twin, patch, { updatedAt: Date.now() }));
+            }
+            await dbDel(x.id);
+          }
+          for (const b of add) await dbPut(b);
+          books = await dbAll(); out.innerHTML = '<div class="note ok">Готово: махнати ' + extra.length + ', добавени ' + add.length + '. Сега в Рафта: ' + books.length + ' книги.</div>';
+        } catch (err) { out.innerHTML = '<div class="note bad">Не завърши. Провери дали има свободно място и опитай пак.</div>'; }
+      };
+    } catch (err) { out.innerHTML = '<div class="note bad">Не успях да сравня. Провери връзката и опитай пак.</div>'; }
+    btn.disabled = false;
+  };
   $('#bUpd').onclick = async () => { const b = $('#bUpd'); b.disabled = true; await checkUpdate(true); b.disabled = false; };
   $('#bGhTest').onclick = async () => {
     const out = $('#ghOut'), v = read(); saveSettings(v);
@@ -2141,14 +2194,20 @@ function renderSettings() {
       /* the work counts, not the edition: title and author decide, ISBN and publisher do not */
       const dateOf = new Map();
       for (const g of grLog) for (const [t, a] of (g.lib || [])) { const k = keyTA({ title: t, author: a }); if (!dateOf.has(k) || (g.date || '') > dateOf.get(k)) dateOf.set(k, g.date || ''); }
-      const todo = [], done = [];
-      for (const b of cur) { const k = keyTA(b); if (!dateOf.has(k)) continue; if (b.status !== 'read' || (!b.readDate && dateOf.get(k))) todo.push(b); else done.push(b); }
-      out.innerHTML = '<div class="note"><b>От Goodreads:</b> ' + grLog.length + ' прочетени произведения общо.<ul class="diagl"><li>Книги от Рафта, които ще се маркират или ще получат дата: ' + todo.length + '</li><li>Вече наред: ' + done.length + '</li>' +
-        (todo.length ? '<li>' + esc(todo.map(b => b.title).join('; ')) + '</li>' : '') + '</ul></div>' +
-        '<div class="acts2"><button class="btn primary" id="bDoGr"' + (todo.length ? '' : ' disabled') + '>Маркирай</button><button class="btn" id="bNoGr">Отказ</button></div>';
+      const partOf = new Set();
+      for (const g of grLog) for (const [t, a] of (g.part || [])) partOf.add(keyTA({ title: t, author: a }));
+      const todo = [], todoP = [], done = [];
+      for (const b of cur) {
+        const k = keyTA(b);
+        if (dateOf.has(k)) { if (b.status !== 'read' || (!b.readDate && dateOf.get(k))) todo.push(b); else done.push(b); }
+        else if (partOf.has(k)) { if (b.status === 'to_read') todoP.push(b); else done.push(b); }
+      }
+      out.innerHTML = '<div class="note"><b>От Goodreads:</b> ' + grLog.length + ' прочетени произведения общо.<ul class="diagl"><li>Ще станат „Прочетена“: ' + todo.length + '</li><li>Ще станат „Частично прочетена“ (сборници, в които е прочетено само част): ' + todoP.length + '</li><li>Вече наред: ' + done.length + '</li>' +
+        (todo.length ? '<li>Прочетени: ' + esc(todo.map(b => b.title).join('; ')) + '</li>' : '') + (todoP.length ? '<li>Частично: ' + esc(todoP.map(b => b.title).join('; ')) + '</li>' : '') + '</ul></div>' +
+        '<div class="acts2"><button class="btn primary" id="bDoGr"' + (todo.length + todoP.length ? '' : ' disabled') + '>Маркирай</button><button class="btn" id="bNoGr">Отказ</button></div>';
       $('#bNoGr').onclick = () => { out.innerHTML = ''; };
       $('#bDoGr').onclick = async () => {
-        try { for (const b of todo) await dbPut(Object.assign({}, b, { status: 'read', updatedAt: Date.now(), readDate: b.readDate || dateOf.get(keyTA(b)) || '' })); books = await dbAll(); out.innerHTML = '<div class="note ok">Готово: ' + todo.length + ' книги са „Прочетена“.</div>'; }
+        try { for (const b of todo) await dbPut(Object.assign({}, b, { status: 'read', updatedAt: Date.now(), readDate: b.readDate || dateOf.get(keyTA(b)) || '' })); for (const b of todoP) await dbPut(Object.assign({}, b, { status: 'partial', updatedAt: Date.now() })); books = await dbAll(); out.innerHTML = '<div class="note ok">Готово: ' + todo.length + ' са „Прочетена“, ' + todoP.length + ' са „Частично прочетена“.</div>'; }
         catch (err) { out.innerHTML = '<div class="note bad">Не завърши. Провери дали има свободно място и опитай пак.</div>'; }
       };
     } catch (err) { out.innerHTML = '<div class="note bad">Не успях да взема списъка от сайта. Провери връзката и опитай пак.</div>'; }
