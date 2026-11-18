@@ -54,22 +54,24 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn[disabled]{opacity:.5;cursor:default}
 .btn.block{width:100%}
 
-.tools{display:grid;gap:10px;margin:4px 0 14px}
-.search{width:100%;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.tools{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:4px 0 14px}
+.search{width:100%;min-width:0;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
 .chip{flex:none;min-height:36px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:14px}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .sortrow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
-.sortrow select{min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:4px 8px}
+.sortrow label{white-space:nowrap;min-width:84px}
+.sortrow select{flex:1;min-width:0;min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:4px 8px}
 
 .list{display:grid;gap:10px}
 .row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;text-align:left;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
-.cover{width:56px;height:80px;border-radius:3px 6px 6px 3px;overflow:hidden;display:block;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.cover{width:56px;height:84px;border-radius:3px 6px 6px 3px;overflow:hidden;display:block;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .cover img{width:100%;height:100%;object-fit:cover;display:block}
 .spine{width:100%;height:100%;display:grid;place-items:center;color:#fff;font:600 26px var(--serif);border-left:6px solid rgba(0,0,0,.25)}
 .meta{display:grid;gap:2px;min-width:0}
 .meta .t{font:600 17px/1.25 var(--serif);overflow-wrap:anywhere}
 .meta .a{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.meta .o,.head .o{color:var(--muted);font:italic 14px/1.3 var(--serif);overflow-wrap:anywhere}
 .meta .p{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
 .pill{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
 .s-to_read{background:var(--accent-soft);color:var(--accent)}
@@ -114,7 +116,7 @@ label.field input{min-height:44px;padding:10px 14px;border-radius:10px;border:1p
 @media (prefers-reduced-motion: reduce){.spin{animation:none;border-top-color:var(--line)}}
 
 .head{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;align-items:end;margin:6px 0 14px}
-.head .cover{width:96px;height:136px}
+.head .cover{width:96px;height:144px}
 .head .spine{font-size:40px}
 .head h2{font-size:22px;line-height:1.2;overflow-wrap:anywhere}
 .badge{display:inline-block;margin-top:8px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
@@ -125,13 +127,27 @@ label.field input{min-height:44px;padding:10px 14px;border-radius:10px;border:1p
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 16px;margin:12px 0}
 .f{display:grid;grid-template-columns:minmax(96px,34%) minmax(0,1fr);gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px dotted var(--line)}
 .f:last-child{border-bottom:0}
-.f label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.f label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);overflow-wrap:anywhere;hyphens:auto;min-width:0}
 .f input,.f select,.f textarea{width:100%;border:0;background:transparent;padding:4px 0;color:var(--ink);font-family:var(--serif);font-size:16px;min-width:0}
 .f textarea{resize:vertical;min-height:84px;font-family:var(--sans);font-size:15px;line-height:1.45}
 .f textarea.ac{min-height:0;overflow:hidden;resize:none;font-family:var(--serif);font-size:16px;line-height:1.35;display:block}
 .f.wide{grid-template-columns:1fr}
 a{color:var(--accent)}
 .f select{font-family:var(--sans)}
+.pick{display:grid;gap:6px;min-width:0}
+.paste{padding:12px 16px}
+.paste textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:8px;font:14px/1.4 var(--sans)}
+.paste .chk span{overflow-wrap:anywhere}
+.pick select{min-height:40px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-family:var(--serif);text-overflow:ellipsis}
+.pick .newv{min-height:40px;padding:6px 8px;border:1px solid var(--accent);border-radius:8px;background:var(--surface)}
+.pick .newv[hidden]{display:none}
+.cv{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-bottom:1px dotted var(--line)}
+.cv:last-child{border-bottom:0}
+.cv img{width:44px;height:66px;object-fit:cover;border-radius:2px;display:block}
+.cv .rot{position:relative;border:0;padding:0;background:none;cursor:pointer}
+.cv .rot span{position:absolute;right:-4px;bottom:-4px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:14px;line-height:22px;text-align:center}
+.cv .fn{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.cv select{width:100%;min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:4px 6px;font-size:14px}
 .srcs{display:grid;gap:6px;font-size:14px;margin:8px 0}
 .srcs a{color:var(--accent);overflow-wrap:anywhere}
 .diag{margin:10px 0;font-size:14px}
@@ -161,17 +177,19 @@ h3.sec{font-size:16px;margin:22px 0 6px}
 
 /* PURE:START — no DOM, no network; covered by tests */
 const STATUS = { to_read: 'За четене', reading: 'Чета', read: 'Прочетена' };
-/* The first 19 are the columns of the owner's spreadsheet, in its order; "Бележки" is the notes field. */
+/* The first 18 are the columns of the owner's spreadsheet, in its order; "Бележки" (notes) follows them. */
 const FIELDS = [
-  ['title', 'Заглавие'], ['author', 'Автор'], ['translator', 'Преводач'], ['isbn', 'ISBN'], ['publisher', 'Издателство'],
-  ['genre', 'Жанр'], ['series', 'Поредица'], ['series_no', 'Номер в поредицата'], ['volume', 'Том'], ['binding', 'Подвързия'],
-  ['pages', 'Брой страници'], ['chapters', 'Брой глави'], ['illustrator', 'Илюстратор'], ['language', 'Език'], ['country', 'Държава'],
+  ['title', 'Заглавие'], ['original_title', 'Оригинално заглавие'], ['author', 'Автор'], ['translator', 'Преводач'], ['isbn', 'ISBN'],
+  ['publisher', 'Издателство'], ['genre', 'Жанр'], ['series', 'Поредица'], ['series_no', 'Номер в поредицата'], ['binding', 'Подвързия'],
+  ['pages', 'Брой страници'], ['illustrator', 'Илюстратор'], ['language', 'Език'], ['country', 'Държава'],
   ['year', 'Година на издание'], ['size', 'Размер (мм)'], ['printer', 'Печат'], ['location', 'Местоположение на съхранение'],
-  ['editor', 'Редактор'], ['cover_artist', 'Художник на корицата'], ['price_text', 'Цена']
+  ['volume', 'Том'], ['editor', 'Редактор'], ['cover_artist', 'Художник на корицата']
 ];
-const TABLE_N = 19;                                   // fields before the extras
-const SUGGEST_LISTS = ['binding', 'country', 'language', 'size'];     // short values: a drop-down of what is already in the library
-const CHIP_FIELDS = ['location', 'series', 'printer'];             // long values: tap a value already used
+const TABLE_N = 18;                                   // fields before the extras
+/* The two shelves. A book saved earlier with another value keeps it (shown as an extra option). */
+const LOCATIONS = ['Библиотека с класика в коридора', 'Библиотека със съвременни романи в хола'];
+/* Drop-down fields: values already in the library, "none" and "add new". */
+const PICK_FIELDS = ['series', 'printer', 'binding', 'language', 'country', 'size'];
 const COPY_FROM_PUBLISHER = ['series', 'binding', 'size', 'printer', 'location', 'language'];
 
 function esc(s) {
@@ -256,13 +274,11 @@ function bookFromModel(obj, seenUrls) {
     }
     if (sources.length >= 5) break;
   }
-  const priceUrl = safeUrl(o.price_url);
   const conf = ['high', 'medium', 'low'].includes(o.confidence) ? o.confidence : 'low';
   return {
-    title: cleanStr(o.title), author: cleanStr(o.author), translator: cleanStr(o.translator),
+    title: cleanStr(o.title), original_title: cleanStr(o.original_title), author: cleanStr(o.author), translator: cleanStr(o.translator),
     editor: cleanStr(o.editor), cover_artist: cleanStr(o.cover_artist), publisher: cleanStr(o.publisher),
     year: cleanNum(o.year), pages: cleanNum(o.pages), isbn, language: cleanStr(o.language), genre: cleanStr(o.genre),
-    price_text: cleanStr(o.price_text), price_url: priceUrl && seenUrls.has(urlKey(priceUrl)) ? priceUrl : '',
     description: cleanStr(o.description), sources, confidence: conf, note: cleanStr(o.note),
     isbn_ok: !isbn || isbn13Valid(isbn)
   };
@@ -273,8 +289,8 @@ function csvCell(v) {
   return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 function toCsv(books) {
-  const cols = FIELDS.map(f => f[0]).concat(['status', 'bought_at', 'notes', 'description', 'price_url', 'sources', 'added']);
-  const head = FIELDS.map(f => f[1]).concat(['Статус', 'Къде е закупена', 'Бележки', 'Описание', 'Връзка към цената', 'Източници', 'Добавена']);
+  const cols = FIELDS.map(f => f[0]).concat(['status', 'notes', 'description', 'sources', 'added']);
+  const head = FIELDS.map(f => f[1]).concat(['Статус', 'Бележки', 'Описание', 'Източници', 'Добавена']);
   const lines = [head.map(csvCell).join(';')];
   for (const b of books) {
     lines.push(cols.map(k => {
@@ -288,17 +304,17 @@ function toCsv(books) {
 }
 /* ---- the spreadsheet: same columns for export and import ---- */
 const TABLE_HEAD = FIELDS.slice(0, TABLE_N).map(f => f[1]).concat(['Бележки']);
-const EXTRA_HEAD = ['Статус', 'Къде е закупена', 'Редактор', 'Художник на корицата', 'Цена', 'Описание'];
+const EXTRA_HEAD = ['Статус', 'Том', 'Редактор', 'Художник на корицата', 'Описание'];
 const HEAD_KEYS = (() => {
   const m = {}; for (const f of FIELDS) m[f[1].toLowerCase()] = f[0];
-  m['бележки'] = 'notes'; m['къде е закупена'] = 'bought_at'; m['описание'] = 'description'; m['статус'] = 'status';
-  m['страници'] = 'pages'; m['година'] = 'year'; m['художник на корицата'] = 'cover_artist';
+  m['бележки'] = 'notes'; m['описание'] = 'description'; m['статус'] = 'status';
+  m['страници'] = 'pages'; m['година'] = 'year'; m['художник на корицата'] = 'cover_artist'; m['оригинално име'] = 'original_title';
   return m;
 })();
 function booksToRows(list) {
   const rows = [TABLE_HEAD.concat(EXTRA_HEAD)];
   for (const b of list) rows.push(FIELDS.slice(0, TABLE_N).map(f => String(b[f[0]] == null ? '' : b[f[0]])).concat([String(b.notes || '')],
-    [STATUS[b.status] || '', b.bought_at || '', b.editor || '', b.cover_artist || '', b.price_text || '', b.description || ''].map(String)));
+    [STATUS[b.status] || '', b.volume || '', b.editor || '', b.cover_artist || '', b.description || ''].map(String)));
   return rows;
 }
 const keyTA = x => fold(String(x.title || '')).replace(/[^a-zа-я0-9]/g, '') + '|' + fold(String(x.author || '')).replace(/[^a-zа-я0-9]/g, '');
@@ -342,7 +358,7 @@ function rowsToBooks(rows, now) {
     });
     if (!any || !(o.title || o.author || o.isbn)) { skipped++; continue; }
     Object.assign(o, { id: 'imp' + (now || Date.now()).toString(36) + (n++).toString(36), createdAt: (now || Date.now()) + n, updatedAt: (now || Date.now()) + n, origin: 'manual', note: '' });
-    o.status = o.status || 'to_read'; o.notes = o.notes || ''; o.bought_at = o.bought_at || '';
+    o.status = o.status || 'to_read'; o.notes = o.notes || '';
     books.push(o);
   }
   return { books, skipped, unknown, error: '' };
@@ -350,7 +366,7 @@ function rowsToBooks(rows, now) {
 /* Merge only: a new book is added; a known book gets only its empty fields filled; nothing is overwritten or deleted. */
 function planImport(local, incoming) {
   const plan = { add: [], fill: [], same: 0 };
-  const extra = ['notes', 'bought_at', 'description'];
+  const extra = ['notes', 'description'];
   for (const b of incoming) {
     const keys = FIELDS.map(f => f[0]).concat(extra);
     if ((local || []).some(x => keys.every(k => String(x[k] || '') === String(b[k] || '')))) { plan.same++; continue; }   // an identical row is already there
@@ -379,7 +395,7 @@ function filterBooks(books, f) {
   const q = (f.q || '').trim().toLowerCase();
   let out = books.filter(b => (!f.status || b.status === f.status) &&
     (!f.loc || b.location === f.loc) &&
-    (!q || [b.title, b.author, b.translator, b.publisher, b.isbn, b.genre, b.series, b.location, b.notes, b.bought_at].some(x => String(x || '').toLowerCase().includes(q))));
+    (!q || [b.title, b.original_title, b.author, b.translator, b.publisher, b.isbn, b.genre, b.series, b.location, b.notes].some(x => String(x || '').toLowerCase().includes(q))));
   const bg = (a, b) => String(a || '').localeCompare(String(b || ''), 'bg');
   const sorts = {
     new: (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
@@ -401,13 +417,13 @@ function buildPrompt(d) {
   if (d.back) lines.push('- Image ' + (++n) + ': photo of the back cover or barcode.');
   if (d.isbn) lines.push('- ISBN-13 decoded from the barcode: ' + d.isbn + ' (checksum valid).');
   if (d.text) lines.push('- Text typed by the user: ' + JSON.stringify(d.text));
-  if (d.known) lines.push('- Already known from free library catalogues (verify it, do not trust it blindly): ' + JSON.stringify(d.known) + '. Fewer searches are needed; focus on price_text, editor, cover_artist, translator and genre.');
+  if (d.known) lines.push('- Already known from free library catalogues (verify it, do not trust it blindly): ' + JSON.stringify(d.known) + '. Fewer searches are needed; focus on original_title, editor, cover_artist, translator and genre.');
   lines.push('');
-  lines.push('Method: read the title, author and publisher from the images (Cyrillic is common). If an ISBN is given or visible, search by ISBN first; otherwise search by title and author. Use web_search to find the publisher\'s own page or a bookstore or catalogue page for this exact edition, and open at least one page that shows the ISBN, page count and price. For Bulgarian books look at the publisher\'s site and at bookstores and catalogues such as Ciela, Helikon, Orange Center, Книжен пазар, Goodreads, Google Books and the National Library. A different edition is not the same book.');
+  lines.push('Method: read the title, author and publisher from the images (Cyrillic is common). If an ISBN is given or visible, search by ISBN first; otherwise search by title and author. Use web_search to find the publisher\'s own page or a bookstore or catalogue page for this exact edition, and open at least one page that shows the ISBN and page count. For a translated book also find the title of the original work in its original language and script (e.g. "The Notebook", "Le Rouge et le Noir"). For Bulgarian books look at the publisher\'s site and at bookstores and catalogues such as Ciela, Helikon, Orange Center, Книжен пазар, Goodreads, Google Books and the National Library. A different edition is not the same book.');
   lines.push('');
-  lines.push('Rules: never invent anything. A field you did not find on a source is null. ISBN only if a page or the barcode shows it. price_text is the price exactly as the store shows it, with currency, store name and whether it is available; prices change, so it is a snapshot. editor and cover_artist only if the book page or publisher credits them. description: at most two sentences in Bulgarian, in your own words, no quotes from the book or from reviews. sources: up to 5 URLs that appeared in your search results, each with a short title. confidence: "high" when the edition is confirmed by a page that matches the ISBN or title + author + publisher + year; "medium" when the book is found but the edition is uncertain; "low" otherwise. note: one short sentence in Bulgarian about any uncertainty, or null.');
+  lines.push('Rules: never invent anything. A field you did not find on a source is null. ISBN only if a page or the barcode shows it. original_title is the title of the original work as first published, in its own language; null for a book written in Bulgarian or when not found. editor and cover_artist only if the book page or publisher credits them. description: at most two sentences in Bulgarian, in your own words, no quotes from the book or from reviews. sources: up to 5 URLs that appeared in your search results, each with a short title. confidence: "high" when the edition is confirmed by a page that matches the ISBN or title + author + publisher + year; "medium" when the book is found but the edition is uncertain; "low" otherwise. note: one short sentence in Bulgarian about any uncertainty, or null.');
   lines.push('');
-  lines.push('Reply with ONLY one JSON object, no markdown, with exactly these keys: title, author, translator, editor, cover_artist, publisher, year (number or null), pages (number or null), isbn, language, genre, price_text, price_url, description, sources (array of {title, url}), confidence, note.');
+  lines.push('Reply with ONLY one JSON object, no markdown, with exactly these keys: title, original_title, author, translator, editor, cover_artist, publisher, year (number or null), pages (number or null), isbn, language, genre, description, sources (array of {title, url}), confidence, note.');
   return lines.join('\n');
 }
 
@@ -457,9 +473,9 @@ function mergeMeta(list, isbn) {
 function blankBook() {
   const b = {};
   for (const f of FIELDS) b[f[0]] = '';
-  return Object.assign(b, { description: '', price_url: '', sources: [], confidence: '', note: '' });
+  return Object.assign(b, { description: '', sources: [], confidence: '', note: '' });
 }
-const MERGE_KEYS = FIELDS.map(f => f[0]).concat(['description', 'price_url']);
+const MERGE_KEYS = FIELDS.map(f => f[0]).concat(['description']);
 /* Web result fills only the empty fields, so nothing the user or a catalogue already gave is overwritten. */
 function mergeWeb(old, nu) {
   const out = Object.assign({}, old);
@@ -602,9 +618,8 @@ function cleanBook(raw) {
   if (!raw || typeof raw !== 'object' || typeof raw.id !== 'string' || !raw.id || raw.id.length > 80) return null;
   const o = { id: raw.id };
   for (const f of FIELDS) o[f[0]] = clip(raw[f[0]], 500);
-  o.description = clip(raw.description, 3000); o.notes = clip(raw.notes, 8000); o.bought_at = clip(raw.bought_at, 200);
+  o.description = clip(raw.description, 3000); o.notes = clip(raw.notes, 8000);
   o.status = Object.prototype.hasOwnProperty.call(STATUS, raw.status) ? raw.status : 'to_read';
-  o.price_url = safeUrl(raw.price_url);
   o.sources = (Array.isArray(raw.sources) ? raw.sources : []).slice(0, 8)
     .map(x => ({ title: clip(x && x.title, 200), url: safeUrl(x && x.url) })).filter(x => x.url);
   o.confidence = ['high', 'medium', 'low'].includes(raw.confidence) ? raw.confidence : '';
@@ -684,9 +699,131 @@ function candFromOL(d) {
     description: '', language: '', genre: '', source: 'Open Library'
   };
 }
+/* ---- text copied from a bookstore or publisher page (Ciela, Хеликон, Orange, store.bg...) ----
+   The browser cannot read those pages itself (they do not allow it), so the person copies the
+   details block and the app picks out the labelled values. Works with "Етикет: стойност" and with
+   the label and the value on two separate lines. */
+const PASTE_LABELS = [
+  ['original_title', /^(оригинално заглавие|оригинално име)$/],
+  ['title', /^заглавие$/],
+  ['author', /^(автор|автори|автор\(и\))$/],
+  ['translator', /^(преводач|преводачи|превод)(?: от [а-я]+(?: език)?)?$/],
+  ['publisher', /^(издателство|издател)$/],
+  ['year', /^(година на издаване|година на издание|година|издадена|дата на издаване|издание)$/],
+  ['pages', /^(брой страници|страници|стр\.?|обем)$/],
+  ['binding', /^(корица|корици|подвързия|вид корица|тип корица)$/],
+  ['size', /^(формат|размери|размер|формат в мм|формат \(мм\)|размери \(см\))$/],
+  ['language', /^език$/],
+  ['series', /^(поредица|серия|серия \/ поредица|поредици и библиотеки)$/],
+  ['cover_artist', /^(художник на корицата|корица художник|дизайн на корицата)$/],
+  ['illustrator', /^(художник|илюстратор|илюстрации)$/],
+  ['editor', /^(редактор|отговорен редактор)$/],
+  ['printer', /^(печат|печатница)$/],
+  ['genre', /^(жанр|категория|категории)$/],
+  ['isbn', /^(isbn|isbn-13|isbn 13|баркод|ean|isbn\/баркод|код)$/]
+];
+function cleanSize(v) {
+  const m = String(v).replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(?:cm|см|mm|мм)?\s*[xх×*\/]\s*(\d+(?:\.\d+)?)\s*(cm|см|mm|мм)?/i);
+  if (!m) return '';
+  let a = parseFloat(m[1]), b = parseFloat(m[2]);
+  const cm = /cm|см/i.test(String(v)) || (a < 40 && b < 40);
+  if (cm) { a *= 10; b *= 10; }
+  const h = Math.round(Math.max(a, b)), w = Math.round(Math.min(a, b));
+  return h > 60 && h < 500 ? h + ' х ' + w : '';
+}
+function cleanPasteValue(k, v) {
+  v = String(v || '').replace(/\s+/g, ' ').replace(/^[\s:–—-]+|[\s;,.]+$/g, '').trim();
+  if (!v || v.length > 200) return '';
+  if (k === 'isbn') return findIsbnInText('ISBN ' + v) || normIsbn(v) || '';
+  if (k === 'year') return firstYear(v);
+  if (k === 'pages') return cleanNum((v.match(/\d{1,5}/) || [''])[0]);
+  if (k === 'binding') return /твърд|hard/i.test(v) ? 'Твърди корици' : /мек|soft|paper/i.test(v) ? 'Мека корица' : '';
+  if (k === 'size') return cleanSize(v);
+  if (k === 'publisher') return v.replace(/^(ик|издателство|издателска къща)\s+/i, '').replace(/^["„“]|["“”]$/g, '');
+  if (k === 'language') return /^бълг/i.test(v) ? 'Български' : v.charAt(0).toUpperCase() + v.slice(1);
+  if (k === 'translator') return v.replace(/^от [а-я]+(?: език)?\s*[:–-]?\s*/i, '');
+  return v;
+}
+function parsePastedBook(text) {
+  const lines = String(text || '').split(/\r?\n/).map(l => l.replace(/ /g, ' ').replace(/^\s+|\s+$/g, '')).filter(Boolean);
+  const out = {};
+  const labelOf = s => {
+    const k = s.toLowerCase().replace(/[:：]\s*$/, '').replace(/\s+/g, ' ').trim();
+    const hit = PASTE_LABELS.find(([, re]) => re.test(k));
+    return hit ? hit[0] : '';
+  };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    let key = '', val = '';
+    const m = line.match(/^([^:：\t]{2,40}?)(?:\s*[:：]|\t+|\s{2,})\s*(.*)$/);   // "Етикет: x", "Етикет<TAB>x" (таблици), "Етикет   x"
+    if (m && labelOf(m[1])) { key = labelOf(m[1]); val = m[2]; }
+    else if (labelOf(line)) { key = labelOf(line); }
+    if (!key) continue;
+    if (!val && i + 1 < lines.length && !labelOf(lines[i + 1].replace(/([:：]|\t|\s{2,}).*$/, ''))) val = lines[++i];
+    const c = cleanPasteValue(key, val);
+    if (c && !out[key]) out[key] = c;
+  }
+  // Labels squeezed into one line ("Обем:448 стр. Формат в мм:130х200 ... ISBN:978...")
+  const flat = lines.join(' ');
+  if (!out.isbn) { const i = findIsbnInText(flat); if (i) out.isbn = i; }
+  if (!out.pages) { const p = flat.match(/(?:обем|страници|брой страници)\s*:?\s*(\d{2,4})|(\d{2,4})\s*(?:стр\.|страници)/i); if (p) out.pages = cleanNum(p[1] || p[2]); }
+  if (!out.size) { const s = flat.match(/(?:формат(?: в мм)?|размери)\s*:?\s*([\d.,]+\s*(?:cm|см|mm|мм)?\s*[xх×]\s*[\d.,]+\s*(?:cm|см|mm|мм)?)/i); if (s) out.size = cleanSize(s[1]); }
+  if (!out.year) { const y = flat.match(/(?:година(?: на изда(?:ване|ние))?|издадена)\s*:?\s*(1[5-9]\d\d|20\d\d)/i); if (y) out.year = y[1]; }
+  if (!out.binding) { const b = flat.match(/(твърд[аи]?|меки?|мека) (?:корица|корици|подвързия)/i); if (b) out.binding = cleanPasteValue('binding', b[1]); }
+  if (!out.publisher) { const p = flat.match(/издателство\s+["„]?([А-ЯA-Z][^,."“”]{1,40}?)["“”]?(?:,|\s+\d{4}|\s+с\s|\s*$)/); if (p) out.publisher = p[1].trim(); }
+  if (!out.title && lines.length) {           // the page heading is usually the first line copied
+    const first = lines.find(l => !labelOf(l.replace(/[:：].*$/, '')) && !/€|лв|цена|купи|доставка|наличност|^\d+([.,]\d+)?$/i.test(l));
+    if (first && first.length <= 120) {
+      out.title = first.replace(/^【|】.*$/g, '').replace(/\s*[-–|].*(ciela|хеликон|helikon|orange|store\.bg|цена).*$/i, '').trim();
+      const NAME = /^[А-ЯA-Z][а-яa-zё.'-]+(?:\s+[А-ЯA-Z][а-яa-zё.'-]+){1,3}$/;
+      const split = out.title.match(/^(.*\S)\s+[-–]\s+(.+)$/);              // "Заглавие - Име Фамилия"
+      if (split && NAME.test(split[2])) { out.title = split[1]; if (!out.author) out.author = split[2]; }
+      const next = lines[lines.indexOf(first) + 1];                         // the author is often the next line
+      if (!out.author && next && NAME.test(next) && !labelOf(next)) out.author = next;
+    }
+  }
+  return out;
+}
+/* ---- covers from a folder: the file name says which book it is ---- */
+const TRANSLIT = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sht', ъ: 'a', ь: 'y', ю: 'yu', я: 'ya', ы: 'y', э: 'e' };
+const latin = s => fold(String(s || '')).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[а-яыэ]/g, c => TRANSLIT[c] || c);
+const words = s => latin(s).split(/[^a-z0-9]+/).filter(Boolean);
+const squash = s => words(s).join('');
+function fileBase(name) {
+  return String(name || '').split(/[\\/]/).pop().replace(/\.[a-z0-9]{2,5}$/i, '').replace(/[_+.]+/g, ' ').trim();
+}
+/* 0..1: how well one title fits the file name (both transliterated, so "Тетрадката" matches "Tetradkata"). */
+function titleFit(fw, fsq, title) {
+  const tw = words(title), tsq = tw.join('');
+  if (!tsq) return 0;
+  if (fsq === tsq) return 1;
+  if (tsq.length >= 4 && fsq.includes(tsq)) return 0.85 + 0.1 * tsq.length / fsq.length;   // the longer title that fits wins ("Пътешествайки" vs "Пътешествайки. Испания и Англия")
+  if (fsq.length >= 6 && tsq.includes(fsq)) return 0.75;
+  const hit = tw.filter(t => fw.some(f => f === t || (t.length >= 4 && tokMatch(f, t)))).length;
+  return 0.8 * hit / tw.length * Math.min(1, hit / Math.max(1, fw.length) + 0.5);
+}
+function coverMatch(name, list) {
+  const base = fileBase(name);
+  const isbn = (base.replace(/[\s-]/g, '').match(/97[89]\d{10}|\d{9}[\dXx]/) || [])[0];
+  const ni = isbn ? normIsbn(isbn) : '';
+  if (ni) { const b = list.find(x => normIsbn(x.isbn) === ni); if (b) return { id: b.id, score: 1, sure: true }; }
+  const fw = words(base), fsq = fw.join('');
+  if (!fsq) return { id: '', score: 0, sure: false };
+  const scored = list.map(b => {
+    const parts = [b.title, String(b.title || '').split(/\s+\/\s+|\s*\(/)[0], b.original_title].filter(Boolean);
+    let s = Math.max(...parts.map(t => titleFit(fw, fsq, t)), 0);
+    const extra = words([b.author, b.publisher, b.series].join(' ')).filter(t => t.length >= 4);
+    if (s > 0 && extra.some(t => fw.includes(t))) s += 0.05;          // author or publisher in the name breaks ties
+    return { id: b.id, score: Math.min(1, s) };
+  }).sort((a, b) => b.score - a.score);
+  const top = scored[0] || { id: '', score: 0 }, next = scored[1] || { score: 0 };
+  if (top.score < 0.55) return { id: '', score: top.score, sure: false };
+  return { id: top.id, score: top.score, sure: top.score - next.score >= 0.04 };
+}
 /* PURE:END */
 
 /* ---------- storage ---------- */
+const APP_VERSION = '2026-10-25b (кеш raft-v13)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '' };
 function getSettings() {
@@ -766,14 +903,14 @@ function renderLibrary() {
     if (!bm || age == null || age >= 30) html += '<div class="note warn">' + (bm && age != null ? 'Последният архив е отпреди ' + age + ' дни.' : 'Още нямаш архив.') +
       ' Книгите са само на това устройство. <button class="btn sm" id="bBackupNow">Направи архив</button></div>';
     html += '<div class="tools"><input class="search" id="q" type="search" placeholder="Търси по заглавие, автор, издателство, ISBN" value="' + esc(filter.q) + '">' +
-      '<div class="chips" role="group" aria-label="Статус">' +
-      [['', 'Всички']].concat(Object.entries(STATUS)).map(([k, l]) => '<button class="chip" data-st="' + k + '" aria-pressed="' + (filter.status === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="sortrow"><label for="st">Статус</label><select id="st">' +
+      [['', 'всички']].concat(Object.entries(STATUS)).map(([k, l]) => '<option value="' + k + '"' + (filter.status === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
       (locs.length > 1 ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') +
       '<div class="sortrow"><label for="sort">Подреди по</label><select id="sort">' +
       [['new', 'последно добавени'], ['title', 'заглавие'], ['author', 'автор'], ['year', 'година']].map(([k, l]) => '<option value="' + k + '"' + (filter.sort === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div></div>';
     html += '<div class="list" id="list">' + list.map(b =>
       '<button class="row" data-id="' + esc(b.id) + '">' + coverHtml(b) +
-      '<span class="meta"><span class="t">' + esc(b.title || 'Без заглавие') + '</span><span class="a">' + esc(b.author) + '</span>' +
+      '<span class="meta"><span class="t">' + esc(b.title || 'Без заглавие') + '</span>' + (b.original_title ? '<span class="o">' + esc(b.original_title) + '</span>' : '') + '<span class="a">' + esc(b.author) + '</span>' +
       '<span class="p">' + esc([b.publisher, b.year].filter(Boolean).join(' · ')) + '</span></span>' +
       (b.status ? '<span class="pill s-' + esc(b.status) + '">' + esc(STATUS[b.status] || '') + '</span>' : '<span></span>') + '</button>').join('') + '</div>';
     if (!list.length) html += '<div class="empty">Няма книги, които да отговарят на търсенето.</div>';
@@ -790,7 +927,7 @@ function renderLibrary() {
   if ($('#q')) {
     $('#q').oninput = e => { filter.q = e.target.value; refreshList(); };
     $('#sort').onchange = e => { filter.sort = e.target.value; refreshList(); };
-    app.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter.status = c.dataset.st; renderLibrary(); });
+    $('#st').onchange = e => { filter.status = e.target.value; refreshList(); };
     $('#bXlsx').onclick = exportXlsx;
     if ($('#loc')) $('#loc').onchange = e => { filter.loc = e.target.value; refreshList(); };
     wireRows();
@@ -819,6 +956,34 @@ async function scaled(bmp, max, q) {
   c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
   c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
   return c.toDataURL('image/jpeg', q);
+}
+/* Every cover ends up the same shape and size (2:3, 480 x 720), so the shelf looks even.
+   The whole photo is kept (nothing of the book is cut off) and centred; the empty sides are filled
+   with a blurred, darkened copy of the same photo. turns = quarter turns clockwise (for a sideways photo). */
+const COVER_W = 480, COVER_H = 720;
+function rotated(src, turns) {
+  turns = ((turns || 0) % 4 + 4) % 4;
+  if (!turns) return src;
+  const c = document.createElement('canvas'), odd = turns % 2 === 1;
+  c.width = odd ? src.height : src.width; c.height = odd ? src.width : src.height;
+  const g = c.getContext('2d'); g.translate(c.width / 2, c.height / 2); g.rotate(turns * Math.PI / 2);
+  g.drawImage(src, -src.width / 2, -src.height / 2);
+  return c;
+}
+async function coverImages(bmp, turns) {
+  const src = rotated(bmp, turns);
+  const out = (W, H, q) => {
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    const kc = Math.max(W / src.width, H / src.height), kf = Math.min(W / src.width, H / src.height);
+    g.fillStyle = '#20262c'; g.fillRect(0, 0, W, H);
+    try { g.filter = 'blur(' + Math.round(W / 24) + 'px) brightness(0.6)'; } catch (e) { /* older browsers: plain fill */ }
+    g.drawImage(src, (W - src.width * kc) / 2, (H - src.height * kc) / 2, src.width * kc, src.height * kc);
+    g.filter = 'none';
+    g.drawImage(src, (W - src.width * kf) / 2, (H - src.height * kf) / 2, src.width * kf, src.height * kf);
+    return c.toDataURL('image/jpeg', q);
+  };
+  return { mid: out(COVER_W, COVER_H, 0.8), thumb: out(160, 240, 0.8) };
 }
 function loadScript(src) {
   return new Promise((res, rej) => {
@@ -937,6 +1102,7 @@ async function takePhoto(slot, file) {
   try {
     const bmp = await loadBitmap(file);
     shot = { full: await scaled(bmp, 1600, 0.85), mid: await scaled(bmp, 800, 0.8), thumb: await scaled(bmp, 240, 0.8) };
+    if (slot === 'cover') { const cv = await coverImages(bmp, 0); shot.mid = cv.mid; shot.thumb = cv.thumb; }   // the saved cover: same shape as all others
     isbn = await scanBarcode(bmp);
     bmp.close && bmp.close();
   } catch (e) { toast('Снимката не може да се отвори. Опитай с друга.'); return renderAdd(); }
@@ -1075,15 +1241,52 @@ async function catFetch(src, step, url, signal, count) {
 async function gFetch(step, query, signal, rep) {
   const base = 'https://www.googleapis.com/books/v1/volumes?' + query;
   const key = getSettings().googleKey;
-  let r = await catFetch('Google Books', step, base + (key ? '&key=' + encodeURIComponent(key) : ''), signal, gCount);
-  if (key && (r.state === 'badkey' || r.state === 'keyrestricted')) {
+  const url = base + (key ? '&key=' + encodeURIComponent(key) : '');
+  let r = await catFetch('Google Books', step, url, signal, gCount);
+  /* Google Books often answers 5xx or times out for a moment: wait and try again, twice. */
+  for (const wait of [1200, 2500]) {
+    if (r.state !== 'server' && r.state !== 'timeout') break;
+    r.recovered = true; rep.push(r);
+    await sleep(wait, signal);
+    r = await catFetch('Google Books', step + ' (нов опит)', url, signal, gCount);
+  }
+  if (key && (r.state === 'badkey' || r.state === 'keyrestricted' || r.state === 'server')) {
     r.recovered = true; rep.push(r);
     r = await catFetch('Google Books', step + ' (без ключ)', base, signal, gCount);
   }
+  if (r.recovered && r.state === 'ok') r.recovered = false;
   rep.push(r);
   return r;
 }
-const CAT_NOTE = 'Данни от Google Books и Open Library. Там няма цена, редактор и художник на корицата.';
+const CAT_NOTE = 'Данни от Google Books и Open Library. Там няма редактор и художник на корицата, а оригиналното заглавие рядко го има.';
+/* Original title from Open Library: the edition's "translation_of", else the title of the work it belongs to.
+   Accepted only when it is clearly another title, not the Bulgarian one or a mixed "X / Х" record. */
+function pickOriginal(cand, bgTitle) {
+  const c = cleanStr(cand).replace(/\s*\((?:[^()]*)\)\s*$/, '').trim();
+  if (!c || c.length > 200 || /\s\/\s/.test(c)) return '';
+  const k = x => fold(String(x || '')).replace(/[^a-zа-я0-9À-ɏͰ-Ͽ]/g, '');
+  if (!k(c) || k(c) === k(bgTitle) || (bgTitle && k(c).includes(k(bgTitle)))) return '';
+  return c;
+}
+async function olOriginal(isbn, bgTitle, signal) {
+  try {
+    await olGate(signal);
+    const r = await fetch('https://openlibrary.org/isbn/' + isbn + '.json', { signal });
+    if (!r.ok) return '';
+    const ed = await r.json();
+    const t = pickOriginal(ed.translation_of, bgTitle || ed.title);
+    if (t) return t;
+    const wk = ((ed.works || [])[0] || {}).key;
+    if (!wk || !/^\/works\/OL\d+W$/.test(wk)) return '';
+    await olGate(signal);
+    const w = await fetch('https://openlibrary.org' + wk + '.json', { signal });
+    if (!w.ok) return '';
+    return pickOriginal((await w.json()).title, bgTitle || ed.title);
+  } catch (e) {
+    if (signal && signal.aborted) throw e;
+    return '';                                  // optional data: a failure never blocks the lookup
+  }
+}
 /* Exact: one ISBN. Only a record that carries this very ISBN counts as a match. */
 async function freeLookup(isbn, signal, rep) {
   rep = rep || [];
@@ -1107,6 +1310,7 @@ async function freeLookup(isbn, signal, rep) {
   }
   const meta = mergeMeta([gm, om], isbn);
   if (!meta.title) return null;
+  if (om) meta.original_title = await olOriginal(isbn, meta.title, signal);
   return Object.assign(blankBook(), meta, { origin: 'catalog', isbn_ok: true, note: CAT_NOTE });
 }
 /* Approximate: cleaned cover text, several variants, ranked against what the catalogues return. */
@@ -1151,7 +1355,7 @@ function failNote(r) {
 let carry = null;               // what the person already typed, kept when the search is repeated
 function openNew(b) {
   cur = Object.assign(b, {
-    id: uid(), createdAt: Date.now(), status: 'to_read', bought_at: '', notes: '',
+    id: uid(), createdAt: Date.now(), status: 'to_read', notes: '',
     thumb: draft.cover ? draft.cover.thumb : (draft.back ? draft.back.thumb : ''), cover: draft.cover ? draft.cover.mid || '' : '', _new: true
   }, carry || {});
   carry = null;
@@ -1255,19 +1459,38 @@ async function enrich() {
 }
 
 /* ---------- book card (new result or saved book) ---------- */
+const NEW_OPT = '__new__';
 function readForm() {
-  app.querySelectorAll('[data-k]').forEach(i => { cur[i.dataset.k] = i.value.replace(/\s*\n\s*/g, ' ').trim(); });
+  app.querySelectorAll('[data-k]').forEach(i => {
+    let v = i.value;
+    if (i.tagName === 'SELECT' && v === NEW_OPT) { const n = app.querySelector('#f_' + i.dataset.k + '_new'); v = n ? n.value : ''; }
+    cur[i.dataset.k] = String(v || '').replace(/\s*\n\s*/g, ' ').trim();
+  });
 }
-function chipsHtml(k, cur0) {
-  const vals = [...new Set(books.map(x => x[k]).filter(Boolean))].filter(v => v !== cur0).slice(0, 6);
-  return vals.length ? '<div class="vchips">' + vals.map(v => '<button type="button" class="chip" data-fill="' + k + '" data-v="' + esc(v) + '">' + esc(v) + '</button>').join('') + '</div>' : '';
+/* A drop-down that opens on tap: the values already used (or the two shelves), "empty", and "add new". */
+function pickOptions(k, val) {
+  const base = k === 'location' ? LOCATIONS.slice()
+    : [...new Set(books.map(x => String(x[k] || '').trim()).filter(Boolean))].sort((x, y) => x.localeCompare(y, 'bg', { numeric: true }));
+  if (val && !base.includes(val)) base.push(val);
+  return base;
+}
+function pickHtml(k, l, val) {
+  const none = { series: '— не е част от поредица —', location: '— не е избрано —' }[k] || '— празно —';
+  const opts = pickOptions(k, val);
+  return '<div class="f"><label for="f_' + k + '">' + l + '</label><div class="pick"><select id="f_' + k + '" data-k="' + k + '">' +
+    '<option value="">' + none + '</option>' +
+    opts.map(v => '<option value="' + esc(v) + '"' + (v === val ? ' selected' : '') + '>' + esc(v) + '</option>').join('') +
+    (k === 'location' ? '' : '<option value="' + NEW_OPT + '">+ Добави нова…</option>') + '</select>' +
+    (k === 'location' ? '' : '<input id="f_' + k + '_new" class="newv" hidden placeholder="Нова стойност" autocomplete="off" aria-label="' + esc(l) + ': нова стойност">') +
+    '</div></div>';
 }
 function renderCard() {
   const b = cur, isNew = !!b._new;
   const dup = b.isbn && books.find(x => x.id !== b.id && x.isbn === b.isbn);
   const confLabel = { high: 'Потвърдено издание', medium: 'Издание за проверка', low: 'Неуверен резултат, провери данните' };
   let html = '<div class="top"><button class="back" id="bBack">‹ ' + (isNew ? 'Отказ' : 'Рафт') + '</button></div>' +
-    '<div class="head">' + '<span id="bZoom" class="zoomable">' + coverHtml(b) + '</span><div><h2>' + esc(b.title || 'Без заглавие') + '</h2><div class="small">' + esc(b.author) + '</div>' +
+    '<div class="head">' + '<span id="bZoom" class="zoomable">' + coverHtml(b) + '</span><div><h2>' + esc(b.title || 'Без заглавие') + '</h2>' +
+    (b.original_title ? '<div class="o">' + esc(b.original_title) + '</div>' : '') + '<div class="small">' + esc(b.author) + '</div>' +
     (b.origin === 'catalog' ? '<span class="badge b-medium">От безплатни каталози</span>' :
       b.confidence ? '<span class="badge b-' + esc(b.confidence) + '">' + esc(confLabel[b.confidence]) + '</span>' : '') + '</div></div>';
   if (b._check) html += '<div class="note warn">' + esc(b._check) + '</div>';
@@ -1280,30 +1503,28 @@ function renderCard() {
     if (b._lookup.lines.length) html += '<details class="diag"><summary>Какво показаха каталозите</summary><ul>' + b._lookup.lines.map(l => '<li>' + esc(l) + '</li>').join('') + '</ul></details>';
   }
   html += '<div class="acts2 tight"><button class="btn" id="bWeb">Потърси в интернет</button>' + (b._lookup ? '<button class="btn" id="bAgain">Търси пак в каталозите</button>' : '') + '</div>' +
+    '<button class="btn block" id="bPaste">Попълни от копиран текст</button><div id="pasteBox"></div>' +
     (b._lookup && getSettings().key ? '<button class="btn block" id="bEnrich">Опитай с Claude (платено, само по твое решение)</button>' : '');
   if (b.note) html += '<div class="note' + (b.origin === 'catalog' ? '' : ' warn') + '">' + esc(b.note) + '</div>';
   if (b.origin === 'catalog') html += getSettings().key
-    ? '<button class="btn block" id="bEnrich">Допълни цена, редактор и художник (търсене в интернет, платено)</button>'
-    : '<p class="small">Цена, редактор и художник могат да се добавят по избор с Claude (нужен е API ключ в Настройки).</p>';
+    ? '<button class="btn block" id="bEnrich">Допълни оригинално заглавие, редактор и художник (търсене в интернет, платено)</button>'
+    : '<p class="small">Оригинално заглавие, редактор и художник могат да се добавят по избор с Claude (нужен е API ключ в Настройки).</p>';
   if (b.isbn && b.isbn_ok === false) html += '<div class="note bad">Този ISBN не минава проверката на контролната цифра. Сравни го с книгата.</div>';
   if (dup) html += '<div class="note">Книга с този ISBN вече е в Рафта: ' + esc(dup.title) + '.</div>';
-  const fieldHtml = ([k, l]) => SUGGEST_LISTS.includes(k)
-    ? '<div class="f"><label for="f_' + k + '">' + l + '</label><input id="f_' + k + '" data-k="' + k + '" list="dl_' + k + '" value="' + esc(b[k]) + '" placeholder="—" autocomplete="off"></div>'
+  const fieldHtml = ([k, l]) => PICK_FIELDS.includes(k) || k === 'location'
+    ? pickHtml(k, l, String(b[k] || '').trim())
     : '<div class="f"><label for="f_' + k + '">' + l + '</label><textarea class="ac" rows="1" id="f_' + k + '" data-k="' + k + '"' +
-      (['year', 'pages', 'series_no', 'volume', 'chapters'].includes(k) ? ' inputmode="numeric"' : '') + ' placeholder="—" autocomplete="off">' + esc(b[k]) + '</textarea></div>' +
-      (CHIP_FIELDS.includes(k) ? chipsHtml(k, b[k]) : '');
+      (['year', 'pages', 'series_no', 'volume'].includes(k) ? ' inputmode="numeric"' : '') +
+      (k === 'original_title' ? ' lang="und" spellcheck="false"' : '') + ' placeholder="—" autocomplete="off">' + esc(b[k]) + '</textarea></div>';
   const sug = suggestFromLibrary(b, books);
   if (sug) html += '<div class="note"><b>Същото издателство в Рафта:</b> ' + esc(Object.entries(sug.vals).map(([k, v]) => FIELDS.find(f => f[0] === k)[1] + ': ' + v).join(', ')) +
     ' (по „' + esc(sug.from) + '“). <button class="btn sm" id="bSuggest">Попълни празните</button></div>';
   html += '<div class="card">' + FIELDS.slice(0, TABLE_N).map(fieldHtml).join('') + '</div>' +
-    '<h3 class="sec">Допълнително (по избор)</h3><div class="card">' + FIELDS.slice(TABLE_N).map(fieldHtml).join('') + '</div>' +
-    SUGGEST_LISTS.map(k => '<datalist id="dl_' + k + '">' + [...new Set(books.map(x => x[k]).filter(Boolean))].sort((x, y) => String(x).localeCompare(String(y), 'bg')).slice(0, 80).map(v => '<option value="' + esc(v) + '">').join('') + '</datalist>').join('');
-  if (b.price_url) html += '<p class="small">Цена според <a href="' + esc(b.price_url) + '" target="_blank" rel="noopener noreferrer">страницата на магазина</a>. Цените се променят.</p>';
+    '<h3 class="sec">Допълнително (по избор)</h3><div class="card">' + FIELDS.slice(TABLE_N).map(fieldHtml).join('') + '</div>';
   html += '<div class="card"><div class="f wide"><label for="f_description">Описание</label><textarea id="f_description" data-k="description">' + esc(b.description) + '</textarea></div></div>';
   html += '<h3 class="sec">Моите данни</h3><div class="card">' +
     '<div class="f"><label for="f_status">Статус</label><select id="f_status" data-k="status">' +
     Object.entries(STATUS).map(([k, l]) => '<option value="' + k + '"' + (b.status === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
-    '<div class="f"><label for="f_bought_at">Къде е закупена</label><input id="f_bought_at" data-k="bought_at" value="' + esc(b.bought_at) + '" placeholder="магазин, подарък…" autocomplete="off"></div>' +
     '<div class="f wide"><label for="f_notes">Бележки</label><textarea id="f_notes" data-k="notes" placeholder="лични бележки">' + esc(b.notes) + '</textarea></div></div>';
   if ((b.sources || []).length) html += '<h3 class="sec">Източници</h3><div class="srcs">' +
     b.sources.map(s => '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + esc(s.title) + '</a>').join('') + '</div>';
@@ -1316,12 +1537,55 @@ function renderCard() {
   app.querySelectorAll('textarea.ac').forEach(t => { fit(t); t.oninput = () => fit(t); });
   $('#bBack').onclick = back;
   if ($('#bEnrich')) $('#bEnrich').onclick = enrich;
-  app.querySelectorAll('[data-fill]').forEach(c => c.onclick = () => { const t = $('#f_' + c.dataset.fill); t.value = c.dataset.v; t.dispatchEvent(new Event('input')); });
+  app.querySelectorAll('.pick select').forEach(s => s.onchange = () => {
+    const n = $('#f_' + s.dataset.k + '_new'); if (!n) return;
+    n.hidden = s.value !== NEW_OPT;
+    if (!n.hidden) n.focus();
+  });
   if ($('#bSuggest')) $('#bSuggest').onclick = () => { readForm(); const sg = suggestFromLibrary(cur, books); if (sg) Object.assign(cur, sg.vals); renderCard(); toast('Попълнено. Провери и запази.'); };
-  $('#bWeb').onclick = () => { readForm(); const u = webSearchUrl(cur); if (u) openUrl(u); else toast('Първо въведи заглавие, автор или ISBN.'); };
+  $('#bWeb').onclick = () => {
+    readForm(); const u = webSearchUrl(cur);
+    if (!u) { toast('Първо въведи заглавие, автор или ISBN.'); return; }
+    openUrl(u);
+    toast('Отвори книгата в магазин, копирай данните за нея и натисни „Попълни от копиран текст“.');
+  };
+  $('#bPaste').onclick = () => {
+    const box = $('#pasteBox');
+    if (box.innerHTML) { box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="card paste"><p class="small">В страницата на книгата (Сиела, Хеликон, Orange, store.bg, издателството) маркирай заглавието и блока с данните (ISBN, издателство, страници, корици, формат) и ги копирай. После ги постави тук.</p>' +
+      '<textarea id="pasteTxt" rows="6" placeholder="Постави текста тук"></textarea>' +
+      '<div class="acts2 tight">' + (navigator.clipboard && navigator.clipboard.readText ? '<button class="btn" id="bClip">Постави от клипборда</button>' : '') +
+      '<button class="btn primary" id="bParse">Разпознай</button></div><div id="pasteOut"></div></div>';
+    const show = () => {
+      const got = parsePastedBook($('#pasteTxt').value);
+      const keys = FIELDS.map(f => f[0]).filter(k => got[k]);
+      const out = $('#pasteOut');
+      if (!keys.length) { out.innerHTML = '<div class="note warn">Не намерих данни. Копирай и редовете с „ISBN“, „Издателство“, „Страници“ и т.н.</div>'; return; }
+      readForm();
+      const label = k => FIELDS.find(f => f[0] === k)[1];
+      out.innerHTML = '<div class="note"><b>Намерени данни.</b> Отметнатите се записват; попълнените вече полета са без отметка, за да не се презапишат.</div>' +
+        keys.map(k => '<label class="chk"><input type="checkbox" data-pk="' + k + '"' + (cur[k] ? '' : ' checked') + '><span><b>' + esc(label(k)) + ':</b> ' + esc(got[k]) +
+          (cur[k] && cur[k] !== got[k] ? ' <span class="small">(сега: ' + esc(cur[k]) + ')</span>' : '') + '</span></label>').join('') +
+        '<button class="btn primary block" id="bApply">Попълни избраните</button>';
+      $('#bApply').onclick = () => {
+        readForm();
+        const done = [];
+        app.querySelectorAll('[data-pk]').forEach(c => { if (c.checked) { cur[c.dataset.pk] = got[c.dataset.pk]; done.push(label(c.dataset.pk)); } });
+        if (done.includes('ISBN')) cur.isbn_ok = !!normIsbn(cur.isbn);
+        renderCard();
+        toast(done.length ? 'Попълнено: ' + done.join(', ') + '. Провери и запази.' : 'Нищо не е избрано.');
+      };
+    };
+    $('#bParse').onclick = show;
+    if ($('#bClip')) $('#bClip').onclick = async () => {
+      try { $('#pasteTxt').value = await navigator.clipboard.readText(); show(); }
+      catch (e) { toast('Браузърът не позволи четене на клипборда. Задръж в полето и избери „Постави“.'); }
+    };
+    $('#pasteTxt').focus();
+  };
   if ($('#bAgain')) $('#bAgain').onclick = () => {
     readForm();
-    carry = { status: cur.status, bought_at: cur.bought_at, notes: cur.notes };
+    carry = { status: cur.status, notes: cur.notes, location: cur.location };
     draft.text = [cur.title, cur.author].filter(Boolean).join(' '); draft.isbn = normIsbn(cur.isbn) || '';
     startLookup();
   };
@@ -1384,7 +1648,7 @@ async function exportXlsx() {
   try {
     await loadXlsx();
     const ws = XLSX.utils.aoa_to_sheet(booksToRows(books));
-    ws['!cols'] = booksToRows([])[0].map((h, i) => ({ wch: [30, 24, 20, 15, 22, 20, 22, 10, 6, 14, 8, 8, 16, 11, 14, 8, 12, 18, 30, 40, 14, 20, 14, 14, 30][i] || 14 }));
+    ws['!cols'] = booksToRows([])[0].map((h, i) => ({ wch: [30, 30, 24, 20, 15, 22, 20, 24, 10, 14, 8, 16, 11, 14, 8, 12, 18, 34, 40, 12, 6, 20, 20, 40][i] || 14 }));
     ws['!freeze'] = { xSplit: 0, ySplit: 1 };
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Библиотека');
     const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -1413,11 +1677,106 @@ function archiveHtml() {
     '<label class="btn">Възстанови от архив<input class="vh" id="impA" type="file" accept="application/json,.json"></label></div>' +
     '<div id="restoreOut"></div><p class="small" id="storInfo"></p>';
 }
+/* Covers chosen from a folder: shrink, match by file name, show the plan, save only after confirmation. */
+async function importCovers(files, out) {
+  const imgs = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name));
+  if (!imgs.length) { out.innerHTML = '<div class="note warn">Няма изображения сред избраните файлове.</div>'; return; }
+  if (!books.length) { out.innerHTML = '<div class="note warn">Рафтът е празен. Първо внеси книгите (таблица или архив), после кориците.</div>'; return; }
+  const items = [];
+  for (let i = 0; i < imgs.length; i++) {
+    out.innerHTML = '<div class="note">Обработвам снимка ' + (i + 1) + ' от ' + imgs.length + '…</div>';
+    const f = imgs[i];
+    try {
+      const bmp = await loadBitmap(f);
+      const cv = await coverImages(bmp, 0);
+      const it = { name: f.webkitRelativePath || f.name, thumb: cv.thumb, mid: cv.mid, raw: await scaled(bmp, 1000, 0.85), turns: 0 };
+      bmp.close && bmp.close();
+      items.push(Object.assign(it, coverMatch(f.name, books)));
+    } catch (e) { items.push({ name: f.name, err: true, id: '' }); }
+  }
+  const opts = books.slice().sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''), 'bg'))
+    .map(b => [b.id, [b.title || 'Без заглавие', b.author, b.publisher].filter(Boolean).join(' · ')]);
+  const draw = () => {
+    const taken = new Map(); items.forEach(it => { if (it.id) taken.set(it.id, (taken.get(it.id) || 0) + 1); });
+    const n = items.filter(it => it.id && !it.err).length;
+    const kb = Math.round(items.filter(it => it.id && !it.err).reduce((s, it) => s + it.mid.length * 0.75 + it.thumb.length * 0.75, 0) / 1024);
+    out.innerHTML = '<div class="card">' + items.map((it, i) => {
+      const b = it.id && books.find(x => x.id === it.id);
+      const why = it.err ? 'Файлът не се отваря (формат HEIC или повреден). Запази го като JPG.'
+        : !it.id ? 'Няма съвпадение. Избери книгата ръчно.'
+        : taken.get(it.id) > 1 ? 'Две снимки сочат към една книга. Остави само едната.'
+        : !it.sure ? 'Има близки заглавия. Провери дали книгата е правилната.'
+        : b && (b.thumb || b.cover) ? 'Книгата вече има корица; ще бъде заменена.' : '';
+      return '<div class="cv">' + (it.err ? '<span></span>' : '<button type="button" class="rot" data-rot="' + i + '" title="Завърти на 90°" aria-label="Завърти корицата на 90 градуса"><img src="' + esc(it.thumb) + '" alt=""><span>↻</span></button>') + '<div><div class="fn">' + esc(it.name) + '</div>' +
+        (it.err ? '' : '<select data-ci="' + i + '"><option value="">— пропусни —</option>' + opts.map(([id, l]) => '<option value="' + esc(id) + '"' + (id === it.id ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select>') +
+        (why ? '<div class="fn" style="color:var(--warn)">' + esc(why) + '</div>' : '') + '</div></div>';
+    }).join('') + '</div>' +
+      '<div class="acts2"><button class="btn primary" id="bCovGo"' + (n ? '' : ' disabled') + '>Прикачи ' + n + (n === 1 ? ' корица' : ' корици') + ' (~' + kb + ' KB)</button><button class="btn" id="bCovNo">Отказ</button></div>';
+    out.querySelectorAll('[data-ci]').forEach(s => s.onchange = () => { const it = items[+s.dataset.ci]; it.id = s.value; it.sure = true; draw(); });
+    out.querySelectorAll('[data-rot]').forEach(btn => btn.onclick = async () => {
+      const it = items[+btn.dataset.rot];
+      try {
+        const img = new Image(); img.src = it.raw; await img.decode();
+        it.turns = (it.turns + 1) % 4;
+        const cv = await coverImages(img, it.turns); it.thumb = cv.thumb; it.mid = cv.mid; draw();
+      } catch (e) { toast('Снимката не може да се завърти.'); }
+    });
+    out.querySelector('#bCovNo').onclick = () => { out.innerHTML = ''; };
+    out.querySelector('#bCovGo').onclick = async () => {
+      const seen = new Set(); let done = 0;
+      try {
+        for (const it of items) {
+          if (!it.id || it.err || seen.has(it.id)) continue;
+          seen.add(it.id);
+          const old = (await dbAll()).find(x => x.id === it.id); if (!old) continue;
+          await dbPut(Object.assign({}, old, { thumb: it.thumb, cover: it.mid, updatedAt: Date.now() })); done++;
+        }
+        books = await dbAll();
+        out.innerHTML = '<div class="note ok">Готово: ' + done + (done === 1 ? ' корица е прикачена' : ' корици са прикачени') + '. Направи архив, за да са запазени и извън телефона.</div>';
+      } catch (e) {
+        books = await dbAll().catch(() => books);
+        out.innerHTML = '<div class="note bad">Записът спря след ' + done + ' корици. Провери дали има свободно място и опитай пак с останалите.</div>';
+      }
+    };
+  };
+  draw();
+}
+/* Fills empty original titles from Open Library, one book at a time; stoppable. */
+let origCtl = null;
+async function fillOriginals(btn, out) {
+  if (origCtl) { origCtl.abort(); return; }
+  const todo = books.filter(b => normIsbn(b.isbn) && !String(b.original_title || '').trim());
+  if (!todo.length) { out.innerHTML = '<div class="note">Няма книги с ISBN и празно оригинално заглавие.</div>'; return; }
+  origCtl = new AbortController(); btn.textContent = 'Спри';
+  let found = 0, i = 0;
+  try {
+    for (const b of todo) {
+      i++; out.innerHTML = '<div class="note">Проверявам ' + i + ' от ' + todo.length + ': ' + esc(b.title) + ' (намерени: ' + found + ')</div>';
+      const t = await olOriginal(normIsbn(b.isbn), b.title, origCtl.signal);
+      if (!t) continue;
+      const old = (await dbAll()).find(x => x.id === b.id);
+      if (old && !String(old.original_title || '').trim()) { await dbPut(Object.assign({}, old, { original_title: t, updatedAt: Date.now() })); found++; }
+    }
+    out.innerHTML = '<div class="note ok">Готово: попълнени ' + found + ' от ' + todo.length + '. За останалите в Open Library няма оригинално заглавие.</div>';
+  } catch (e) {
+    out.innerHTML = e && e.name === 'AbortError' ? '<div class="note">Спряно. Попълнени: ' + found + '.</div>' : '<div class="note bad">Прекъсна: няма връзка или записът не успя. Попълнени: ' + found + '.</div>';
+  } finally {
+    origCtl = null; btn.textContent = 'Попълни липсващите';
+    books = await dbAll().catch(() => books);
+  }
+}
 function renderSettings() {
   const s = getSettings();
   app.innerHTML = '<div class="top"><button class="back" id="bBack">‹ Назад</button><h1>Настройки</h1></div>' +
     statsHtml() +
     '<h3 class="sec">Архив и възстановяване</h3>' + archiveHtml() +
+    '<h3 class="sec">Корици от папка</h3>' +
+    '<p class="small">Избери снимките на кориците или цялата папка (например „Cover“). Всяка снимка се свързва с книгата по името на файла: заглавие на кирилица или латиница, или ISBN. Преди запис виждаш всяко съвпадение и можеш да го смениш. Всички корици стават с еднаква форма и размер (480 x 720 px, около 40 до 90 KB). Ако снимка е настрани, натисни ↻ върху нея в прегледа.</p>' +
+    '<div class="acts2"><label class="btn">Избери снимки<input class="vh" id="impC" type="file" accept="image/*" multiple></label>' +
+    '<label class="btn">Избери папка<input class="vh" id="impCD" type="file" webkitdirectory multiple></label></div><div id="covOut"></div>' +
+    '<h3 class="sec">Оригинални заглавия</h3>' +
+    '<p class="small">Попълва празното „Оригинално заглавие“ на книгите с ISBN от Open Library: безплатно, около 2 секунди на книга. За български издания там често няма запис; тогава заглавието се попълва ръчно или с Claude от картата на книгата. Нищо попълнено не се презаписва.</p>' +
+    '<button class="btn block" id="bOrig">Попълни липсващите</button><div id="origOut"></div>' +
     '<h3 class="sec">Безплатно разпознаване</h3>' +
     '<label class="chk" for="ocr"><input id="ocr" type="checkbox"' + (s.ocr ? ' checked' : '') + '><span>Разпознавай текст от снимките на телефона (OCR). Безплатно, около 5 до 20 секунди на снимка. Снимките не напускат телефона.</span></label>' +
     '<label class="field" for="gkey">Google Books API ключ (по избор)<input id="gkey" type="password" value="' + esc(s.googleKey) + '" autocomplete="off" spellcheck="false"></label>' +
@@ -1433,7 +1792,8 @@ function renderSettings() {
     '<div class="acts2"><button class="btn primary" id="bSave">Запази</button><button class="btn" id="bTest">Тествай ключа</button></div><div id="testOut"></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
     '<div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
-    '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>';
+    '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
+    '<p class="small">Версия на приложението: ' + APP_VERSION + '</p>';
   const $ = x => app.querySelector(x);
   const read = () => {
     const max = Math.min(10, Math.max(1, parseInt($('#max').value, 10) || 6));
@@ -1469,13 +1829,19 @@ function renderSettings() {
   };
   $('#bCsv').onclick = exportCsv;
   $('#bXlsx').onclick = exportXlsx;
+  const onCovers = e => { const fs = [...e.target.files]; e.target.value = ''; if (fs.length) importCovers(fs, $('#covOut')); };
+  $('#impC').onchange = onCovers; $('#impCD').onchange = onCovers;
+  $('#bOrig').onclick = () => fillOriginals($('#bOrig'), $('#origOut'));
   $('#impT').onchange = async e => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     const out = $('#impOut'); out.innerHTML = '<p class="small">Чета таблицата…</p>';
     try {
       await loadXlsx();
       const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+      /* The book list may not be the first sheet (legend, change log...): take the first sheet with a "Заглавие" column. */
+      const sheetRows = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: '' });
+      const pickName = wb.SheetNames.find(n => (sheetRows(n)[0] || []).some(h => String(h).trim().toLowerCase() === 'заглавие')) || wb.SheetNames[0];
+      const rows = sheetRows(pickName);
       const pr = rowsToBooks(rows);
       if (pr.error) { out.innerHTML = '<div class="note bad">' + esc(pr.error) + '</div>'; return; }
       const plan = planImport(await dbAll(), pr.books), tw = tableWarnings(pr.books);
