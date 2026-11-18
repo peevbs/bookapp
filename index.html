@@ -67,14 +67,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .list.grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
 .list.grid3{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px}
 .grp{grid-column:1/-1;font:600 15px var(--serif);color:var(--muted);margin:10px 0 0;padding-bottom:4px;border-bottom:1px solid var(--line)}
-.card{display:grid;gap:6px;align-content:start;text-align:left;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0}
-.card .cover{width:100%;height:auto;aspect-ratio:2/3;border-radius:3px 8px 8px 3px}
-.card .spine{font-size:40px}
-.card .ct{font:600 15px/1.25 var(--serif);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.card .ca{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
-.grid3 .card{padding:6px;gap:4px}
-.grid3 .card .ct{font-size:12.5px;-webkit-line-clamp:2}
-.grid3 .card .spine{font-size:30px}
+.bk{display:grid;gap:6px;align-content:start;text-align:left;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0}
+.bk .cover{width:100%;height:auto;aspect-ratio:2/3;border-radius:3px 8px 8px 3px}
+.bk .spine{font-size:40px}
+.bk .ct{font:600 15px/1.25 var(--serif);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bk .ca{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.grid3 .bk{padding:6px;gap:4px}
+.grid3 .bk .ct{font-size:12.5px;-webkit-line-clamp:2}
+.grid3 .bk .spine{font-size:30px}
 .row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;text-align:left;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
 .cover{width:56px;height:84px;border-radius:3px 6px 6px 3px;overflow:hidden;display:block;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .cover img{width:100%;height:100%;object-fit:cover;display:block}
@@ -126,6 +126,7 @@ label.field input{min-height:44px;padding:10px 14px;border-radius:10px;border:1p
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.spin{animation:none;border-top-color:var(--line)}}
 
+.covcol{display:grid;gap:6px;justify-items:center}
 .head{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;align-items:end;margin:6px 0 14px}
 .head .cover{width:96px;height:144px}
 .head .spine{font-size:40px}
@@ -841,9 +842,9 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v19)';
+const APP_VERSION = '2026-11-18 (кеш raft-v20)';
 const API = 'https://api.anthropic.com/v1/messages';
-const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '' };
+const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
   try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('raft.settings') || '{}')); } catch (e) { return Object.assign({}, DEFAULTS); }
 }
@@ -933,7 +934,7 @@ function renderLibrary() {
       '<span class="meta"><span class="t">' + esc(b.title || 'Без заглавие') + '</span>' + (b.original_title ? '<span class="o">' + esc(b.original_title) + '</span>' : '') + '<span class="a">' + esc(b.author) + '</span>' +
       '<span class="p">' + esc([b.publisher, b.year].filter(Boolean).join(' · ')) + '</span></span>' +
       (b.status ? '<span class="pill s-' + esc(b.status) + '">' + esc(STATUS[b.status] || '') + '</span>' : '<span></span>') + '</button>';
-    const cardHtml = b => '<button class="card" data-id="' + esc(b.id) + '">' + coverHtml(b) + '<span class="ct">' + esc(b.title || 'Без заглавие') + '</span>' +
+    const cardHtml = b => '<button class="bk" data-id="' + esc(b.id) + '">' + coverHtml(b) + '<span class="ct">' + esc(b.title || 'Без заглавие') + '</span>' +
       (view === 'grid2' && b.author ? '<span class="ca">' + esc(b.author) + '</span>' : '') + '</button>';
     let body = '', lastG = null;
     for (const b of list) {
@@ -970,7 +971,7 @@ function refreshList() {
   if (keep) { const q = app.querySelector('#q'); q.focus(); q.setSelectionRange(pos, pos); }
 }
 function wireRows() {
-  app.querySelectorAll('.row, .card').forEach(r => r.onclick = () => {
+  app.querySelectorAll('.row, .bk').forEach(r => r.onclick = () => {
     const b = books.find(x => x.id === r.dataset.id);
     if (b) { cur = JSON.parse(JSON.stringify(b)); push('card'); }
   });
@@ -1515,12 +1516,60 @@ function pickHtml(k, l, val) {
     (k === 'location' ? '' : '<input id="f_' + k + '_new" class="newv" hidden placeholder="Нова стойност" autocomplete="off" aria-label="' + esc(l) + ': нова стойност">') +
     '</div></div>';
 }
+/* ---- optional: copy new cover photos to GitHub (needs a personal token kept only on this phone) ---- */
+const GHQ = 'raft.ghq';
+const ghQueue = () => { try { return JSON.parse(localStorage.getItem(GHQ) || '[]') || []; } catch (e) { return []; } };
+const ghSetQueue = q => { try { localStorage.setItem(GHQ, JSON.stringify(q)); } catch (e) { /* optional */ } };
+const ghEnqueue = id => { const q = ghQueue(); if (!q.includes(id)) { q.push(id); ghSetQueue(q); } };
+const b64utf8 = str => { const u = new TextEncoder().encode(str); let bin = ''; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); };
+async function ghPutCover(b, s) {
+  const path = 'covers/new/' + b.id + '.json', url = 'https://api.github.com/repos/' + s.ghRepo + '/contents/' + path;
+  const H = { Authorization: 'Bearer ' + s.ghToken, Accept: 'application/vnd.github+json' };
+  let sha;
+  const g = await fetch(url + '?ref=main', { headers: H, cache: 'no-store' });
+  if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) return { ok: false, status: g.status };
+  const body = { message: 'Cover: ' + (b.title || b.id), branch: 'main', content: b64utf8(JSON.stringify({ id: b.id, isbn: b.isbn || '', title: b.title || '', author: b.author || '', thumb: b.thumb || '', cover: b.cover || '', at: new Date().toISOString() })) };
+  if (sha) body.sha = sha;
+  const r = await fetch(url, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify(body) });
+  return { ok: r.ok, status: r.status };
+}
+let ghBusy = false;
+async function ghFlush(quiet) {
+  const s = getSettings(); let q = ghQueue();
+  if (ghBusy || !q.length || !s.ghToken || !s.ghRepo || navigator.onLine === false) return;
+  ghBusy = true; let done = 0, stop = '';
+  try {
+    for (const id of q.slice()) {
+      const b = books.find(x => x.id === id);
+      if (!b || !b.thumb) { ghSetQueue(ghQueue().filter(x => x !== id)); continue; }
+      let r; try { r = await ghPutCover(b, s); } catch (e) { stop = 'Няма връзка. Ще опитам пак, когато си онлайн.'; break; }
+      if (r.ok) { ghSetQueue(ghQueue().filter(x => x !== id)); done++; }
+      else { stop = r.status === 401 || r.status === 403 || r.status === 404 ? 'GitHub отказа достъп (провери токена и хранилището в Настройки).' : 'GitHub върна грешка ' + r.status + '.'; break; }
+    }
+  } finally { ghBusy = false; }
+  if (!quiet) { if (done) toast('Корици, качени в GitHub: ' + done + '.'); else if (stop) toast(stop); }
+}
+window.addEventListener('online', () => ghFlush(true));
+async function saveCoverPhoto(file) {
+  try {
+    const bmp = await loadBitmap(file), cv = await coverImages(bmp, 0);
+    cur.thumb = cv.thumb; cur.cover = cv.mid;
+    const z = app.querySelector('#bZoom'); if (z) z.innerHTML = coverHtml(cur);
+    if (!cur._new) {
+      const stored = books.find(x => x.id === cur.id) || cur;
+      await dbPut(Object.assign({}, stored, { thumb: cv.thumb, cover: cv.mid, updatedAt: Date.now() }));
+      books = await dbAll(); ghEnqueue(cur.id); toast(getSettings().ghToken ? 'Корицата е запазена. Качвам в GitHub…' : 'Корицата е запазена на телефона.');
+      ghFlush(false);
+    } else toast('Корицата е добавена. Запази книгата.');
+  } catch (e) { toast('Снимката не се обработи. Опитай пак.'); }
+}
 function renderCard() {
   const b = cur, isNew = !!b._new;
   const dup = b.isbn && books.find(x => x.id !== b.id && x.isbn === b.isbn);
   const confLabel = { high: 'Потвърдено издание', medium: 'Издание за проверка', low: 'Неуверен резултат, провери данните' };
   let html = '<div class="top"><button class="back" id="bBack">‹ ' + (isNew ? 'Отказ' : 'Рафт') + '</button></div>' +
-    '<div class="head">' + '<span id="bZoom" class="zoomable">' + coverHtml(b) + '</span><div><h2>' + esc(b.title || 'Без заглавие') + '</h2>' +
+    '<div class="head"><div class="covcol"><span id="bZoom" class="zoomable">' + coverHtml(b) + '</span>' +
+    '<button class="btn sm" id="bCamCover" aria-label="Снимай или смени корицата">✎ Корица</button><input class="vh" id="covFile" type="file" accept="image/*"></div><div><h2>' + esc(b.title || 'Без заглавие') + '</h2>' +
     (b.original_title ? '<div class="o">' + esc(b.original_title) + '</div>' : '') + '<div class="small">' + esc(b.author) + '</div>' +
     (b.origin === 'catalog' ? '<span class="badge b-medium">От безплатни каталози</span>' :
       b.confidence ? '<span class="badge b-' + esc(b.confidence) + '">' + esc(confLabel[b.confidence]) + '</span>' : '') + '</div></div>';
@@ -1620,6 +1669,8 @@ function renderCard() {
     draft.text = [cur.title, cur.author].filter(Boolean).join(' '); draft.isbn = normIsbn(cur.isbn) || '';
     startLookup();
   };
+  $('#bCamCover').onclick = () => $('#covFile').click();
+  $('#covFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) saveCoverPhoto(f); };
   $('#bZoom').onclick = () => {
     const src = cur.cover || cur.thumb; if (!src) return;
     const z = document.createElement('div'); z.className = 'zoom'; z.innerHTML = '<img alt="">'; z.firstChild.src = src;
@@ -1821,6 +1872,10 @@ function renderSettings() {
     '<label class="field" for="model">Модел<input id="model" value="' + esc(s.model) + '" autocomplete="off" spellcheck="false"></label>' +
     '<label class="field" for="max">Най-много търсения в интернет на книга (1 до 10)<input id="max" type="number" min="1" max="10" value="' + esc(s.maxSearches) + '"></label>' +
     '<div class="acts2"><button class="btn primary" id="bSave">Запази</button><button class="btn" id="bTest">Тествай ключа</button></div><div id="testOut"></div>' +
+    '<h3 class="sec">Корици в GitHub (по избор)</h3><p class="small">Нови корици, които снимаш, се качват в хранилището, когато си онлайн, и не се губят. Нужен е личен токен на GitHub само за хранилището на Рафт с право „Contents: Read and write“. Токенът се пази само в този браузър. Без токен кориците остават на телефона и влизат в пълния архив.</p>' +
+    '<label class="field" for="ghrepo">Хранилище<input id="ghrepo" value="' + esc(s.ghRepo) + '" autocomplete="off" spellcheck="false"></label>' +
+    '<label class="field" for="ghtok">Токен на GitHub<input id="ghtok" type="password" value="' + esc(s.ghToken) + '" autocomplete="off" spellcheck="false"></label>' +
+    '<div class="acts2"><button class="btn" id="bGhTest">Тествай и качи чакащите</button></div><div id="ghOut"><p class="small">Чакащи за качване: ' + ghQueue().length + '</p></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
     '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
     '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
@@ -1828,7 +1883,7 @@ function renderSettings() {
   const $ = x => app.querySelector(x);
   const read = () => {
     const max = Math.min(10, Math.max(1, parseInt($('#max').value, 10) || 6));
-    return { key: $('#key').value.trim(), model: $('#model').value.trim() || DEFAULTS.model, maxSearches: max, ocr: $('#ocr').checked, googleKey: $('#gkey').value.trim() };
+    return { key: $('#key').value.trim(), model: $('#model').value.trim() || DEFAULTS.model, maxSearches: max, ocr: $('#ocr').checked, googleKey: $('#gkey').value.trim(), ghToken: $('#ghtok').value.trim(), ghRepo: $('#ghrepo').value.trim() || DEFAULTS.ghRepo };
   };
   $('#bBack').onclick = back;
   $('#bSave').onclick = () => toast(saveSettings(read()) ? 'Запазено.' : 'Браузърът не позволява запис.');
@@ -1914,12 +1969,32 @@ function renderSettings() {
     } catch (err) { $('#impOut').innerHTML = '<div class="note bad">Не успях да взема таблицата от сайта. Провери връзката и опитай пак.</div>'; }
     btn.disabled = false;
   };
+  $('#bGhTest').onclick = async () => {
+    const out = $('#ghOut'), v = read(); saveSettings(v);
+    if (!v.ghToken) { out.innerHTML = '<div class="note bad">Въведи токен.</div>'; return; }
+    out.innerHTML = '<div class="note">Проверявам…</div>';
+    try {
+      const r = await fetch('https://api.github.com/repos/' + v.ghRepo, { headers: { Authorization: 'Bearer ' + v.ghToken, Accept: 'application/vnd.github+json' }, cache: 'no-store' });
+      if (!r.ok) { out.innerHTML = '<div class="note bad">GitHub отказа (' + r.status + '). Провери токена и името на хранилището.</div>'; return; }
+      const j = await r.json(), can = j.permissions && j.permissions.push;
+      if (!can) { out.innerHTML = '<div class="note bad">Токенът вижда хранилището, но няма право за запис (Contents: Read and write).</div>'; return; }
+      await ghFlush(true);
+      out.innerHTML = '<div class="note ok">Връзката работи. Чакащи за качване: ' + ghQueue().length + '.</div>';
+    } catch (e) { out.innerHTML = '<div class="note bad">Няма връзка с GitHub.</div>'; }
+  };
   $('#bGhCov').onclick = async () => {
     const btn = $('#bGhCov'), out = $('#covGh'); btn.disabled = true; out.innerHTML = '<p class="small">Свалям корици…</p>';
     try {
       const r = await fetch('covers.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) throw new Error('http ' + r.status);
       const list = await r.json();
+      try {   /* covers photographed later and pushed by the phone */
+        const lr = await fetch('https://api.github.com/repos/' + getSettings().ghRepo + '/contents/covers/new?ref=main', { cache: 'no-store' });
+        if (lr.ok) for (const f of await lr.json()) {
+          if (!/\.json$/.test(f.name)) continue;
+          try { const x = await (await fetch('covers/new/' + f.name + '?t=' + Date.now(), { cache: 'no-store' })).json(); if (x && x.thumb) list.unshift(x); } catch (e) { /* skip one */ }
+        }
+      } catch (e) { /* optional */ }
       const cur = await dbAll(); let set = 0, had = 0, miss = 0;
       for (const b of cur) {
         if (b.thumb) { had++; continue; }
@@ -1982,6 +2057,7 @@ function renderSettings() {
   } catch (e) { /* not critical */ }
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* best effort */ }
   renderLibrary();
+  ghFlush(true);
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
