@@ -841,7 +841,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v17)';
+const APP_VERSION = '2026-11-18 (кеш raft-v19)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '' };
 function getSettings() {
@@ -1498,9 +1498,10 @@ function readForm() {
   });
 }
 /* A drop-down that opens on tap: the values already used (or the two shelves), "empty", and "add new". */
+const BINDINGS = ['Твърди корици', 'Твърди корици с порезка', 'Мека корица', 'Мека корица с порезка'];
 function pickOptions(k, val) {
   const base = k === 'location' ? LOCATIONS.slice()
-    : [...new Set(books.map(x => String(x[k] || '').trim()).filter(Boolean))].sort((x, y) => x.localeCompare(y, 'bg', { numeric: true }));
+    : [...new Set([...(k === 'binding' ? BINDINGS : []), ...books.map(x => String(x[k] || '').trim())].filter(Boolean))].sort((x, y) => x.localeCompare(y, 'bg', { numeric: true }));
   if (val && !base.includes(val)) base.push(val);
   return base;
 }
@@ -1870,7 +1871,7 @@ function renderSettings() {
       /* Books may be on several sheets (Библиотека, Детски, Вероятни дубликати...): read every sheet that has a "Заглавие" column.
          A row already read from an earlier sheet (same title and author) is not counted twice. */
       const sheetRows = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: '' });
-      const names = wb.SheetNames.filter(n => (sheetRows(n)[0] || []).some(h => String(h).trim().toLowerCase() === 'заглавие'));
+      const names = wb.SheetNames.filter(n => !/дубликат/i.test(n) && (sheetRows(n)[0] || []).some(h => String(h).trim().toLowerCase() === 'заглавие'));   // the duplicates sheet is a review list, not books to add
       const pr = { books: [], skipped: 0, unknown: [], error: '' }, seenKeys = new Set(); let sheetInfo = [];
       for (const n of (names.length ? names : [wb.SheetNames[0]])) {
         const one = rowsToBooks(sheetRows(n));
