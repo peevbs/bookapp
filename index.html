@@ -823,7 +823,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-10-25b (кеш raft-v13)';
+const APP_VERSION = '2026-11-18 (кеш raft-v14)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '' };
 function getSettings() {
@@ -1791,7 +1791,7 @@ function renderSettings() {
     '<label class="field" for="max">Най-много търсения в интернет на книга (1 до 10)<input id="max" type="number" min="1" max="10" value="' + esc(s.maxSearches) + '"></label>' +
     '<div class="acts2"><button class="btn primary" id="bSave">Запази</button><button class="btn" id="bTest">Тествай ключа</button></div><div id="testOut"></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
-    '<div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
+    '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
     '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
     '<p class="small">Версия на приложението: ' + APP_VERSION + '</p>';
   const $ = x => app.querySelector(x);
@@ -1832,12 +1832,11 @@ function renderSettings() {
   const onCovers = e => { const fs = [...e.target.files]; e.target.value = ''; if (fs.length) importCovers(fs, $('#covOut')); };
   $('#impC').onchange = onCovers; $('#impCD').onchange = onCovers;
   $('#bOrig').onclick = () => fillOriginals($('#bOrig'), $('#origOut'));
-  $('#impT').onchange = async e => {
-    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const runImport = async (fname, getBuf) => {
     const out = $('#impOut'); out.innerHTML = '<p class="small">Чета таблицата…</p>';
     try {
       await loadXlsx();
-      const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+      const wb = XLSX.read(await getBuf(), { type: 'array' });
       /* The book list may not be the first sheet (legend, change log...): take the first sheet with a "Заглавие" column. */
       const sheetRows = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: '' });
       const pickName = wb.SheetNames.find(n => (sheetRows(n)[0] || []).some(h => String(h).trim().toLowerCase() === 'заглавие')) || wb.SheetNames[0];
@@ -1845,7 +1844,7 @@ function renderSettings() {
       const pr = rowsToBooks(rows);
       if (pr.error) { out.innerHTML = '<div class="note bad">' + esc(pr.error) + '</div>'; return; }
       const plan = planImport(await dbAll(), pr.books), tw = tableWarnings(pr.books);
-      out.innerHTML = '<div class="note"><b>' + esc(f.name) + ':</b> ' + pr.books.length + ' книги.<ul class="diagl">' +
+      out.innerHTML = '<div class="note"><b>' + esc(fname) + ':</b> ' + pr.books.length + ' книги.<ul class="diagl">' +
         '<li>Нови: ' + plan.add.length + '</li><li>Вече в Рафта, ще се попълнят празни полета: ' + plan.fill.length + '</li><li>Вече в Рафта, без промяна: ' + plan.same + '</li>' +
         (tw.dup.length ? '<li>Повтарящи се книги в таблицата (същото заглавие и автор): ' + tw.dup.length + '. Ще се внесат и двете; прегледай ги после.</li>' : '') +
         (tw.clash.length ? '<li>Един ISBN на различни заглавия: ' + esc(tw.clash.join('; ')) + '. Вероятно е грешка в таблицата; внасят се като отделни книги.</li>' : '') +
@@ -1863,6 +1862,18 @@ function renderSettings() {
         } catch (err) { out.innerHTML = '<div class="note bad">Импортът не завърши. Провери дали има свободно място и опитай пак.</div>'; }
       };
     } catch (err) { out.innerHTML = '<div class="note bad">Таблицата не може да се прочете.</div>'; }
+  };
+  $('#impT').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) runImport(f.name, () => f.arrayBuffer()); };
+  $('#bGh').onclick = async () => {
+    const btn = $('#bGh'); btn.disabled = true;
+    try {
+      await runImport('таблицата от GitHub', async () => {
+        const r = await fetch('biblioteka.xlsx?t=' + Date.now(), { cache: 'no-store' });
+        if (!r.ok) throw new Error('http ' + r.status);
+        return r.arrayBuffer();
+      });
+    } catch (err) { $('#impOut').innerHTML = '<div class="note bad">Не успях да взема таблицата от сайта. Провери връзката и опитай пак.</div>'; }
+    btn.disabled = false;
   };
   $('#bArchive').onclick = async () => {
     try {
