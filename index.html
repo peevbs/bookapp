@@ -874,7 +874,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v28)';
+const APP_VERSION = '2026-11-18 (кеш raft-v29)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -943,6 +943,7 @@ function show(v) {
   return renderLibrary();
 }
 
+const statusLine = b => { const l = STATUS[b.status || 'to_read'] || ''; const d = b.status === 'read' && /^\d{4}-\d{2}-\d{2}$/.test(b.readDate || '') ? ' · ' + b.readDate.slice(8, 10) + '.' + b.readDate.slice(5, 7) + '.' + b.readDate.slice(0, 4) : ''; return l + d; };
 /* ---------- reading log: Goodreads history + books marked read here ---------- */
 const todayIso = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 let grLog = [];
@@ -1721,7 +1722,7 @@ function renderCard() {
   let html = '<div class="top"><button class="back" id="bBack">‹ ' + (isNew ? 'Отказ' : 'Рафт') + '</button></div>' +
     '<div class="head"><div class="covcol"><span id="bZoom" class="zoomable">' + coverHtml(b) + '</span>' +
     '<button class="btn sm" id="bCamCover" aria-label="Снимай или смени корицата">✎ Корица</button><input class="vh" id="covFile" type="file" accept="image/*"></div><div><h2>' + esc(b.title || 'Без заглавие') + '</h2>' +
-    (b.original_title ? '<div class="o">' + esc(b.original_title) + '</div>' : '') + '<div class="small">' + esc(b.author) + '</div>' +
+    (b.original_title ? '<div class="o">' + esc(b.original_title) + '</div>' : '') + '<div class="small">' + esc(b.author) + '</div>' + (isNew ? '' : '<div><span class="pill s-' + esc(b.status || 'to_read') + '" id="hdSt">' + esc(statusLine(b)) + '</span></div>') +
     (b.origin === 'catalog' ? '<span class="badge b-medium">От безплатни каталози</span>' :
       b.confidence ? '<span class="badge b-' + esc(b.confidence) + '">' + esc(confLabel[b.confidence]) + '</span>' : '') + '</div></div>';
   if (b._check) html += '<div class="note warn">' + esc(b._check) + '</div>';
@@ -1823,6 +1824,8 @@ function renderCard() {
   };
   $('#bCamCover').onclick = () => $('#covFile').click();
   $('#covFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) saveCoverPhoto(f); };
+  { const upd = () => { const h = $('#hdSt'), st = $('#f_status'), rd = $('#f_readDate'); if (!h || !st) return; const t = { status: st.value, readDate: rd ? rd.value : '' }; h.className = 'pill s-' + t.status; h.textContent = statusLine(t); };
+    ['#f_status', '#f_readDate'].forEach(q => { const e = $(q); if (e) e.addEventListener('change', upd); }); }
   $('#bZoom').onclick = () => {
     const src = cur.cover || cur.thumb; if (!src) return;
     const z = document.createElement('div'); z.className = 'zoom'; z.innerHTML = '<img alt="">'; z.firstChild.src = src;

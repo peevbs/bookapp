@@ -3,7 +3,7 @@
 // they must work without internet. They are fetched in the background after install, so OCR and the
 // barcode reader work offline even before they were used once.
 // API calls go to other origins and are never touched here.
-const V = 'raft-v28';
+const V = 'raft-v29';
 const VENDOR = 'raft-vendor-v1';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 const VENDOR_FILES = [
