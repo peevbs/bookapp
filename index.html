@@ -56,6 +56,18 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 .tools{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:4px 0 14px}
 .search{width:100%;min-width:0;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.srow{display:flex;gap:8px;align-items:stretch}
+.srow .search{flex:1}
+.fbtn{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:15px;white-space:nowrap}
+.fbtn[aria-expanded="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fbadge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center}
+.fpanel{display:grid;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.fpanel[hidden]{display:none}
+.fpanel{min-width:0;grid-template-columns:minmax(0,1fr)}
+.fpanel>*{min-width:0}
+.fpanel .chips{flex-wrap:wrap;overflow:visible}
+.fpanel .sortrow select{min-width:0;width:100%}
+.flab{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:-4px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
 .chip{flex:none;min-height:36px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:14px}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -844,7 +856,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v22)';
+const APP_VERSION = '2026-11-18 (кеш raft-v23)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -880,6 +892,7 @@ const dbDel = id => tx('readwrite', s => s.delete(id)).then(r => { ghMarkBooks()
 let books = [];
 let filter = { q: '', status: '', sort: 'new' };
 let view = 'list';
+let filtersOpen = false;
 try { const u = JSON.parse(localStorage.getItem('raft.ui') || '{}'); if (['list', 'grid2', 'grid3'].includes(u.view)) view = u.view; if (['new', 'title', 'author', 'loc', 'year'].includes(u.sort)) filter.sort = u.sort; } catch (e) { /* optional */ }
 const saveUi = () => { try { localStorage.setItem('raft.ui', JSON.stringify({ view, sort: filter.sort })); } catch (e) { /* optional */ } };
 let cur = null;                 // book being viewed or reviewed
@@ -926,11 +939,15 @@ function renderLibrary() {
     const bm = getBackupMeta(), age = bm ? daysSince(bm.t) : null;
     if (!bm || age == null || age >= 30) html += '<div class="note warn">' + (bm && age != null ? 'Последният архив е отпреди ' + age + ' дни.' : 'Още нямаш архив.') +
       ' Книгите са само на това устройство. <button class="btn sm" id="bBackupNow">Направи архив</button></div>';
-    html += '<div class="tools"><input class="search" id="q" type="search" placeholder="Търси по заглавие, автор, издателство, ISBN" value="' + esc(filter.q) + '">' +
-      '<div class="chips" id="vw">' + [['list', '☰ Списък'], ['grid2', '▦ По 2 в ред'], ['grid3', '▩ По 3 в ред']].map(([k, l]) => '<button class="chip" data-v="' + k + '" aria-pressed="' + (view === k) + '">' + l + '</button>').join('') + '</div>' +
-      '<div class="chips" id="so">' + [['new', 'Последно добавени'], ['title', 'Заглавие А–Я'], ['author', 'Автор'], ['loc', 'Рафт'], ['year', 'Година']].map(([k, l]) => '<button class="chip" data-s="' + k + '" aria-pressed="' + (filter.sort === k) + '">' + l + '</button>').join('') + '</div>' +
-      '<div class="chips" id="sts">' + [['', 'Всички'], ['to_read', 'За четене'], ['reading', 'Чета'], ['read', 'Прочетени']].map(([k, l]) => '<button class="chip" data-st="' + k + '" aria-pressed="' + (filter.status === k) + '">' + l + '</button>').join('') + '</div>' +
-      (locs.length > 1 ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') + '</div>';
+    const nAct = (filter.status ? 1 : 0) + (filter.loc ? 1 : 0) + (filter.sort !== 'new' ? 1 : 0);
+    html += '<div class="tools"><div class="srow"><input class="search" id="q" type="search" placeholder="Търси по заглавие, автор, издателство, ISBN" value="' + esc(filter.q) + '">' +
+      '<button class="fbtn" id="bFilt" aria-expanded="' + filtersOpen + '" aria-controls="fpanel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Филтри' + (nAct ? '<span class="fbadge">' + nAct + '</span>' : '') + '</button></div>' +
+      '<div class="fpanel" id="fpanel"' + (filtersOpen ? '' : ' hidden') + '>' +
+      '<div class="flab">Изглед</div><div class="chips" id="vw">' + [['list', '☰ Списък'], ['grid2', '▦ По 2 в ред'], ['grid3', '▩ По 3 в ред']].map(([k, l]) => '<button class="chip" data-v="' + k + '" aria-pressed="' + (view === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="flab">Подреди по</div><div class="chips" id="so">' + [['new', 'Последно добавени'], ['title', 'Заглавие А–Я'], ['author', 'Автор'], ['loc', 'Рафт'], ['year', 'Година']].map(([k, l]) => '<button class="chip" data-s="' + k + '" aria-pressed="' + (filter.sort === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="flab">Статус</div><div class="chips" id="sts">' + [['', 'Всички'], ['to_read', 'За четене'], ['reading', 'Чета'], ['read', 'Прочетени']].map(([k, l]) => '<button class="chip" data-st="' + k + '" aria-pressed="' + (filter.status === k) + '">' + l + '</button>').join('') + '</div>' +
+      (locs.length > 1 ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') +
+      (nAct ? '<button class="btn sm" id="bClrF">Изчисти филтрите</button>' : '') + '</div></div>';
     const groupOf = b => filter.sort === 'title' ? ((b.title || '?').trim().charAt(0).toUpperCase() || '?') : filter.sort === 'author' ? (b.author || 'Без автор') : filter.sort === 'loc' ? (b.location || 'Без рафт') : '';
     const rowHtml = b => '<button class="row" data-id="' + esc(b.id) + '">' + coverHtml(b) +
       '<span class="meta"><span class="t">' + esc(b.title || 'Без заглавие') + '</span>' + (b.original_title ? '<span class="o">' + esc(b.original_title) + '</span>' : '') + '<span class="a">' + esc(b.author) + '</span>' +
@@ -958,6 +975,8 @@ function renderLibrary() {
   if ($('#bBackupNow')) $('#bBackupNow').onclick = () => push('settings');
   if ($('#q')) {
     $('#q').oninput = e => { filter.q = e.target.value; refreshList(); };
+    $('#bFilt').onclick = () => { filtersOpen = !filtersOpen; $('#fpanel').hidden = !filtersOpen; $('#bFilt').setAttribute('aria-expanded', String(filtersOpen)); };
+    if ($('#bClrF')) $('#bClrF').onclick = () => { filter.status = ''; filter.loc = ''; filter.sort = 'new'; saveUi(); refreshList(); };
     app.querySelectorAll('#vw .chip').forEach(c => c.onclick = () => { view = c.dataset.v; saveUi(); refreshList(); });
     app.querySelectorAll('#so .chip').forEach(c => c.onclick = () => { filter.sort = c.dataset.s; saveUi(); refreshList(); });
     app.querySelectorAll('#sts .chip').forEach(c => c.onclick = () => { filter.status = c.dataset.st; refreshList(); });
