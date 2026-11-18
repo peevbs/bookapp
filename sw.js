@@ -3,14 +3,16 @@
 // they must work without internet. They are fetched in the background after install, so OCR and the
 // barcode reader work offline even before they were used once.
 // API calls go to other origins and are never touched here.
-const V = 'raft-v29';
+const V = 'raft-v30';
 const VENDOR = 'raft-vendor-v1';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 const VENDOR_FILES = [
   'vendor/zxing.min.js', 'vendor/xlsx.full.min.js', 'vendor/tesseract.min.js', 'vendor/worker.min.js',
   // tesseract picks one of the three cores by what the phone supports; new Chrome uses relaxed SIMD
   'vendor/core/tesseract-core-relaxedsimd-lstm.wasm.js', 'vendor/core/tesseract-core-simd-lstm.wasm.js', 'vendor/core/tesseract-core-lstm.wasm.js',
-  'vendor/tessdata/bul.traineddata.gz', 'vendor/tessdata/eng.traineddata.gz'
+  'vendor/tessdata/bul.traineddata.gz', 'vendor/tessdata/eng.traineddata.gz',
+  'vendor/fonts/cormorant-garamond-cyrillic-600-normal.woff2', 'vendor/fonts/cormorant-garamond-latin-600-normal.woff2',
+  'vendor/fonts/cormorant-garamond-cyrillic-600-italic.woff2', 'vendor/fonts/cormorant-garamond-latin-600-italic.woff2'
 ];
 
 self.addEventListener('install', e => {

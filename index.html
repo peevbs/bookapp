@@ -8,9 +8,13 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Рафт</title>
+<title>Библиотеката</title>
 <style>
 /* Layout: one column, catalogue-card detail view, sticky add button at the bottom of the shelf. */
+@font-face{font-family:"Cormorant Garamond";font-style:normal;font-weight:600;font-display:swap;src:url(vendor/fonts/cormorant-garamond-cyrillic-600-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Cormorant Garamond";font-style:normal;font-weight:600;font-display:swap;src:url(vendor/fonts/cormorant-garamond-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Cormorant Garamond";font-style:italic;font-weight:600;font-display:swap;src:url(vendor/fonts/cormorant-garamond-cyrillic-600-italic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Cormorant Garamond";font-style:italic;font-weight:600;font-display:swap;src:url(vendor/fonts/cormorant-garamond-latin-600-italic.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 :root{
   --bg:#f2f3ef; --surface:#fbfbf9; --ink:#18222b; --muted:#5b6872; --line:#d3d8d2;
   --accent:#27698a; --accent-ink:#ffffff; --accent-soft:#dcebf2;
@@ -45,6 +49,10 @@ button,input,select,textarea{font:inherit;color:inherit}
 .top{display:flex;align-items:center;gap:12px;padding:18px 0 10px}
 .top h1{font-size:28px;letter-spacing:.01em;flex:1}
 .top .count{color:var(--muted);font-size:14px}
+.gear{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--ink);cursor:pointer;padding:0}
+#toTop{position:fixed;left:12px;bottom:84px;z-index:6;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);opacity:0;pointer-events:none;transition:opacity .2s;display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.18)}
+#toTop.show{opacity:.55;pointer-events:auto}
+#toTop.show:active{opacity:.9}
 .back{border:0;background:none;padding:8px 10px 8px 0;color:var(--accent);font-weight:600;cursor:pointer}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;text-align:center}
@@ -99,6 +107,7 @@ button.rrow{cursor:pointer}
 .bk .spine{font-size:40px}
 .bk .ct{font:600 15px/1.25 var(--serif);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .bk .ca{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.bk .pill{display:block;text-align:center;font-size:14px;padding:8px 6px;margin-top:2px;white-space:normal}
 .grid3 .bk{padding:6px;gap:4px}
 .grid3 .bk .ct{font-size:12.5px;-webkit-line-clamp:2}
 .grid3 .bk .spine{font-size:30px}
@@ -158,10 +167,18 @@ label.field input{min-height:44px;padding:10px 14px;border-radius:10px;border:1p
 .upd{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;gap:8px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:var(--ink);color:var(--bg);font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .upd span{flex:1}
 .covcol{display:grid;gap:6px;justify-items:center}
-.head{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;align-items:end;margin:6px 0 14px}
-.head .cover{width:96px;height:144px}
-.head .spine{font-size:40px}
-.head h2{font-size:22px;line-height:1.2;overflow-wrap:anywhere}
+.head{display:grid;justify-items:center;gap:6px;margin:6px 0 14px;text-align:center}
+.head .cover{width:132px;height:198px}
+.head .spine{font-size:48px}
+.head .bt{font:600 32px/1.12 "Cormorant Garamond",var(--serif);overflow-wrap:anywhere;text-wrap:balance;margin-top:8px;padding:0 6px}
+.head .o{font:italic 600 19px/1.2 "Cormorant Garamond",var(--serif);color:var(--muted);overflow-wrap:anywhere}
+.head .au{font:600 13px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);opacity:.8;overflow-wrap:anywhere}
+.head .stc{margin-top:4px}
+.head .stc .pill{font-size:14px;padding:6px 16px}
+.cbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.editp{display:grid;gap:8px;margin:0 0 14px}
+.editp[hidden]{display:none}
+.editp .btn{width:100%}
 .badge{display:inline-block;margin-top:8px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
 .b-high{background:var(--ok-soft);color:var(--ok)}
 .b-medium{background:var(--warn-soft);color:var(--warn)}
@@ -213,6 +230,7 @@ h3.sec{font-size:16px;margin:22px 0 6px}
 </head>
 <body>
 <main id="app" aria-live="polite"></main>
+<button id="toTop" aria-label="Нагоре" title="Нагоре"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 15 7-7 7 7"/></svg></button>
 <div id="toast" class="toast" hidden></div>
 
 <script>
@@ -232,7 +250,7 @@ const TABLE_N = 18;                                   // fields before the extra
 /* The two shelves. A book saved earlier with another value keeps it (shown as an extra option). */
 const LOCATIONS = ['Библиотека с класика в коридора', 'Библиотека със съвременни романи в хола'];
 /* Drop-down fields: values already in the library, "none" and "add new". */
-const PICK_FIELDS = ['series', 'printer', 'binding', 'language', 'country', 'size'];
+const PICK_FIELDS = ['genre', 'publisher', 'series', 'printer', 'binding', 'language', 'country', 'size'];
 const COPY_FROM_PUBLISHER = ['series', 'binding', 'size', 'printer', 'location', 'language'];
 
 function esc(s) {
@@ -390,7 +408,7 @@ function tableWarnings(list) {
 function rowsToBooks(rows, now) {
   if (!rows || rows.length < 2) return { books: [], skipped: 0, unknown: [], error: 'Таблицата е празна.' };
   const keys = rows[0].map(h => HEAD_KEYS[String(h || '').trim().toLowerCase()] || null);
-  if (!keys.includes('title')) return { books: [], skipped: 0, unknown: [], error: 'Не намирам колона „Заглавие“. Това не прилича на таблицата на Рафт.' };
+  if (!keys.includes('title')) return { books: [], skipped: 0, unknown: [], error: 'Не намирам колона „Заглавие“. Това не прилича на таблицата на Библиотеката.' };
   const unknown = rows[0].filter((h, i) => h && !keys[i]).map(String);
   const stByLabel = Object.fromEntries(Object.entries(STATUS).map(([k, l]) => [l.toLowerCase(), k]));
   const books = []; let skipped = 0, n = 0;
@@ -451,6 +469,7 @@ function filterBooks(books, f) {
     title: (a, b) => bg(a.title, b.title),
     author: (a, b) => bg(a.author, b.author) || bg(a.title, b.title),
     year: (a, b) => (+b.year || 0) - (+a.year || 0),
+    series: (a, b) => (a.series ? 0 : 1) - (b.series ? 0 : 1) || bg(a.series, b.series) || ((parseFloat(a.series_no) || 1e9) - (parseFloat(b.series_no) || 1e9)) || bg(a.title, b.title),
     loc: (a, b) => (a.location ? 0 : 1) - (b.location ? 0 : 1) || bg(a.location, b.location) || bg(a.title, b.title)
   };
   return out.sort(sorts[f.sort] || sorts.new);
@@ -671,6 +690,7 @@ function cleanBook(raw) {
   o.description = clip(raw.description, 3000); o.notes = clip(raw.notes, 8000);
   o.status = Object.prototype.hasOwnProperty.call(STATUS, raw.status) ? raw.status : 'to_read';
   o.readDate = /^\d{4}-\d{2}-\d{2}$/.test(String(raw.readDate || '')) ? raw.readDate : '';
+  o.rating = /^[1-5]$/.test(String(raw.rating || '')) ? String(raw.rating) : '';
   o.sources = (Array.isArray(raw.sources) ? raw.sources : []).slice(0, 8)
     .map(x => ({ title: clip(x && x.title, 200), url: safeUrl(x && x.url) })).filter(x => x.url);
   o.confidence = ['high', 'medium', 'low'].includes(raw.confidence) ? raw.confidence : '';
@@ -687,7 +707,7 @@ function parseArchive(text) {
   let list, format = 1, exportedAt = '', declared = null, sha = '';
   if (Array.isArray(j)) list = j;
   else if (j && j.app === 'raft' && Array.isArray(j.books)) { list = j.books; format = +j.format || 0; exportedAt = String(j.exportedAt || ''); declared = j.count; sha = String(j.sha256 || ''); }
-  else return { ok: false, error: 'Това не е архив на Рафт.' };
+  else return { ok: false, error: 'Това не е архив на Библиотеката.' };
   if (format > BACKUP_FORMAT) return { ok: false, error: 'Архивът е от по-нова версия на приложението. Обнови приложението и опитай пак.' };
   const books = []; let invalid = 0;
   for (const raw of list) { const c = cleanBook(raw); if (c) books.push(c); else invalid++; }
@@ -874,7 +894,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v29)';
+const APP_VERSION = '2026-11-18 (кеш raft-v30)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -911,7 +931,7 @@ let books = [];
 let filter = { q: '', status: '', sort: 'new' };
 let view = 'list';
 let filtersOpen = false;
-try { const u = JSON.parse(localStorage.getItem('raft.ui') || '{}'); if (['list', 'grid2', 'grid3'].includes(u.view)) view = u.view; if (['new', 'title', 'author', 'loc', 'year'].includes(u.sort)) filter.sort = u.sort; } catch (e) { /* optional */ }
+try { const u = JSON.parse(localStorage.getItem('raft.ui') || '{}'); if (['list', 'grid2', 'grid3'].includes(u.view)) view = u.view; if (['new', 'title', 'author', 'series', 'loc', 'year'].includes(u.sort)) filter.sort = u.sort; } catch (e) { /* optional */ }
 const saveUi = () => { try { localStorage.setItem('raft.ui', JSON.stringify({ view, sort: filter.sort })); } catch (e) { /* optional */ } };
 let cur = null;                 // book being viewed or reviewed
 let draft = newDraft();
@@ -928,12 +948,22 @@ function toast(msg) {
   clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 3200);
 }
 
+/* Back-to-top button: only on the library list, only after scrolling down. */
+(function () {
+  const b = document.getElementById('toTop'); if (!b) return;
+  const upd = () => b.classList.toggle('show', window.scrollY > 500 && !!document.getElementById('list'));
+  window.addEventListener('scroll', upd, { passive: true });
+  b.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.raftTopCheck = upd;
+})();
+
 /* ---------- navigation ---------- */
 function push(v) { history.pushState({ v }, ''); show(v); }
 function replace(v) { history.replaceState({ v }, ''); show(v); }
 function back() { history.back(); }
 window.addEventListener('popstate', e => show((e.state && e.state.v) || 'library'));
 function show(v) {
+  if (window.raftTopCheck) setTimeout(window.raftTopCheck, 0);
   window.scrollTo(0, 0);
   if (v === 'add') return renderAdd();
   if (v === 'pick') return renderPick();
@@ -960,9 +990,9 @@ async function loadGrLog() {
 /* One row per read work. A Goodreads entry that is the same work as a read book in the shelf is not counted twice. */
 function readRows() {
   const libRead = books.filter(b => b.status === 'read');
-  const keys = new Set(libRead.map(keyTA)), grDate = new Map(), rows = [];
-  for (const g of grLog) for (const [t, a] of (g.lib || [])) { const k = keyTA({ title: t, author: a }); if (!grDate.has(k) || (g.date || '') > grDate.get(k)) grDate.set(k, g.date || ''); }
-  for (const b of libRead) rows.push({ id: b.id, title: b.title, author: b.author, date: b.readDate || grDate.get(keyTA(b)) || '', rating: 0, thumb: b.thumb });
+  const keys = new Set(libRead.map(keyTA)), grDate = new Map(), grRate = new Map(), rows = [];
+  for (const g of grLog) for (const [t, a] of (g.lib || [])) { const k = keyTA({ title: t, author: a }); if (!grDate.has(k) || (g.date || '') > grDate.get(k)) { grDate.set(k, g.date || ''); if (g.rating) grRate.set(k, g.rating); } }
+  for (const b of libRead) rows.push({ id: b.id, title: b.title, author: b.author, date: b.readDate || grDate.get(keyTA(b)) || '', rating: +b.rating || grRate.get(keyTA(b)) || 0, thumb: b.thumb });
   for (const g of grLog) if (!(g.lib || []).some(([t, a]) => keys.has(keyTA({ title: t, author: a })))) rows.push({ id: '', title: g.title, author: g.author, orig: g.orig || '', date: g.date || '', rating: g.rating || 0 });
   return rows;
 }
@@ -970,7 +1000,7 @@ function renderRead() {
   const rows = readRows(), by = new Map(), part = books.filter(b => b.status === 'partial').sort((a, b) => (a.title || '').localeCompare(b.title || '', 'bg'));
   for (const r of rows) { const y = (r.date || '').slice(0, 4) || 'Без дата'; if (!by.has(y)) by.set(y, []); by.get(y).push(r); }
   const years = [...by.keys()].sort((a, b) => a === 'Без дата' ? 1 : b === 'Без дата' ? -1 : b.localeCompare(a));
-  let html = '<div class="top"><button class="back" id="bBack">‹ Рафт</button><h1>Прочетени</h1><span class="count">' + plural(rows.length) + '</span></div>';
+  let html = '<div class="top"><button class="back" id="bBack">‹ Библиотека</button><h1>Прочетени</h1><span class="count">' + plural(rows.length) + '</span></div>';
   if (!rows.length) html += '<div class="empty">Още няма прочетени книги.</div>';
   else html += '<div class="chips" id="yrs">' + years.map(y => '<button class="chip" data-y="' + esc(y) + '">' + esc(y) + ' · ' + by.get(y).length + '</button>').join('') + '</div>';
   for (const y of years) {
@@ -998,8 +1028,8 @@ function coverHtml(b, cls) {
 }
 function renderLibrary() {
   const list = filterBooks(books, filter);
-  let html = '<div class="top"><h1>Рафт</h1><span class="count">' + plural(books.length) + '</span>' +
-    '<button class="btn sm" id="bSettings">Настройки</button></div>';
+  let html = '<div class="top"><h1>Библиотеката</h1><span class="count">' + plural(books.length) + '</span>' +
+    '<button class="gear" id="bSettings" aria-label="Настройки" title="Настройки"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>';
   if (books.length) {
     const locs = [...new Set(books.map(x => x.location).filter(Boolean))].sort((x, y) => x.localeCompare(y, 'bg'));
     const bm = getBackupMeta(), age = bm ? daysSince(bm.t) : null;
@@ -1011,11 +1041,11 @@ function renderLibrary() {
       '<button class="fbtn" id="bRead"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Прочетени<span class="fbadge ok">' + readRows().length + '</span></button></div>' +
       '<div class="fpanel" id="fpanel"' + (filtersOpen ? '' : ' hidden') + '>' +
       '<div class="flab">Изглед</div><div class="chips" id="vw">' + [['list', '☰ Списък'], ['grid2', '▦ По 2 в ред'], ['grid3', '▩ По 3 в ред']].map(([k, l]) => '<button class="chip" data-v="' + k + '" aria-pressed="' + (view === k) + '">' + l + '</button>').join('') + '</div>' +
-      '<div class="flab">Подреди по</div><div class="chips" id="so">' + [['new', 'Последно добавени'], ['title', 'Заглавие А–Я'], ['author', 'Автор'], ['loc', 'Рафт'], ['year', 'Година']].map(([k, l]) => '<button class="chip" data-s="' + k + '" aria-pressed="' + (filter.sort === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="flab">Подреди по</div><div class="chips" id="so">' + [['new', 'Последно добавени'], ['title', 'Заглавие А–Я'], ['author', 'Автор'], ['series', 'Поредица'], ['loc', 'Библиотека'], ['year', 'Година']].map(([k, l]) => '<button class="chip" data-s="' + k + '" aria-pressed="' + (filter.sort === k) + '">' + l + '</button>').join('') + '</div>' +
       '<div class="flab">Статус</div><div class="chips" id="sts">' + [['', 'Всички'], ['to_read', 'За четене'], ['partial', 'Частично'], ['read', 'Прочетени']].map(([k, l]) => '<button class="chip" data-st="' + k + '" aria-pressed="' + (filter.status === k) + '">' + l + '</button>').join('') + '</div>' +
-      (locs.length > 1 ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') +
+      (locs.length > 1 && filter.sort === 'loc' ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') +
       (nAct ? '<button class="btn sm" id="bClrF">Изчисти филтрите</button>' : '') + '</div></div>';
-    const groupOf = b => filter.sort === 'title' ? ((b.title || '?').trim().charAt(0).toUpperCase() || '?') : filter.sort === 'author' ? (b.author || 'Без автор') : filter.sort === 'loc' ? (b.location || 'Без рафт') : '';
+    const groupOf = b => filter.sort === 'title' ? ((b.title || '?').trim().charAt(0).toUpperCase() || '?') : filter.sort === 'author' ? (b.author || 'Без автор') : filter.sort === 'loc' ? (b.location || 'Без местоположение') : filter.sort === 'series' ? (b.series || 'Без поредица') : '';
     const rowHtml = b => '<button class="row" data-id="' + esc(b.id) + '">' + coverHtml(b) +
       '<span class="meta"><span class="t">' + esc(b.title || 'Без заглавие') + '</span>' + (b.original_title ? '<span class="o">' + esc(b.original_title) + '</span>' : '') + '<span class="a">' + esc(b.author) + '</span>' +
       '<span class="p">' + esc([b.publisher, b.year].filter(Boolean).join(' · ')) + '</span></span>' +
@@ -1033,7 +1063,7 @@ function renderLibrary() {
     if (!list.length) html += '<div class="empty">Няма книги, които да отговарят на търсенето.</div>';
     html += '<div class="foot"><button class="btn sm" id="bXlsx">Експорт в Excel</button></div>';
   } else {
-    html += '<div class="empty"><h2>Рафтът е празен</h2>Снимай корицата и гърба с баркода. Приложението разпознава текста и баркода на телефона и търси в Google Books и Open Library. Claude е по избор, само за книги, които не се намират безплатно.</div>';
+    html += '<div class="empty"><h2>Библиотеката е празна</h2>Снимай корицата и гърба с баркода. Приложението разпознава текста и баркода на телефона и търси в Google Books и Open Library. Claude е по избор, само за книги, които не се намират безплатно.</div>';
   }
   html += '<div class="bar"><button class="btn primary block" id="bAdd">Добави книга</button></div>';
   app.innerHTML = html;
@@ -1047,7 +1077,7 @@ function renderLibrary() {
     $('#bFilt').onclick = () => { filtersOpen = !filtersOpen; $('#fpanel').hidden = !filtersOpen; $('#bFilt').setAttribute('aria-expanded', String(filtersOpen)); };
     if ($('#bClrF')) $('#bClrF').onclick = () => { filter.status = ''; filter.loc = ''; filter.sort = 'new'; saveUi(); refreshList(); };
     app.querySelectorAll('#vw .chip').forEach(c => c.onclick = () => { view = c.dataset.v; saveUi(); refreshList(); });
-    app.querySelectorAll('#so .chip').forEach(c => c.onclick = () => { filter.sort = c.dataset.s; saveUi(); refreshList(); });
+    app.querySelectorAll('#so .chip').forEach(c => c.onclick = () => { filter.sort = c.dataset.s; if (filter.sort !== 'loc') filter.loc = ''; saveUi(); refreshList(); });
     app.querySelectorAll('#sts .chip').forEach(c => c.onclick = () => { filter.status = c.dataset.st; refreshList(); });
     $('#bXlsx').onclick = exportXlsx;
     if ($('#loc')) $('#loc').onchange = e => { filter.loc = e.target.value; refreshList(); };
@@ -1072,7 +1102,7 @@ function openStatusMenu(b) {
     const bt = e.target.closest('button'); if (!bt) return;
     const k = bt.dataset.k; o.remove();
     if (!k || k === (b.status || 'to_read')) return;
-    try { await dbPut(Object.assign({}, b, { status: k, updatedAt: Date.now() }, k === 'read' && !b.readDate ? { readDate: todayIso() } : {})); books = await dbAll(); refreshList(); toast('Статусът е „' + STATUS[k] + '“.'); }
+    try { await dbPut(Object.assign({}, b, { status: k, updatedAt: Date.now() }, k === 'read' && !b.readDate ? { readDate: todayIso() } : {})); books = await dbAll(); refreshList(); const nb = books.find(x => x.id === b.id) || b; if (k === 'read') toastAct('Статусът е „Прочетена“.', 'Goodreads', () => openUrl(goodreadsUrl(nb))); else toast('Статусът е „' + STATUS[k] + '“.'); }
     catch (err) { toast('Не успях да запиша. Провери дали има свободно място.'); }
   };
 }
@@ -1597,8 +1627,95 @@ async function enrich() {
   if (!r.ok) app.insertAdjacentHTML('afterbegin', failNote(r));
 }
 
+/* ---------- Goodreads helpers ---------- */
+const goodreadsUrl = b => 'https://www.goodreads.com/search?q=' + encodeURIComponent(normIsbn(b.isbn) || [b.original_title || b.title, b.original_title ? b.author : b.author].filter(Boolean).join(' '));
+function toastAct(msg, label, fn) {
+  const t = document.getElementById('toast');
+  t.innerHTML = '<span></span> <button class="btn sm" type="button"></button>';
+  t.firstChild.textContent = msg; t.lastChild.textContent = label; t.lastChild.onclick = () => { t.hidden = true; fn(); };
+  t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 9000);
+}
+const gcell = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+/* CSV in the format the Goodreads importer accepts (goodreads.com/review/import). Only books that Goodreads does not know yet or that were read after its last entry. */
+function goodreadsExport() {
+  const known = new Map();
+  for (const g of grLog) for (const [t, a] of (g.lib || [])) { const k = keyTA({ title: t, author: a }); if (!known.has(k) || (g.date || '') > known.get(k)) known.set(k, g.date || ''); }
+  const rows = books.filter(b => b.status === 'read' && (!known.has(keyTA(b)) || (b.readDate && b.readDate > (known.get(keyTA(b)) || ''))));
+  const head = ['Title', 'Author', 'ISBN13', 'My Rating', 'Publisher', 'Year Published', 'Number of Pages', 'Date Read', 'Exclusive Shelf'];
+  const csv = [head.map(gcell).join(',')].concat(rows.map(b => [b.original_title || b.title, b.author, normIsbn(b.isbn), b.rating || '', b.publisher, b.year, b.pages, (b.readDate || '').replace(/-/g, '/'), 'read'].map(gcell).join(','))).join('\r\n');
+  return { n: rows.length, csv };
+}
+
+/* ---------- imprint page (издателско каре): OCR on the device, Claude only on request ---------- */
+function imprintNormalize(text) {
+  const out = [];
+  for (let line of String(text || '').split(/\r?\n/)) {
+    line = line.replace(/\s+/g, ' ').trim(); if (!line) continue;
+    let m;
+    if ((m = line.match(/^(?:заглавие на оригинала|оригинално заглавие|заглавие на оригинал|original title|title of the original)\s*[:–-]?\s*(.+)$/i))) out.push('Оригинално заглавие: ' + m[1]);
+    else if ((m = line.match(/^(?:превод|преводач(?:и)?)(?:\s+от\s+[а-яa-z]+(?:\s+език)?)?\s*[:–-]?\s*(.+)$/i))) out.push('Преводач: ' + m[1]);
+    else if ((m = line.match(/^(?:научен редактор|отговорен редактор|редактор)\s*[:–-]?\s*(.+)$/i))) out.push('Редактор: ' + m[1]);
+    else if ((m = line.match(/^(?:художник на корицата|худ\. оформление на корицата|оформление на корицата|дизайн на корицата|корица)\s*[:–-]?\s*(.+)$/i))) out.push('Художник на корицата: ' + m[1]);
+    else if ((m = line.match(/^(?:илюстратор|илюстрации|художник)\s*[:–-]?\s*(.+)$/i))) out.push('Илюстратор: ' + m[1]);
+    else if ((m = line.match(/^(?:печатница|печат)\s*[:–-]?\s*(.+)$/i))) out.push('Печат: ' + m[1]);
+    else if ((m = line.match(/^isbn[\s-]*(?:13)?\s*[:–-]?\s*(.+)$/i))) out.push('ISBN: ' + m[1]);
+    else if ((m = line.match(/^(?:издателство|издател|издателска къща)\s*[:–-]?\s*(.+)$/i))) out.push('Издателство: ' + m[1]);
+    else if ((m = line.match(/^(?:първо издание|издание|©|copyright ©?|copyright)\D{0,30}((?:19|20)\d\d)/i))) out.push('Година: ' + m[1]);
+    else if ((m = line.match(/^(?:брой страници|страници|стр\.|обем)\s*[:–-]?\s*(\d{2,4})\b/i))) out.push('Страници: ' + m[1]);
+    else out.push(line);
+  }
+  return out.join('\n');
+}
+let impPhoto = '';
+async function imprintFromPhoto(file) {
+  const box = () => app.querySelector('#pasteBox');
+  if (!box()) return;
+  if (!app.querySelector('#pasteTxt')) app.querySelector('#bPaste').click();
+  const note = t => { const o = app.querySelector('#pasteOut'); if (o) o.innerHTML = '<div class="note">' + esc(t) + '</div>'; };
+  try {
+    note('Отварям снимката…');
+    const bmp = await loadBitmap(file);
+    impPhoto = await scaled(bmp, 1800, 0.9);
+    bmp.close && bmp.close();
+    note('Чета текста от снимката на телефона. Първия път отнема около минута…');
+    const lines = await ocrRun(impPhoto, m => { if (m && m.status) note('Чета текста… ' + (m.progress ? Math.round(m.progress * 100) + '%' : '')); });
+    const text = imprintNormalize(lines.filter(l => l.t).map(l => l.t).join('\n'));
+    if (!text.trim()) { note('Не открих текст на снимката. Снимай по-отблизо и на добра светлина.'); return; }
+    app.querySelector('#pasteTxt').value = text;
+    app.querySelector('#bParse').click();
+    if (getSettings().key) {
+      const out = app.querySelector('#pasteOut');
+      out.insertAdjacentHTML('beforeend', '<button class="btn block" id="bImpAi" type="button">Анализирай снимката с Claude (платено, само по твое решение)</button>');
+      out.querySelector('#bImpAi').onclick = claudeImprint;
+    }
+  } catch (e) { note('Снимката не се чете. Опитай с нова или със снимка във формат JPG.'); }
+}
+async function claudeImprint() {
+  const s = getSettings(), btn = app.querySelector('#bImpAi');
+  if (!impPhoto || !s.key) return;
+  btn.disabled = true; btn.textContent = 'Claude чете снимката…';
+  try {
+    const body = { model: s.model, max_tokens: 1200, messages: [{ role: 'user', content: [
+      { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: impPhoto.split(',')[1] } },
+      { type: 'text', text: 'Това е снимка на издателското каре (страницата с данните за изданието) на книга. Извлечи САМО това, което е написано на снимката; нищо не измисляй и не допълвай от паметта си. Върни САМО един JSON обект без markdown с ключове: title, original_title, author, translator, editor, cover_artist, illustrator, publisher, year, pages, isbn, series, printer, language. Непознатото или нечетливото е null.' }] }] };
+    const r = await callApi(s, body);
+    if (!r.ok) throw new Error(String(r.status));
+    const txt = ((r.data && r.data.content) || []).map(c => c.text || '').join('');
+    const j = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+    const L = [['Заглавие', 'title'], ['Оригинално заглавие', 'original_title'], ['Автор', 'author'], ['Преводач', 'translator'], ['Редактор', 'editor'], ['Художник на корицата', 'cover_artist'], ['Илюстратор', 'illustrator'], ['Издателство', 'publisher'], ['Година', 'year'], ['Страници', 'pages'], ['ISBN', 'isbn'], ['Поредица', 'series'], ['Печат', 'printer'], ['Език', 'language']];
+    const lines = L.filter(([, k]) => j[k] != null && String(j[k]).trim()).map(([l, k]) => l + ': ' + String(j[k]).trim());
+    app.querySelector('#pasteTxt').value = lines.join('\n');
+    app.querySelector('#bParse').click();
+    toast('Claude прочете снимката. Провери данните.');
+  } catch (e) {
+    toast('Claude не успя (ключ, квота или връзка). Данните от телефона остават.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Анализирай снимката с Claude (платено, само по твое решение)'; }
+  }
+}
+
 /* ---------- book card (new result or saved book) ---------- */
 const NEW_OPT = '__new__';
+let editOpen = null;
 function readForm() {
   app.querySelectorAll('[data-k]').forEach(i => {
     let v = i.value;
@@ -1640,7 +1757,7 @@ async function checkUpdate(manual) {
 function showUpdate(v) {
   if (document.getElementById('upd')) return;
   const d = document.createElement('div'); d.id = 'upd'; d.className = 'upd'; d.setAttribute('role', 'status');
-  d.innerHTML = '<span>Има нова версия на Рафт.</span><button class="btn sm primary" id="bUpdNow">Обнови сега</button><button class="btn sm" id="bUpdLater" aria-label="Затвори">✕</button>';
+  d.innerHTML = '<span>Има нова версия на Библиотеката.</span><button class="btn sm primary" id="bUpdNow">Обнови сега</button><button class="btn sm" id="bUpdLater" aria-label="Затвори">✕</button>';
   document.body.appendChild(d);
   d.querySelector('#bUpdLater').onclick = () => d.remove();
   d.querySelector('#bUpdNow').onclick = applyUpdate;
@@ -1717,14 +1834,18 @@ async function saveCoverPhoto(file) {
 }
 function renderCard() {
   const b = cur, isNew = !!b._new;
+  if (isNew && editOpen === null) editOpen = b.id || 'new';
   const dup = b.isbn && books.find(x => x.id !== b.id && x.isbn === b.isbn);
   const confLabel = { high: 'Потвърдено издание', medium: 'Издание за проверка', low: 'Неуверен резултат, провери данните' };
-  let html = '<div class="top"><button class="back" id="bBack">‹ ' + (isNew ? 'Отказ' : 'Рафт') + '</button></div>' +
-    '<div class="head"><div class="covcol"><span id="bZoom" class="zoomable">' + coverHtml(b) + '</span>' +
-    '<button class="btn sm" id="bCamCover" aria-label="Снимай или смени корицата">✎ Корица</button><input class="vh" id="covFile" type="file" accept="image/*"></div><div><h2>' + esc(b.title || 'Без заглавие') + '</h2>' +
-    (b.original_title ? '<div class="o">' + esc(b.original_title) + '</div>' : '') + '<div class="small">' + esc(b.author) + '</div>' + (isNew ? '' : '<div><span class="pill s-' + esc(b.status || 'to_read') + '" id="hdSt">' + esc(statusLine(b)) + '</span></div>') +
+  let html = '<div class="top"><button class="back" id="bBack">‹ ' + (isNew ? 'Отказ' : 'Библиотека') + '</button></div>' +
+    '<div class="head"><div class="covcol"><span id="bZoom" class="zoomable">' + coverHtml(b) + '</span></div>' +
+    '<div class="cbtns"><button class="btn sm" id="bCamCover" aria-label="Снимай или смени корицата">✎ Корица</button>' +
+    '<button class="btn sm" id="bEdit" aria-expanded="' + (editOpen === (b.id || 'new')) + '" aria-controls="editPanel">✎ Редактирай</button><input class="vh" id="covFile" type="file" accept="image/*"></div>' +
+    '<h2 class="bt">' + esc(b.title || 'Без заглавие') + '</h2>' +
+    (b.original_title ? '<div class="o">' + esc(b.original_title) + '</div>' : '') + (b.author ? '<div class="au">' + esc(b.author) + '</div>' : '') +
+    (isNew ? '' : '<div class="stc"><span class="pill s-' + esc(b.status || 'to_read') + '" id="hdSt">' + esc(statusLine(b)) + '</span></div>') +
     (b.origin === 'catalog' ? '<span class="badge b-medium">От безплатни каталози</span>' :
-      b.confidence ? '<span class="badge b-' + esc(b.confidence) + '">' + esc(confLabel[b.confidence]) + '</span>' : '') + '</div></div>';
+      b.confidence ? '<span class="badge b-' + esc(b.confidence) + '">' + esc(confLabel[b.confidence]) + '</span>' : '') + '</div>';
   if (b._check) html += '<div class="note warn">' + esc(b._check) + '</div>';
   if (b._lookup) {
     const k = b._lookup.kind;
@@ -1734,22 +1855,24 @@ function renderCard() {
       : '<div class="note warn"><b>Не намерих книгата в Google Books и Open Library.</b> В полетата е текстът, който прочетох от корицата. Поправи го или попълни каквото знаеш и запази.</div>';
     if (b._lookup.lines.length) html += '<details class="diag"><summary>Какво показаха каталозите</summary><ul>' + b._lookup.lines.map(l => '<li>' + esc(l) + '</li>').join('') + '</ul></details>';
   }
-  html += '<div class="acts2 tight"><button class="btn" id="bWeb">Потърси в интернет</button>' + (b._lookup ? '<button class="btn" id="bAgain">Търси пак в каталозите</button>' : '') + '</div>' +
-    '<button class="btn block" id="bPaste">Попълни от копиран текст</button><div id="pasteBox"></div>' +
-    (b._lookup && getSettings().key ? '<button class="btn block" id="bEnrich">Опитай с Claude (платено, само по твое решение)</button>' : '');
+  html += '<div class="card editp" id="editPanel"' + (editOpen === (b.id || 'new') ? '' : ' hidden') + '>' +
+    '<button class="btn" id="bWeb">Потърси в интернет</button>' + (b._lookup ? '<button class="btn" id="bAgain">Търси пак в каталозите</button>' : '') +
+    '<button class="btn" id="bPaste">Попълни от копиран текст</button><div id="pasteBox"></div>' +
+    '<button class="btn" id="bImprint">Попълни от снимка на издателското каре</button><input class="vh" id="impFile" type="file" accept="image/*">' +
+    (b._lookup && getSettings().key ? '<button class="btn" id="bEnrich">Опитай с Claude (платено, само по твое решение)</button>' : '') + '</div>';
   if (b.note) html += '<div class="note' + (b.origin === 'catalog' ? '' : ' warn') + '">' + esc(b.note) + '</div>';
   if (b.origin === 'catalog') html += getSettings().key
     ? '<button class="btn block" id="bEnrich">Допълни оригинално заглавие, редактор и художник (търсене в интернет, платено)</button>'
     : '<p class="small">Оригинално заглавие, редактор и художник могат да се добавят по избор с Claude (нужен е API ключ в Настройки).</p>';
   if (b.isbn && b.isbn_ok === false) html += '<div class="note bad">Този ISBN не минава проверката на контролната цифра. Сравни го с книгата.</div>';
-  if (dup) html += '<div class="note">Книга с този ISBN вече е в Рафта: ' + esc(dup.title) + '.</div>';
+  if (dup) html += '<div class="note">Книга с този ISBN вече е в Библиотеката: ' + esc(dup.title) + '.</div>';
   const fieldHtml = ([k, l]) => PICK_FIELDS.includes(k) || k === 'location'
     ? pickHtml(k, l, String(b[k] || '').trim())
     : '<div class="f"><label for="f_' + k + '">' + l + '</label><textarea class="ac" rows="1" id="f_' + k + '" data-k="' + k + '"' +
       (['year', 'pages', 'series_no', 'volume'].includes(k) ? ' inputmode="numeric"' : '') +
       (k === 'original_title' ? ' lang="und" spellcheck="false"' : '') + ' placeholder="—" autocomplete="off">' + esc(b[k]) + '</textarea></div>';
   const sug = suggestFromLibrary(b, books);
-  if (sug) html += '<div class="note"><b>Същото издателство в Рафта:</b> ' + esc(Object.entries(sug.vals).map(([k, v]) => FIELDS.find(f => f[0] === k)[1] + ': ' + v).join(', ')) +
+  if (sug) html += '<div class="note"><b>Същото издателство в Библиотеката:</b> ' + esc(Object.entries(sug.vals).map(([k, v]) => FIELDS.find(f => f[0] === k)[1] + ': ' + v).join(', ')) +
     ' (по „' + esc(sug.from) + '“). <button class="btn sm" id="bSuggest">Попълни празните</button></div>';
   html += '<div class="card">' + FIELDS.slice(0, TABLE_N).map(fieldHtml).join('') + '</div>' +
     '<h3 class="sec">Допълнително (по избор)</h3><div class="card">' + FIELDS.slice(TABLE_N).map(fieldHtml).join('') + '</div>';
@@ -1758,11 +1881,13 @@ function renderCard() {
     '<div class="f"><label for="f_status">Статус</label><select id="f_status" data-k="status">' +
     Object.entries(STATUS).map(([k, l]) => '<option value="' + k + '"' + (b.status === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
     '<div class="f"><label for="f_readDate">Прочетена на</label><input type="date" id="f_readDate" data-k="readDate" value="' + esc(b.readDate || '') + '"></div>' +
+    '<div class="f"><label for="f_rating">Моя оценка</label><select id="f_rating" data-k="rating"><option value="">—</option>' + [1, 2, 3, 4, 5].map(n => '<option value="' + n + '"' + (String(b.rating) === String(n) ? ' selected' : '') + '>' + '★'.repeat(n) + '</option>').join('') + '</select></div>' +
+    (isNew ? '' : '<div class="f wide"><button class="btn" id="bGrOpen" type="button">Отвори в Goodreads</button><p class="small">Goodreads не позволява автоматично отбелязване от други приложения. Бутонът отваря търсенето на тази книга, там натискаш „Read“. Новопрочетените можеш да ги качиш наведнъж от Настройки → „Експорт за Goodreads“.</p></div>') +
     '<div class="f wide"><label for="f_notes">Бележки</label><textarea id="f_notes" data-k="notes" placeholder="лични бележки">' + esc(b.notes) + '</textarea></div></div>';
   if ((b.sources || []).length) html += '<h3 class="sec">Източници</h3><div class="srcs">' +
     b.sources.map(s => '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + esc(s.title) + '</a>').join('') + '</div>';
   if (isNew && b.searches != null) html += '<p class="small">Направени търсения: ' + b.searches + '.</p>';
-  html += '<div class="acts2"><button class="btn primary" id="bSave">' + (isNew ? 'Запази в Рафта' : 'Запази промените') + '</button>' +
+  html += '<div class="acts2"><button class="btn primary" id="bSave">' + (isNew ? 'Запази в Библиотеката' : 'Запази промените') + '</button>' +
     (isNew ? '' : '<button class="btn danger" id="bDel">Изтрий</button>') + '</div>';
   app.innerHTML = html;
   const $ = s => app.querySelector(s);
@@ -1776,6 +1901,14 @@ function renderCard() {
     if (!n.hidden) n.focus();
   });
   if ($('#bSuggest')) $('#bSuggest').onclick = () => { readForm(); const sg = suggestFromLibrary(cur, books); if (sg) Object.assign(cur, sg.vals); renderCard(); toast('Попълнено. Провери и запази.'); };
+  $('#bEdit').onclick = () => {
+    const id = cur.id || 'new', p = $('#editPanel'); p.hidden = !p.hidden; editOpen = p.hidden ? null : id;
+    $('#bEdit').setAttribute('aria-expanded', String(!p.hidden));
+    if (!p.hidden) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+  if ($('#bGrOpen')) $('#bGrOpen').onclick = () => { readForm(); openUrl(goodreadsUrl(cur)); };
+  $('#bImprint').onclick = () => $('#impFile').click();
+  $('#impFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) imprintFromPhoto(f); };
   $('#bWeb').onclick = () => {
     readForm(); const u = webSearchUrl(cur);
     if (!u) { toast('Първо въведи заглавие, автор или ISBN.'); return; }
@@ -1839,7 +1972,7 @@ function renderCard() {
       await dbPut(rec);
       books = await dbAll();
       if (isNew && rec.thumb) ghEnqueue(rec.id);
-      toast(isNew ? 'Книгата е в Рафта.' : 'Промените са запазени.');
+      if (rec.status === 'read' && rec.status !== (b.status || '') && !isNew) toastAct('Промените са запазени.', 'Отвори в Goodreads', () => openUrl(goodreadsUrl(rec))); else toast(isNew ? 'Книгата е в Библиотеката.' : 'Промените са запазени.');
       back();
     } catch (e) { toast('Не успях да запиша. Провери дали има свободно място.'); }
   };
@@ -1900,8 +2033,8 @@ function statsHtml() {
   if (!st.total) return '';
   const row = (l, v) => '<div class="f"><label>' + esc(l) + '</label><div>' + esc(v) + '</div></div>';
   return '<h3 class="sec">Библиотеката в числа</h3><div class="card">' +
-    row('Книги', st.total) + Object.entries(STATUS).map(([k, l]) => row(l, st.byStatus[k] || 0)).join('') +
-    row('С ISBN', st.withIsbn + ' от ' + st.total) + row('Със снимка на корица', st.withCover + ' от ' + st.total) +
+    row('Книги', st.total) + Object.entries({ to_read: 'За четене', partial: 'Частично прочетени', read: 'Прочетени' }).map(([k, l]) => row(l, st.byStatus[k] || 0)).join('') +
+    row('С ISBN', st.withIsbn + ' от ' + st.total) + row('С корица', st.withCover + ' от ' + st.total) +
     (st.authors.length ? row('Най-често срещани автори', st.authors.map(e => e[0] + ' (' + e[1] + ')').join(', ')) : '') +
     (st.publishers.length ? row('Най-често срещани издателства', st.publishers.map(e => e[0] + ' (' + e[1] + ')').join(', ')) : '') +
     (st.decades.length ? row('По десетилетия', st.decades.map(e => e[0] + 'те: ' + e[1]).join(', ')) : '') + '</div>';
@@ -1919,7 +2052,7 @@ function archiveHtml() {
 async function importCovers(files, out) {
   const imgs = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name));
   if (!imgs.length) { out.innerHTML = '<div class="note warn">Няма изображения сред избраните файлове.</div>'; return; }
-  if (!books.length) { out.innerHTML = '<div class="note warn">Рафтът е празен. Първо внеси книгите (таблица или архив), после кориците.</div>'; return; }
+  if (!books.length) { out.innerHTML = '<div class="note warn">Библиотеката е празна. Първо внеси книгите (таблица или архив), после кориците.</div>'; return; }
   const items = [];
   for (let i = 0; i < imgs.length; i++) {
     out.innerHTML = '<div class="note">Обработвам снимка ' + (i + 1) + ' от ' + imgs.length + '…</div>';
@@ -1979,19 +2112,25 @@ async function importCovers(files, out) {
   };
   draw();
 }
+/* Disney books have no author: the original title is the name of the film. Only well-known titles listed here. */
+const DISNEY = { 'замръзналото кралство': 'Frozen', 'замръзналото кралство 2': 'Frozen II', 'красавицата и звярът': 'Beauty and the Beast', 'малката русалка': 'The Little Mermaid', 'аладин': 'Aladdin', 'цар лъв': 'The Lion King', 'пепеляшка': 'Cinderella', 'спящата красавица': 'Sleeping Beauty', 'снежанка и седемте джуджета': 'Snow White and the Seven Dwarfs', 'книга за джунглата': 'The Jungle Book', 'мулан': 'Mulan', 'покахонтас': 'Pocahontas', 'тарзан': 'Tarzan', 'моана': 'Moana', 'коко': 'Coco', 'енканто': 'Encanto', 'бамби': 'Bambi', 'дъмбо': 'Dumbo', 'пинокио': 'Pinocchio', 'питър пан': 'Peter Pan' };
+const disneyOriginal = b => !String(b.author || '').trim() && (/disney|дисни/i.test(String(b.series || '') + ' ' + String(b.publisher || '')) || /hachette/i.test(String(b.publisher || ''))) ? (DISNEY[String(b.title || '').toLowerCase().replace(/\s+/g, ' ').trim()] || '') : '';
 /* Fills empty original titles from Open Library, one book at a time; stoppable. */
 let origCtl = null;
 async function fillOriginals(btn, out) {
   if (origCtl) { origCtl.abort(); return; }
+  let disney = 0;
+  for (const b of books) { if (String(b.original_title || '').trim()) continue; const t = disneyOriginal(b); if (t) { await dbPut(Object.assign({}, b, { original_title: t, updatedAt: Date.now() })); disney++; } }
+  if (disney) books = await dbAll();
   const todo = books.filter(b => normIsbn(b.isbn) && !String(b.original_title || '').trim());
-  if (!todo.length) { out.innerHTML = '<div class="note">Няма книги с ISBN и празно оригинално заглавие.</div>'; return; }
+  if (!todo.length) { out.innerHTML = '<div class="note">' + (disney ? 'Попълнени са ' + disney + ' книги на Дисни по името на филма. ' : '') + 'Няма други книги с ISBN и празно оригинално заглавие.</div>'; return; }
   origCtl = new AbortController(); btn.textContent = 'Спри';
   let found = 0, i = 0;
   try {
     for (const b of todo) {
       i++; out.innerHTML = '<div class="note">Проверявам ' + i + ' от ' + todo.length + ': ' + esc(b.title) + ' (намерени: ' + found + ')</div>';
       const t = await olOriginal(normIsbn(b.isbn), b.title, origCtl.signal);
-      if (!t) continue;
+      if (!t || fold(t) === fold(b.title)) continue;   // the Bulgarian title is not an original
       const old = (await dbAll()).find(x => x.id === b.id);
       if (old && !String(old.original_title || '').trim()) { await dbPut(Object.assign({}, old, { original_title: t, updatedAt: Date.now() })); found++; }
     }
@@ -2028,13 +2167,13 @@ function renderSettings() {
     '<label class="field" for="model">Модел<input id="model" value="' + esc(s.model) + '" autocomplete="off" spellcheck="false"></label>' +
     '<label class="field" for="max">Най-много търсения в интернет на книга (1 до 10)<input id="max" type="number" min="1" max="10" value="' + esc(s.maxSearches) + '"></label>' +
     '<div class="acts2"><button class="btn primary" id="bSave">Запази</button><button class="btn" id="bTest">Тествай ключа</button></div><div id="testOut"></div>' +
-    '<h3 class="sec">Книги и корици в GitHub (по избор)</h3><p class="small">След всяка промяна списъкът с книги (data/books.json) и новите корици (covers/new/) се качват в хранилището, когато си онлайн. Нужен е личен токен на GitHub само за хранилището на Рафт с право „Contents: Read and write“. Токенът се пази само в този браузър. Без токен всичко остава на телефона и влиза в пълния архив.</p>' +
+    '<h3 class="sec">Книги и корици в GitHub (по избор)</h3><p class="small">След всяка промяна списъкът с книги (data/books.json) и новите корици (covers/new/) се качват в хранилището, когато си онлайн. Нужен е личен токен на GitHub само за хранилището на Библиотеката с право „Contents: Read and write“. Токенът се пази само в този браузър. Без токен всичко остава на телефона и влиза в пълния архив.</p>' +
     '<label class="field" for="ghrepo">Хранилище<input id="ghrepo" value="' + esc(s.ghRepo) + '" autocomplete="off" spellcheck="false"></label>' +
     '<label class="field" for="ghtok">Токен на GitHub<input id="ghtok" type="password" value="' + esc(s.ghToken) + '" autocomplete="off" spellcheck="false"></label>' +
     '<div class="acts2"><button class="btn" id="bGhTest">Тествай и качи чакащите</button></div><div id="ghOut"><p class="small">Корици за качване: ' + ghQueue().length + '. Списък с книги: ' + (ghBooksPending() ? 'чака' : 'качен или още не е пускан') + '.</p></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
-    '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bRec">Изравни Рафта с таблицата (махни дублираните)</button><div id="recOut"></div><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div>' +
-    '<button class="btn block" id="bGr">Маркирай прочетените по Goodreads</button><div id="grOut"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
+    '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bRec">Изравни Библиотеката с таблицата (махни дублираните)</button><div id="recOut"></div><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div>' +
+    '<button class="btn block" id="bGr">Маркирай прочетените по Goodreads</button><div id="grOut"></div><button class="btn block" id="bGrCsv">Експорт за Goodreads (новопрочетените)</button><div id="grCsvOut"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
     '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
     '<p class="small">Версия на приложението: ' + APP_VERSION + '</p><button class="btn block" id="bUpd">Провери за нова версия</button>';
   const $ = x => app.querySelector(x);
@@ -2096,7 +2235,7 @@ function renderSettings() {
       if (pr.error) { out.innerHTML = '<div class="note bad">' + esc(pr.error) + '</div>'; return; }
       const plan = planImport(await dbAll(), pr.books), tw = tableWarnings(pr.books);
       out.innerHTML = '<div class="note"><b>' + esc(fname) + ':</b> ' + pr.books.length + ' книги.<ul class="diagl">' +
-        '<li>Листове: ' + esc(sheetInfo.join('; ')) + '</li><li>Нови: ' + plan.add.length + '</li><li>Вече в Рафта, ще се попълнят празни полета: ' + plan.fill.length + '</li><li>Вече в Рафта, без промяна: ' + plan.same + '</li>' +
+        '<li>Листове: ' + esc(sheetInfo.join('; ')) + '</li><li>Нови: ' + plan.add.length + '</li><li>Вече в Библиотеката, ще се попълнят празни полета: ' + plan.fill.length + '</li><li>Вече в Библиотеката, без промяна: ' + plan.same + '</li>' +
         (tw.dup.length ? '<li>Повтарящи се книги в таблицата (същото заглавие и автор): ' + tw.dup.length + '. Ще се внесат и двете; прегледай ги после.</li>' : '') +
         (tw.clash.length ? '<li>Един ISBN на различни заглавия: ' + esc(tw.clash.join('; ')) + '. Вероятно е грешка в таблицата; внасят се като отделни книги.</li>' : '') +
         (tw.badIsbn.length ? '<li>ISBN с грешна контролна цифра: ' + tw.badIsbn.length + '. Белязани са като непроверени.</li>' : '') +
@@ -2149,7 +2288,7 @@ function renderSettings() {
       for (const [ti, bi] of pairs) if (!tUsed.has(ti) && !bUsed.has(bi)) { tUsed.add(ti); bUsed.add(bi); }
       const extra = local.filter((b, i) => !bUsed.has(i) && /^imp/.test(b.id)), kept = local.filter((b, i) => !bUsed.has(i) && !/^imp/.test(b.id));
       const add = table.filter((t, i) => !tUsed.has(i));
-      out.innerHTML = '<div class="note"><b>Таблицата:</b> ' + table.length + ' книги. В Рафта: ' + local.length + '.<ul class="diagl"><li>Съвпадат: ' + tUsed.size + '</li><li>Излишни (няма ги в таблицата, от стари внасяния): ' + extra.length + (extra.length ? ' — ' + esc(extra.map(b => b.title + (b.publisher ? ' (' + b.publisher + ')' : '')).join('; ')) : '') + '</li><li>Липсват в Рафта: ' + add.length + (add.length ? ' — ' + esc(add.map(b => b.title).join('; ')) : '') + '</li>' + (kept.length ? '<li>Добавени от теб и извън таблицата (остават): ' + kept.length + '</li>' : '') + '</ul><p class="small">Статус, дата на четене и корица на излишните се прехвърлят върху останалото копие, ако там липсват.</p></div>' +
+      out.innerHTML = '<div class="note"><b>Таблицата:</b> ' + table.length + ' книги. В Библиотеката: ' + local.length + '.<ul class="diagl"><li>Съвпадат: ' + tUsed.size + '</li><li>Излишни (няма ги в таблицата, от стари внасяния): ' + extra.length + (extra.length ? ' — ' + esc(extra.map(b => b.title + (b.publisher ? ' (' + b.publisher + ')' : '')).join('; ')) : '') + '</li><li>Липсват в Библиотеката: ' + add.length + (add.length ? ' — ' + esc(add.map(b => b.title).join('; ')) : '') + '</li>' + (kept.length ? '<li>Добавени от теб и извън таблицата (остават): ' + kept.length + '</li>' : '') + '</ul><p class="small">Статус, дата на четене и корица на излишните се прехвърлят върху останалото копие, ако там липсват.</p></div>' +
         '<div class="acts2"><button class="btn primary" id="bDoRec"' + (extra.length + add.length ? '' : ' disabled') + '>Изравни</button><button class="btn" id="bNoRec">Отказ</button></div>';
       $('#bNoRec').onclick = () => { out.innerHTML = ''; };
       $('#bDoRec').onclick = async () => {
@@ -2168,7 +2307,7 @@ function renderSettings() {
             await dbDel(x.id);
           }
           for (const b of add) await dbPut(b);
-          books = await dbAll(); out.innerHTML = '<div class="note ok">Готово: махнати ' + extra.length + ', добавени ' + add.length + '. Сега в Рафта: ' + books.length + ' книги.</div>';
+          books = await dbAll(); out.innerHTML = '<div class="note ok">Готово: махнати ' + extra.length + ', добавени ' + add.length + '. Сега в Библиотеката: ' + books.length + ' книги.</div>';
         } catch (err) { out.innerHTML = '<div class="note bad">Не завърши. Провери дали има свободно място и опитай пак.</div>'; }
       };
     } catch (err) { out.innerHTML = '<div class="note bad">Не успях да сравня. Провери връзката и опитай пак.</div>'; }
@@ -2188,6 +2327,16 @@ function renderSettings() {
       await ghFlush(true);
       out.innerHTML = '<div class="note ' + (ghBooksPending() || ghQueue().length ? 'warn' : 'ok') + '">Връзката работи. ' + (ghBooksPending() || ghQueue().length ? 'Не всичко е качено още: ' + ghQueue().length + ' корици' + (ghBooksPending() ? ', списъкът с книги чака' : '') + '. Опитай пак.' : 'Списъкът с книги и кориците са качени в GitHub.') + '</div>';
     } catch (e) { out.innerHTML = '<div class="note bad">Няма връзка с GitHub.</div>'; }
+  };
+  $('#bGrCsv').onclick = async () => {
+    const out = $('#grCsvOut');
+    try {
+      await loadGrLog();
+      const r = goodreadsExport();
+      if (!r.n) { out.innerHTML = '<div class="note">Няма прочетени книги, които още да не са в Goodreads.</div>'; return; }
+      await saveFile('goodreads-' + stamp() + '.csv', 'text/csv;charset=utf-8', '\ufeff' + r.csv);
+      out.innerHTML = '<div class="note ok">Файлът е с ' + r.n + ' книги. В Goodreads: My Books → Import and export → Import. Goodreads ги разпознава по ISBN, затова провери после дали са се обединили с правилните издания.</div>';
+    } catch (e) { out.innerHTML = '<div class="note bad">Файлът не се запази. Опитай пак.</div>'; }
   };
   $('#bGr').onclick = async () => {
     const btn = $('#bGr'), out = $('#grOut'); btn.disabled = true; out.innerHTML = '<p class="small">Чета списъка…</p>';
