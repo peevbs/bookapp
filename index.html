@@ -64,6 +64,17 @@ button,input,select,textarea{font:inherit;color:inherit}
 .sortrow select{flex:1;min-width:0;min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:4px 8px}
 
 .list{display:grid;gap:10px}
+.list.grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
+.list.grid3{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px}
+.grp{grid-column:1/-1;font:600 15px var(--serif);color:var(--muted);margin:10px 0 0;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.card{display:grid;gap:6px;align-content:start;text-align:left;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0}
+.card .cover{width:100%;height:auto;aspect-ratio:2/3;border-radius:3px 8px 8px 3px}
+.card .spine{font-size:40px}
+.card .ct{font:600 15px/1.25 var(--serif);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card .ca{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.grid3 .card{padding:6px;gap:4px}
+.grid3 .card .ct{font-size:12.5px;-webkit-line-clamp:2}
+.grid3 .card .spine{font-size:30px}
 .row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;text-align:left;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
 .cover{width:56px;height:84px;border-radius:3px 6px 6px 3px;overflow:hidden;display:block;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .cover img{width:100%;height:100%;object-fit:cover;display:block}
@@ -320,6 +331,12 @@ function booksToRows(list) {
 const keyTA = x => fold(String(x.title || '')).replace(/[^a-zа-я0-9]/g, '') + '|' + fold(String(x.author || '')).replace(/[^a-zа-я0-9]/g, '');
 const keyT = x => fold(String(x.title || '')).replace(/[^a-zа-я0-9]/g, '');
 /* Same ISBN is not enough: the owner's table has one ISBN on two different titles (a typo somewhere), and those must stay two books. */
+/* Known series typed in Latin letters (a transliteration slip) become the real names. */
+const fixSeries = v => {
+  const t = String(v || '');
+  if (/z?l?atna|zlatna/i.test(t) && /kolek/i.test(t)) { if (/\bxix\b/i.test(t)) return 'Златна колекция на XIX век'; if (/\bxx\b/i.test(t)) return 'Златна колекция на XX век'; }
+  return t;
+};
 const sameBook = (a, b) => {
   const ia = normIsbn(a.isbn), ib = normIsbn(b.isbn);
   if (ia && ib && ia === ib) return !keyT(a) || !keyT(b) || keyT(a) === keyT(b);
@@ -358,7 +375,7 @@ function rowsToBooks(rows, now) {
     });
     if (!any || !(o.title || o.author || o.isbn)) { skipped++; continue; }
     Object.assign(o, { id: 'imp' + (now || Date.now()).toString(36) + (n++).toString(36), createdAt: (now || Date.now()) + n, updatedAt: (now || Date.now()) + n, origin: 'manual', note: '' });
-    o.status = o.status || 'to_read'; o.notes = o.notes || '';
+    o.status = o.status || 'to_read'; o.notes = o.notes || ''; o.series = fixSeries(o.series);
     books.push(o);
   }
   return { books, skipped, unknown, error: '' };
@@ -401,7 +418,8 @@ function filterBooks(books, f) {
     new: (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
     title: (a, b) => bg(a.title, b.title),
     author: (a, b) => bg(a.author, b.author) || bg(a.title, b.title),
-    year: (a, b) => (+b.year || 0) - (+a.year || 0)
+    year: (a, b) => (+b.year || 0) - (+a.year || 0),
+    loc: (a, b) => (a.location ? 0 : 1) - (b.location ? 0 : 1) || bg(a.location, b.location) || bg(a.title, b.title)
   };
   return out.sort(sorts[f.sort] || sorts.new);
 }
@@ -627,7 +645,7 @@ function cleanBook(raw) {
   o.note = clip(raw.note, 500); o.isbn_ok = raw.isbn_ok !== false;
   o.createdAt = Number.isFinite(raw.createdAt) ? raw.createdAt : 0;
   o.updatedAt = Number.isFinite(raw.updatedAt) ? raw.updatedAt : 0;
-  o.thumb = dataImg(raw.thumb, 300000); o.cover = dataImg(raw.cover, 2500000);
+  o.thumb = dataImg(raw.thumb, 300000); o.cover = dataImg(raw.cover, 2500000); o.series = fixSeries(o.series);
   return o;
 }
 const stable = o => JSON.stringify(o, (k, v) => (v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => { a[x] = v[x]; return a; }, {}) : v));
@@ -823,7 +841,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v16)';
+const APP_VERSION = '2026-11-18 (кеш raft-v17)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '' };
 function getSettings() {
@@ -858,6 +876,9 @@ const dbDel = id => tx('readwrite', s => s.delete(id));
 /* ---------- state ---------- */
 let books = [];
 let filter = { q: '', status: '', sort: 'new' };
+let view = 'list';
+try { const u = JSON.parse(localStorage.getItem('raft.ui') || '{}'); if (['list', 'grid2', 'grid3'].includes(u.view)) view = u.view; if (['new', 'title', 'author', 'loc', 'year'].includes(u.sort)) filter.sort = u.sort; } catch (e) { /* optional */ }
+const saveUi = () => { try { localStorage.setItem('raft.ui', JSON.stringify({ view, sort: filter.sort })); } catch (e) { /* optional */ } };
 let cur = null;                 // book being viewed or reviewed
 let draft = newDraft();
 let abortCtl = null;
@@ -903,16 +924,24 @@ function renderLibrary() {
     if (!bm || age == null || age >= 30) html += '<div class="note warn">' + (bm && age != null ? 'Последният архив е отпреди ' + age + ' дни.' : 'Още нямаш архив.') +
       ' Книгите са само на това устройство. <button class="btn sm" id="bBackupNow">Направи архив</button></div>';
     html += '<div class="tools"><input class="search" id="q" type="search" placeholder="Търси по заглавие, автор, издателство, ISBN" value="' + esc(filter.q) + '">' +
-      '<div class="sortrow"><label for="st">Статус</label><select id="st">' +
-      [['', 'всички']].concat(Object.entries(STATUS)).map(([k, l]) => '<option value="' + k + '"' + (filter.status === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
-      (locs.length > 1 ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') +
-      '<div class="sortrow"><label for="sort">Подреди по</label><select id="sort">' +
-      [['new', 'последно добавени'], ['title', 'заглавие'], ['author', 'автор'], ['year', 'година']].map(([k, l]) => '<option value="' + k + '"' + (filter.sort === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div></div>';
-    html += '<div class="list" id="list">' + list.map(b =>
-      '<button class="row" data-id="' + esc(b.id) + '">' + coverHtml(b) +
+      '<div class="chips" id="vw">' + [['list', '☰ Списък'], ['grid2', '▦ По 2 в ред'], ['grid3', '▩ По 3 в ред']].map(([k, l]) => '<button class="chip" data-v="' + k + '" aria-pressed="' + (view === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="chips" id="so">' + [['new', 'Последно добавени'], ['title', 'Заглавие А–Я'], ['author', 'Автор'], ['loc', 'Рафт'], ['year', 'Година']].map(([k, l]) => '<button class="chip" data-s="' + k + '" aria-pressed="' + (filter.sort === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="chips" id="sts">' + [['', 'Всички'], ['to_read', 'За четене'], ['reading', 'Чета'], ['read', 'Прочетени']].map(([k, l]) => '<button class="chip" data-st="' + k + '" aria-pressed="' + (filter.status === k) + '">' + l + '</button>').join('') + '</div>' +
+      (locs.length > 1 ? '<div class="sortrow"><label for="loc">Къде е</label><select id="loc"><option value="">навсякъде</option>' + locs.map(l => '<option' + (filter.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' : '') + '</div>';
+    const groupOf = b => filter.sort === 'title' ? ((b.title || '?').trim().charAt(0).toUpperCase() || '?') : filter.sort === 'author' ? (b.author || 'Без автор') : filter.sort === 'loc' ? (b.location || 'Без рафт') : '';
+    const rowHtml = b => '<button class="row" data-id="' + esc(b.id) + '">' + coverHtml(b) +
       '<span class="meta"><span class="t">' + esc(b.title || 'Без заглавие') + '</span>' + (b.original_title ? '<span class="o">' + esc(b.original_title) + '</span>' : '') + '<span class="a">' + esc(b.author) + '</span>' +
       '<span class="p">' + esc([b.publisher, b.year].filter(Boolean).join(' · ')) + '</span></span>' +
-      (b.status ? '<span class="pill s-' + esc(b.status) + '">' + esc(STATUS[b.status] || '') + '</span>' : '<span></span>') + '</button>').join('') + '</div>';
+      (b.status ? '<span class="pill s-' + esc(b.status) + '">' + esc(STATUS[b.status] || '') + '</span>' : '<span></span>') + '</button>';
+    const cardHtml = b => '<button class="card" data-id="' + esc(b.id) + '">' + coverHtml(b) + '<span class="ct">' + esc(b.title || 'Без заглавие') + '</span>' +
+      (view === 'grid2' && b.author ? '<span class="ca">' + esc(b.author) + '</span>' : '') + '</button>';
+    let body = '', lastG = null;
+    for (const b of list) {
+      const g = groupOf(b);
+      if (g !== lastG) { body += '<h2 class="grp">' + esc(g) + '</h2>'; lastG = g; }
+      body += view === 'list' ? rowHtml(b) : cardHtml(b);
+    }
+    html += '<div class="list ' + view + '" id="list">' + body + '</div>';
     if (!list.length) html += '<div class="empty">Няма книги, които да отговарят на търсенето.</div>';
     html += '<div class="foot"><button class="btn sm" id="bXlsx">Експорт в Excel</button></div>';
   } else {
@@ -926,8 +955,9 @@ function renderLibrary() {
   if ($('#bBackupNow')) $('#bBackupNow').onclick = () => push('settings');
   if ($('#q')) {
     $('#q').oninput = e => { filter.q = e.target.value; refreshList(); };
-    $('#sort').onchange = e => { filter.sort = e.target.value; refreshList(); };
-    $('#st').onchange = e => { filter.status = e.target.value; refreshList(); };
+    app.querySelectorAll('#vw .chip').forEach(c => c.onclick = () => { view = c.dataset.v; saveUi(); refreshList(); });
+    app.querySelectorAll('#so .chip').forEach(c => c.onclick = () => { filter.sort = c.dataset.s; saveUi(); refreshList(); });
+    app.querySelectorAll('#sts .chip').forEach(c => c.onclick = () => { filter.status = c.dataset.st; refreshList(); });
     $('#bXlsx').onclick = exportXlsx;
     if ($('#loc')) $('#loc').onchange = e => { filter.loc = e.target.value; refreshList(); };
     wireRows();
@@ -940,7 +970,7 @@ function refreshList() {
   if (keep) { const q = app.querySelector('#q'); q.focus(); q.setSelectionRange(pos, pos); }
 }
 function wireRows() {
-  app.querySelectorAll('.row').forEach(r => r.onclick = () => {
+  app.querySelectorAll('.row, .card').forEach(r => r.onclick = () => {
     const b = books.find(x => x.id === r.dataset.id);
     if (b) { cur = JSON.parse(JSON.stringify(b)); push('card'); }
   });
@@ -1945,6 +1975,10 @@ function renderSettings() {
 (async function init() {
   history.replaceState({ v: 'library' }, '');
   try { books = await dbAll(); } catch (e) { toast('Хранилището не е достъпно в този режим на браузъра.'); }
+  try {   /* one-time clean-up of series saved in Latin letters */
+    for (const b of books) { const f = fixSeries(b.series); if (f !== (b.series || '')) await dbPut(Object.assign({}, b, { series: f })); }
+    books = await dbAll();
+  } catch (e) { /* not critical */ }
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* best effort */ }
   renderLibrary();
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
