@@ -126,6 +126,8 @@ label.field input{min-height:44px;padding:10px 14px;border-radius:10px;border:1p
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.spin{animation:none;border-top-color:var(--line)}}
 
+.upd{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;gap:8px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:var(--ink);color:var(--bg);font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.upd span{flex:1}
 .covcol{display:grid;gap:6px;justify-items:center}
 .head{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;align-items:end;margin:6px 0 14px}
 .head .cover{width:96px;height:144px}
@@ -842,7 +844,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v20)';
+const APP_VERSION = '2026-11-18 (кеш raft-v21)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -1516,6 +1518,35 @@ function pickHtml(k, l, val) {
     (k === 'location' ? '' : '<input id="f_' + k + '_new" class="newv" hidden placeholder="Нова стойност" autocomplete="off" aria-label="' + esc(l) + ': нова стойност">') +
     '</div></div>';
 }
+/* ---- new version notice: compares the running version with the one on the site ---- */
+let lastUpdCheck = 0;
+async function checkUpdate(manual) {
+  lastUpdCheck = Date.now();
+  try {
+    const r = await fetch('index.html?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('http ' + r.status);
+    const m = (await r.text()).match(/const APP_VERSION = '([^']+)'/);
+    if (m && m[1] !== APP_VERSION) { showUpdate(m[1]); return true; }
+    if (manual) toast('Имаш последната версия.');
+  } catch (e) { if (manual) toast('Не мога да проверя. Няма връзка със сайта.'); }
+  return false;
+}
+function showUpdate(v) {
+  if (document.getElementById('upd')) return;
+  const d = document.createElement('div'); d.id = 'upd'; d.className = 'upd'; d.setAttribute('role', 'status');
+  d.innerHTML = '<span>Има нова версия на Рафт.</span><button class="btn sm primary" id="bUpdNow">Обнови сега</button><button class="btn sm" id="bUpdLater" aria-label="Затвори">✕</button>';
+  document.body.appendChild(d);
+  d.querySelector('#bUpdLater').onclick = () => d.remove();
+  d.querySelector('#bUpdNow').onclick = applyUpdate;
+}
+async function applyUpdate() {
+  try {
+    if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.update().catch(() => {}))); }
+    if (window.caches) for (const k of await caches.keys()) if (!/vendor/.test(k)) await caches.delete(k);
+  } catch (e) { /* reload anyway */ }
+  location.reload();
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Date.now() - lastUpdCheck > 600000) checkUpdate(false); });
 /* ---- optional: copy new cover photos to GitHub (needs a personal token kept only on this phone) ---- */
 const GHQ = 'raft.ghq';
 const ghQueue = () => { try { return JSON.parse(localStorage.getItem(GHQ) || '[]') || []; } catch (e) { return []; } };
@@ -1879,7 +1910,7 @@ function renderSettings() {
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
     '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
     '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
-    '<p class="small">Версия на приложението: ' + APP_VERSION + '</p>';
+    '<p class="small">Версия на приложението: ' + APP_VERSION + '</p><button class="btn block" id="bUpd">Провери за нова версия</button>';
   const $ = x => app.querySelector(x);
   const read = () => {
     const max = Math.min(10, Math.max(1, parseInt($('#max').value, 10) || 6));
@@ -1969,6 +2000,7 @@ function renderSettings() {
     } catch (err) { $('#impOut').innerHTML = '<div class="note bad">Не успях да взема таблицата от сайта. Провери връзката и опитай пак.</div>'; }
     btn.disabled = false;
   };
+  $('#bUpd').onclick = async () => { const b = $('#bUpd'); b.disabled = true; await checkUpdate(true); b.disabled = false; };
   $('#bGhTest').onclick = async () => {
     const out = $('#ghOut'), v = read(); saveSettings(v);
     if (!v.ghToken) { out.innerHTML = '<div class="note bad">Въведи токен.</div>'; return; }
@@ -2057,7 +2089,7 @@ function renderSettings() {
   } catch (e) { /* not critical */ }
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* best effort */ }
   renderLibrary();
-  ghFlush(true);
+  ghFlush(true); checkUpdate(false);
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
