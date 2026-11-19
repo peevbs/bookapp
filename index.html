@@ -997,7 +997,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-19 (кеш raft-v42)';
+const APP_VERSION = '2026-11-19 (кеш raft-v43)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -2499,6 +2499,8 @@ function renderSettings() {
     '<label class="field" for="ghrepo">Хранилище<input id="ghrepo" value="' + esc(s.ghRepo) + '" autocomplete="off" spellcheck="false"></label>' +
     '<label class="field" for="ghtok">Токен на GitHub<input id="ghtok" type="password" value="' + esc(s.ghToken) + '" autocomplete="off" spellcheck="false"></label>' +
     '<div class="acts2"><button class="btn" id="bGhTest">Тествай и качи чакащите</button></div><div id="ghOut"><p class="small">Корици за качване: ' + ghQueue().length + '. Списък с книги: ' + (ghBooksPending() ? 'чака' : 'качен или още не е пускан') + '.</p></div>' +
+    '<h3 class="sec">Корици на цял екран</h3><p class="small">Сваля обработените големи корици (изрязани, изправени, с подобрена рязкост) на телефона, за да се виждат бързо и без интернет. Книгите, които вече ги имат, се пропускат.</p>' +
+    '<button class="btn block" id="bBigAll">Свали всички големи корици</button><div id="bigOut"></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
     '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bSnap">Зареди статусите, оценките и бележките от GitHub</button><div id="snapOut"></div><button class="btn block" id="bRec">Изравни Библиотеката с таблицата (махни дублираните)</button><div id="recOut"></div><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div>' +
     '<button class="btn block" id="bGr">Маркирай прочетените по Goodreads</button><div id="grOut"></div><button class="btn block" id="bGrCsv">Експорт за Goodreads (новопрочетените)</button><div id="grCsvOut"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
@@ -2664,6 +2666,24 @@ function renderSettings() {
     btn.disabled = false;
   };
   $('#bUpd').onclick = async () => { const b = $('#bUpd'); b.disabled = true; await checkUpdate(true); b.disabled = false; };
+  $('#bBigAll').onclick = async () => {
+    const btn = $('#bBigAll'), out = $('#bigOut'); btn.disabled = true;
+    let ok = 0, have = 0, miss = 0, fail = 0, n = 0; const list = books.slice();
+    try {
+      for (const b of list) {
+        n++; out.innerHTML = '<div class="note">Свалям… ' + n + ' от ' + list.length + '</div>';
+        try {
+          if (await bigGet(b.id)) { have++; continue; }
+          const r = await fetch('covers/big/' + encodeURIComponent(b.id) + '.jpg', { cache: 'no-cache' });
+          if (r.status === 404) { miss++; continue; }
+          if (!r.ok) { fail++; continue; }
+          const bl = await r.blob(); if (!/^image\//.test(bl.type)) { miss++; continue; }
+          await bigPut(b.id, bl); ok++;
+        } catch (e) { fail++; if (!navigator.onLine) break; }
+      }
+    } finally { btn.disabled = false; }
+    out.innerHTML = '<div class="note ' + (fail ? 'warn' : 'ok') + '">Свалени: ' + ok + '. Вече налични: ' + have + '. Още не са качени: ' + miss + (fail ? '. Неуспешни (няма връзка?): ' + fail : '') + '.</div>';
+  };
   $('#bGhTest').onclick = async () => {
     const out = $('#ghOut'), v = read(); saveSettings(v);
     if (!v.ghToken) { out.innerHTML = '<div class="note bad">Въведи токен.</div>'; return; }
