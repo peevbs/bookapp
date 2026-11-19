@@ -997,7 +997,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-19 (кеш raft-v41)';
+const APP_VERSION = '2026-11-19 (кеш raft-v42)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -1928,16 +1928,22 @@ const ghQueue = () => { try { return JSON.parse(localStorage.getItem(GHQ) || '[]
 const ghSetQueue = q => { try { localStorage.setItem(GHQ, JSON.stringify(q)); } catch (e) { /* optional */ } };
 const ghEnqueue = id => { const q = ghQueue(); if (!q.includes(id)) { q.push(id); ghSetQueue(q); } };
 const b64utf8 = str => { const u = new TextEncoder().encode(str); let bin = ''; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); };
-async function ghPutFile(path, obj, message, s) {
+async function ghPutFile(path, obj, message, s, rawB64) {
   const url = 'https://api.github.com/repos/' + s.ghRepo + '/contents/' + path;
   const H = { Authorization: 'Bearer ' + s.ghToken, Accept: 'application/vnd.github+json' };
   let sha;
   const g = await fetch(url + '?ref=main', { headers: H, cache: 'no-store' });
   if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) return { ok: false, status: g.status };
-  const body = { message, branch: 'main', content: b64utf8(JSON.stringify(obj)) };
+  const body = { message, branch: 'main', content: rawB64 || b64utf8(JSON.stringify(obj)) };
   if (sha) body.sha = sha;
   const r = await fetch(url, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify(body) });
   return { ok: r.ok, status: r.status };
+}
+/* The big (original-quality) cover goes to covers/big/<id>.jpg, so no photo is lost and other phones can show it too. */
+const blobB64 = blob => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1] || ''); fr.onerror = () => rej(fr.error); fr.readAsDataURL(blob); });
+async function ghPutBig(b, s) {
+  const blob = await bigGet(b.id); if (!blob) return { ok: true, status: 0 };
+  return ghPutFile('covers/big/' + b.id + '.jpg', null, 'Big cover: ' + (b.title || b.id), s, await blobB64(blob));
 }
 const ghPutCover = (b, s) => ghPutFile('covers/new/' + b.id + '.json', { id: b.id, isbn: b.isbn || '', title: b.title || '', author: b.author || '', thumb: b.thumb || '', cover: b.cover || '', at: new Date().toISOString() }, 'Cover: ' + (b.title || b.id), s);
 /* The whole list of books (without pictures) is kept in data/books.json, so GitHub always has the phone's latest data. */
@@ -1959,7 +1965,7 @@ async function ghFlush(quiet) {
     for (const id of q.slice()) {
       const b = books.find(x => x.id === id);
       if (!b || !b.thumb) { ghSetQueue(ghQueue().filter(x => x !== id)); continue; }
-      let r; try { r = await ghPutCover(b, s); } catch (e) { stop = 'Няма връзка. Ще опитам пак, когато си онлайн.'; break; }
+      let r; try { r = await ghPutCover(b, s); if (r.ok) r = await ghPutBig(b, s); } catch (e) { stop = 'Няма връзка. Ще опитам пак, когато си онлайн.'; break; }
       if (r.ok) { ghSetQueue(ghQueue().filter(x => x !== id)); done++; } else { stop = fail(r); break; }
     }
     if (!stop && ghBooksPending()) {
