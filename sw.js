@@ -3,7 +3,7 @@
 // they must work without internet. They are fetched in the background after install, so OCR and the
 // barcode reader work offline even before they were used once.
 // API calls go to other origins and are never touched here.
-const V = 'raft-v40';
+const V = 'raft-v41';
 const VENDOR = 'raft-vendor-v1';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 const VENDOR_FILES = [
@@ -42,6 +42,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
   if (e.request.method !== 'GET' || u.origin !== location.origin) return;
+  if (u.pathname.includes('/covers/big/')) return;      // big covers go straight to the network; the app keeps its own copy
   if (u.pathname.includes('/vendor/')) {
     e.respondWith(
       caches.open(VENDOR).then(c => c.match(e.request, { ignoreSearch: true }).then(hit => hit || fetch(e.request).then(r => {
