@@ -258,6 +258,20 @@ h3.sec{font-size:16px;margin:22px 0 6px}
 .small{font-size:13px;color:var(--muted)}
 
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:min(92vw,520px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:20}
+
+/* ---- start-up splash ---- */
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;background:radial-gradient(120% 90% at 50% 30%,#14595b 0%,#0b3436 55%,#071e20 100%);color:#f3d58a;overflow:hidden;transition:opacity .45s ease}
+#splash.out{opacity:0;pointer-events:none}
+#splash .lg{margin-top:12vh;width:min(46vw,200px);aspect-ratio:1;border-radius:22%;box-shadow:0 0 0 1px rgba(243,213,138,.25),0 18px 50px rgba(0,0,0,.5),0 0 60px rgba(243,200,100,.28);opacity:0;transform:translateY(-14px) scale(.9);animation:spLogo 1s cubic-bezier(.2,.8,.2,1) .1s forwards}
+#splash .nm{margin-top:15vh;padding:0 24px;text-align:center;font:italic 600 clamp(30px,9vw,44px)/1.15 "Cormorant Garamond",Georgia,serif;opacity:0;filter:blur(6px);letter-spacing:.3em;animation:spName 1.3s ease .75s forwards;text-shadow:0 0 22px rgba(243,200,100,.45)}
+#splash .nm small{display:block;margin-top:10px;font-size:.5em;letter-spacing:.35em;text-transform:uppercase;font-style:normal;opacity:.0;animation:spSub 1s ease 1.5s forwards}
+#splash .nm svg{display:block;margin:14px auto 0;width:150px;height:20px;color:#f3d58a;opacity:.8}
+#splash i{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffe9a8;box-shadow:0 0 8px 2px rgba(255,225,140,.8);opacity:0;animation:spTw 1.8s ease-in-out infinite}
+@keyframes spLogo{to{opacity:1;transform:none}}
+@keyframes spName{to{opacity:1;filter:blur(0);letter-spacing:.04em}}
+@keyframes spSub{to{opacity:.8}}
+@keyframes spTw{0%,100%{opacity:0;transform:translateY(6px) scale(.5)}50%{opacity:1;transform:translateY(-8px) scale(1)}}
+@media (prefers-reduced-motion:reduce){#splash .lg,#splash .nm{animation-duration:.01s;animation-delay:0s;filter:none}#splash i{display:none}}
 </style>
 </head>
 <body>
@@ -267,6 +281,41 @@ h3.sec{font-size:16px;margin:22px 0 6px}
 <g id="orh"><path d="M66.5 8C73 8 75 2.6 83 3.2 89 3.7 90 10.4 84.6 10.6 81 10.8 80.4 6.6 83.6 6.2"/><path d="M88 8.6C96 12.6 106 12.8 115 6.6"/><path d="M97 10.2C98.6 6.4 102.6 5 107 6.2 105.2 9.4 101.4 11 97 10.2Z" fill="currentColor"/><circle cx="116" cy="6.2" r="1.2" fill="currentColor" stroke="none"/></g>
 <use href="#orh" transform="matrix(-1 0 0 1 120 0)"/></g></symbol>
 </defs></svg>
+<div id="splash" role="img" aria-label="Библиотеката на Ивайло"><img class="lg" src="icon-512.png" alt="" width="200" height="200"><div class="nm">Библиотеката на Ивайло<svg viewBox="0 0 120 16" aria-hidden="true"><use href="#orn"/></svg></div></div>
+<script>
+/* Splash: sparkles + a soft fairy chime (Web Audio, no file). Browsers may keep sound off until the first touch. */
+(function () {
+  var sp = document.getElementById('splash'); if (!sp) return;
+  var done = false, t0 = Date.now();
+  function close() { if (done) return; done = true; sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 500); }
+  for (var n = 0; n < 16; n++) { var d = document.createElement('i'); d.style.left = (8 + Math.random() * 84) + '%'; d.style.top = (6 + Math.random() * 78) + '%'; d.style.animationDelay = (0.5 + Math.random() * 1.8).toFixed(2) + 's'; d.style.animationDuration = (1.4 + Math.random() * 1.2).toFixed(2) + 's'; sp.appendChild(d); }
+  var played = false, ctx = null;
+  function chime() {
+    if (played) return;
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') { ctx.resume(); }
+      if (ctx.state !== 'running') return;
+      played = true;
+      var out = ctx.createGain(); out.gain.value = 0.22; out.connect(ctx.destination);
+      var dl = ctx.createDelay(); dl.delayTime.value = 0.23; var fb = ctx.createGain(); fb.gain.value = 0.38; dl.connect(fb); fb.connect(dl); dl.connect(out);
+      var t = ctx.currentTime + 0.05, notes = [1318.5, 1568, 1975.5, 2637, 3136, 3951];
+      notes.forEach(function (f, i) {
+        [[f, 'sine', 1], [f * 2.01, 'triangle', 0.25]].forEach(function (p) {
+          var o = ctx.createOscillator(), g = ctx.createGain(); o.type = p[1]; o.frequency.value = p[0];
+          var st = t + i * 0.085; g.gain.setValueAtTime(0.0001, st); g.gain.exponentialRampToValueAtTime(0.5 * p[2], st + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, st + 0.9);
+          o.connect(g); g.connect(out); g.connect(dl); o.start(st); o.stop(st + 1);
+        });
+      });
+    } catch (e) { /* no sound is fine */ }
+  }
+  setTimeout(chime, 600);
+  sp.addEventListener('pointerdown', function () { chime(); });
+  document.addEventListener('pointerdown', chime, { once: true });
+  setTimeout(close, 2900);
+  sp.addEventListener('click', close);
+})();
+</script>
 <main id="app" aria-live="polite"></main>
 <button id="toTop" aria-label="Нагоре" title="Нагоре"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 15 7-7 7 7"/></svg></button>
 <div id="toast" class="toast" hidden></div>
@@ -945,7 +994,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v31)';
+const APP_VERSION = '2026-11-18 (кеш raft-v32)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
