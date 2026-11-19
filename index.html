@@ -204,6 +204,7 @@ a.hl{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
 .stars .off{color:var(--line)}
 .grb{display:grid;justify-items:center;gap:8px;padding:6px 0}
 .grb .btn{min-width:60%}
+.grb .btn.tiny{min-width:0}
 .btn.tiny{min-height:30px;padding:3px 12px;font-size:13px;border-color:var(--line);opacity:.85}
 .delrow{display:flex;justify-content:center;margin:4px 0 24px}
 .sheet .opts{display:grid;gap:6px;max-height:52vh;overflow:auto}
@@ -994,7 +995,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v33)';
+const APP_VERSION = '2026-11-18 (кеш raft-v34)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -1752,7 +1753,19 @@ async function enrich() {
 }
 
 /* ---------- Goodreads helpers ---------- */
-const goodreadsUrl = b => 'https://www.goodreads.com/search?q=' + encodeURIComponent(normIsbn(b.isbn) || [b.original_title || b.title, b.original_title ? b.author : b.author].filter(Boolean).join(' '));
+/* Goodreads searches in the order of trust: ISBN, ISSN, Bulgarian title + author, original title. The first is the link; the rest are offered if it finds nothing. */
+const GR = 'https://www.goodreads.com/search?q=';
+function goodreadsTries(b) {
+  const t = [], isbn = normIsbn(b.isbn), issn = normIssn(b.isbn);
+  if (isbn) t.push(['ISBN ' + isbn, GR + encodeURIComponent(isbn)]);
+  if (issn && !isbn) t.push(['ISSN ' + issn, GR + encodeURIComponent(issn)]);
+  const bg = [b.title, b.author].filter(Boolean).join(' ').trim();
+  if (bg) t.push(['Българско заглавие и автор', GR + encodeURIComponent(bg)]);
+  const o = String(b.original_title || '').split(/\s*[;\/]\s*/)[0].replace(/\s*\(.*\)\s*$/, '').trim();
+  if (o && fold(o) !== fold(b.title)) t.push(['Оригинално заглавие', GR + encodeURIComponent(o)]);
+  return t;
+}
+const goodreadsUrl = b => (goodreadsTries(b)[0] || ['', GR])[1];
 function toastAct(msg, label, fn) {
   const t = document.getElementById('toast');
   t.innerHTML = '<span></span> <button class="btn sm" type="button"></button>';
@@ -2101,7 +2114,7 @@ function renderCard() {
       (b.notes ? '<div class="f wide"><label>Бележки</label><div class="v">' + esc(b.notes) + '</div></div>' : '');
   }
   const rt = ratingOf(b);
-  if (!isNew) html += '<div class="f wide grb"><button class="btn" id="bGrOpen" type="button">Отвори в Goodreads</button>' + (rt ? starsHtml(rt) : '') + '</div>';
+  if (!isNew) html += '<div class="f wide grb"><button class="btn" id="bGrOpen" type="button">Отвори в Goodreads</button>' + (rt ? starsHtml(rt) : '') + (goodreadsTries(b).length > 1 ? '<button class="btn tiny" id="bGrMore" type="button">Не го намира? Други търсения</button>' : '') + '</div>';
   html += '</div>';
   if ((b.sources || []).length) html += '<h3 class="sec">Източници</h3><div class="srcs">' +
     b.sources.map(s => '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + esc(s.title) + '</a>').join('') + '</div>';
@@ -2121,6 +2134,7 @@ function renderCard() {
     z.onclick = () => z.remove(); document.body.appendChild(z);
   };
   if ($('#bGrOpen')) $('#bGrOpen').onclick = () => { if (editing) readForm(); openUrl(goodreadsUrl(cur)); };
+  if ($('#bGrMore')) $('#bGrMore').onclick = () => { if (editing) readForm(); const tr = goodreadsTries(cur); pickSheet('Търси в Goodreads по', { options: tr.map((x, i) => [String(i), x[0]]), none: '', allowNew: false }, '', v => { if (v !== '') openUrl(tr[+v][1]); }); };
   const stored = () => books.find(x => x.id === cur.id);
   if ($('#bEdit')) $('#bEdit').onclick = () => {
     if (editing) { const o = stored(); if (o) cur = JSON.parse(JSON.stringify(o)); editOpen = null; } else editOpen = id;
@@ -2684,6 +2698,19 @@ function renderSettings() {
     for (const b of books) { const f = fixSeries(b.series), st = b.status === 'reading' ? 'to_read' : b.status; if (f !== (b.series || '') || st !== b.status) await dbPut(Object.assign({}, b, { series: f, status: st })); }
     books = await dbAll();
   } catch (e) { /* not critical */ }
+  try {   /* corrections of original titles published in data/fixes.json; each version is applied once, only where the old value is still there */
+    const seen = +localStorage.getItem('raft.fixv') || 0;
+    const r = await fetch('data/fixes.json?t=' + Date.now(), { cache: 'no-store' });
+    if (r.ok) {
+      const f = await r.json();
+      if ((f.version || 0) > seen && Array.isArray(f.fixes)) {
+        let n = 0;
+        for (const x of f.fixes) for (const b of books) if (b.original_title === x.from && keyT(b) === keyT({ title: x.title })) { await dbPut(Object.assign({}, b, { original_title: x.to, updatedAt: Date.now() })); n++; }
+        localStorage.setItem('raft.fixv', String(f.version)); books = await dbAll();
+        if (n) setTimeout(() => toast('Поправени оригинални заглавия: ' + n + '.'), 3300);
+      }
+    }
+  } catch (e) { /* offline: tried again next time */ }
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* best effort */ }
   renderLibrary();
   ghFlush(true); checkUpdate(false);

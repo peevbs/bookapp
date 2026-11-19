@@ -1,0 +1,101 @@
+{
+ "version": 1,
+ "fixes": [
+  {
+   "title": "Поп, дама, вале / Смях в тъмното",
+   "author": "Владимир Набоков",
+   "from": "King, Queen, Knave / Laughter in the Dark",
+   "to": "Король, дама, валет / Камера обскура"
+  },
+  {
+   "title": "Дамата с камелиите",
+   "author": "Александър Дюма-син",
+   "from": "La dame aux camelias",
+   "to": "La Dame aux camélias"
+  },
+  {
+   "title": "Архивът на Асперн",
+   "author": "Хенри Джеймс",
+   "from": "The Aspern papers",
+   "to": "The Aspern Papers"
+  },
+  {
+   "title": "Моби Дик",
+   "author": "Херман Мелвил",
+   "from": "Moby Dick",
+   "to": "Moby-Dick; or, The Whale"
+  },
+  {
+   "title": "Йосиф в Египет",
+   "author": "Томас Ман",
+   "from": "Josef und seine Brüder",
+   "to": "Joseph in Ägypten"
+  },
+  {
+   "title": "Черната Далия",
+   "author": "Джеймс Елрой",
+   "from": "Black Dahlia",
+   "to": "The Black Dahlia"
+  },
+  {
+   "title": "Прагът на зрелостта",
+   "author": "Джоузеф Конрад",
+   "from": "The Shadow line",
+   "to": "The Shadow-Line"
+  },
+  {
+   "title": "Десет малки негърчета",
+   "author": "Агата Кристи",
+   "from": "Ten Little Niggers",
+   "to": "And Then There Were None"
+  },
+  {
+   "title": "Безнадежден случай",
+   "author": "Грейъм Грийн",
+   "from": "A Burnt-out Case",
+   "to": "A Burnt-Out Case"
+  },
+  {
+   "title": "Погнусата",
+   "author": "Жан-Пол Сартър",
+   "from": "La nausée",
+   "to": "La Nausée"
+  },
+  {
+   "title": "Гласът на планината",
+   "author": "Ясунари Кавабата",
+   "from": "The Sound of the Mountain / Yama no oto",
+   "to": "山の音 (Yama no oto)"
+  },
+  {
+   "title": "Златният храм",
+   "author": "Юкио Мишима",
+   "from": "Kinkakuji",
+   "to": "金閣寺 (Kinkakuji)"
+  },
+  {
+   "title": "Фарс, или никога вече самота",
+   "author": "Кърт Вонегът",
+   "from": "Slapstick, or Lonesome No More",
+   "to": "Slapstick or Lonesome No More!"
+  },
+  {
+   "title": "Франкенщайн",
+   "author": "Мери Шели",
+   "from": "Frankenstein (Or, the Modern Prometheus)",
+   "to": "Frankenstein; or, The Modern Prometheus"
+  },
+  {
+   "title": "Алиса в страната на чудесата. Алиса в огледалния свят",
+   "author": "Луис Карол",
+   "from": "Alice's adventures in Wonderland; Through the Looking-Glass, and what Alice found there",
+   "to": "Alice's Adventures in Wonderland; Through the Looking-Glass, and What Alice Found There"
+  },
+  {
+   "title": "Възпоминание за манастира",
+   "author": "Жузе Сарамагу",
+   "from": "Memorial do convento",
+   "to": "Memorial do Convento"
+  }
+ ]
+}
