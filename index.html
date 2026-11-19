@@ -994,7 +994,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v32)';
+const APP_VERSION = '2026-11-18 (кеш raft-v33)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -2380,7 +2380,7 @@ function renderSettings() {
     '<label class="field" for="ghtok">Токен на GitHub<input id="ghtok" type="password" value="' + esc(s.ghToken) + '" autocomplete="off" spellcheck="false"></label>' +
     '<div class="acts2"><button class="btn" id="bGhTest">Тествай и качи чакащите</button></div><div id="ghOut"><p class="small">Корици за качване: ' + ghQueue().length + '. Списък с книги: ' + (ghBooksPending() ? 'чака' : 'качен или още не е пускан') + '.</p></div>' +
     '<h3 class="sec">Таблица (Excel)</h3><p class="small">Същите колони като в твоята таблица. Импортът само добавя нови книги и попълва празни полета, нищо не презаписва и не изтрива. Книги се познават по ISBN, а без ISBN по заглавие и автор.</p>' +
-    '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bRec">Изравни Библиотеката с таблицата (махни дублираните)</button><div id="recOut"></div><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div>' +
+    '<button class="btn block" id="bGh">Зареди най-новата таблица от сайта</button><button class="btn block" id="bSnap">Зареди статусите, оценките и бележките от GitHub</button><div id="snapOut"></div><button class="btn block" id="bRec">Изравни Библиотеката с таблицата (махни дублираните)</button><div id="recOut"></div><button class="btn block" id="bGhCov">Зареди корици от сайта</button><div id="covGh"></div>' +
     '<button class="btn block" id="bGr">Маркирай прочетените по Goodreads</button><div id="grOut"></div><button class="btn block" id="bGrCsv">Експорт за Goodreads (новопрочетените)</button><div id="grCsvOut"></div><div class="acts2"><button class="btn primary" id="bXlsx">Експорт в Excel</button><label class="btn">Импорт от таблица<input class="vh" id="impT" type="file" accept=".xlsx,.xls,.csv,text/csv"></label></div><div id="impOut"></div>' +
     '<div class="acts2"><button class="btn" id="bCsv">Експорт в CSV</button></div>' +
     '<p class="small">Версия на приложението: ' + APP_VERSION + '</p><button class="btn block" id="bUpd">Провери за нова версия</button>';
@@ -2471,6 +2471,28 @@ function renderSettings() {
         return r.arrayBuffer();
       });
     } catch (err) { $('#impOut').innerHTML = '<div class="note bad">Не успях да взема таблицата от сайта. Провери връзката и опитай пак.</div>'; }
+    btn.disabled = false;
+  };
+  /* The phone keeps data/books.json up to date in GitHub; this brings its statuses, dates, ratings and notes onto another phone. Nothing local is overwritten except a plain "to read" status. */
+  $('#bSnap').onclick = async () => {
+    const btn = $('#bSnap'), out = $('#snapOut'); btn.disabled = true; out.innerHTML = '<p class="small">Чета последния запис…</p>';
+    try {
+      const r = await fetch('data/books.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('http ' + r.status);
+      const snap = ((await r.json()).books || []).map(cleanBook).filter(Boolean);
+      if (!snap.length) { out.innerHTML = '<div class="note warn">В GitHub още няма запис на книгите от телефона.</div>'; btn.disabled = false; return; }
+      const local = await dbAll(); let added = 0, upd = 0;
+      for (const t of snap) {
+        const m = local.find(b => b.id === t.id) || local.find(b => sameBook(b, t));
+        if (!m) { await dbPut(Object.assign({}, t, { thumb: '', cover: '' })); added++; continue; }
+        const patch = {};
+        for (const k of MERGE_KEYS.concat(['readDate', 'rating'])) if (!String(m[k] || '').trim() && String(t[k] || '').trim()) patch[k] = t[k];
+        if (m.status === 'to_read' && t.status !== 'to_read') patch.status = t.status;
+        if (Object.keys(patch).length) { await dbPut(Object.assign({}, m, patch, { updatedAt: Date.now() })); upd++; }
+      }
+      books = await dbAll();
+      out.innerHTML = '<div class="note ok">Готово: допълнени ' + upd + ' книги, добавени нови ' + added + '. Кориците се зареждат от „Зареди корици от сайта“.</div>';
+    } catch (err) { out.innerHTML = '<div class="note bad">Не успях да прочета записа от сайта. Провери връзката и опитай пак.</div>'; }
     btn.disabled = false;
   };
   /* Make the shelf match the table one to one: every table row keeps exactly one book, leftovers from older imports are listed and removed. */
