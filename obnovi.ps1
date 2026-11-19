@@ -32,7 +32,7 @@ try {
       Copy-Item $f.FullName $dest -Force; $changed += $rel
     } else { $same++ }
   }
-  # Корици, качени от телефона (covers\new, covers\big): остават СЛЕД копирането на компютъра, а от публичното хранилище се трият.
+  # Малките корици, качени от телефона (covers\new), остават СЛЕД копирането на компютъра, а от публичното хранилище се трият. Големите (covers\big) остават в хранилището за постоянно, за да се виждат от всеки телефон.
   # Трие се само ако в папката има файл .gh-token (токен на GitHub с право за запис) и само файлове, които вече са тук и са еднакви.
   $removed = 0; $removeNote = ''
   $tokenFile = Join-Path $dir '.gh-token'
@@ -40,7 +40,7 @@ try {
     try {
       $tok = (Get-Content $tokenFile -Raw).Trim()
       $H = @{ 'User-Agent' = 'raft-sync'; Authorization = ('Bearer ' + $tok); Accept = 'application/vnd.github+json' }
-      foreach ($sub in @('covers/new', 'covers/big')) {
+      foreach ($sub in @('covers/new')) {
         $list = $null
         try { $list = Invoke-RestMethod -UseBasicParsing -Uri ("https://api.github.com/repos/$repo/contents/$sub" + '?ref=main') -Headers $H } catch { continue }   # папката я няма: нищо за трите
         foreach ($it in @($list)) {
