@@ -996,7 +996,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v35)';
+const APP_VERSION = '2026-11-18 (кеш raft-v36)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -1754,7 +1754,7 @@ async function enrich() {
 }
 
 /* ---------- Goodreads helpers ---------- */
-/* Goodreads searches in the order of trust: ISBN, ISSN, Bulgarian title + author, original title. The first is the link; the rest are offered if it finds nothing. */
+/* Goodreads searches: saved exact page, original title, Bulgarian title + author; ISBN / ISSN only as a last option. The first is the link; the rest are offered if it finds nothing. */
 const GR = 'https://www.goodreads.com/search?q=';
 /* The exact Goodreads page the owner confirmed for a book (…/book/show/…); kept with the book and synced to GitHub with the rest. */
 function grUrlOk(u) {
@@ -1764,12 +1764,12 @@ function grUrlOk(u) {
 function goodreadsTries(b) {
   const t = [], isbn = normIsbn(b.isbn), issn = normIssn(b.isbn);
   if (grUrlOk(b.grUrl)) t.push(['Запазена връзка', grUrlOk(b.grUrl)]);
-  if (isbn) t.push(['ISBN ' + isbn, GR + encodeURIComponent(isbn)]);
-  if (issn && !isbn) t.push(['ISSN ' + issn, GR + encodeURIComponent(issn)]);
-  const bg = [b.title, b.author].filter(Boolean).join(' ').trim();
-  if (bg) t.push(['Българско заглавие и автор', GR + encodeURIComponent(bg)]);
   const o = String(b.original_title || '').split(/\s*[;\/]\s*/)[0].replace(/\s*\(.*\)\s*$/, '').trim();
   if (o && fold(o) !== fold(b.title)) t.push(['Оригинално заглавие', GR + encodeURIComponent(o)]);
+  const bg = [b.title, b.author].filter(Boolean).join(' ').trim();
+  if (bg) t.push(['Българско заглавие и автор', GR + encodeURIComponent(bg)]);
+  if (isbn) t.push(['ISBN ' + isbn, GR + encodeURIComponent(isbn)]);   /* only as a last resort, never the default */
+  else if (issn) t.push(['ISSN ' + issn, GR + encodeURIComponent(issn)]);
   return t;
 }
 const goodreadsUrl = b => (goodreadsTries(b)[0] || ['', GR])[1];
