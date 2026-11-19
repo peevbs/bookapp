@@ -73,7 +73,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 button.rrow{cursor:pointer}
 .rd{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
 .rt{display:grid;gap:1px;min-width:0}
-.rt b{font:600 15px/1.25 var(--serif);overflow-wrap:anywhere}
+.rt b{font:600 15px/1.25 var(--serif);overflow-wrap:break-word;hyphens:manual}
 .rt span{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
 .rs{color:#c58a00;font-size:12px;white-space:nowrap}
 #yrs{margin-bottom:6px}
@@ -105,7 +105,7 @@ button.rrow{cursor:pointer}
 .bk{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0;height:100%}
 .bk .cover{width:100%;height:auto;aspect-ratio:2/3;border-radius:3px 8px 8px 3px;flex:none}
 .bk .spine{font-size:40px}
-.bk .ct{width:100%;font:600 15px/1.25 var(--serif);text-align:center;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bk .ct{width:100%;font:600 15px/1.25 var(--serif);text-align:center;overflow-wrap:break-word;hyphens:manual;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .bk .ca{width:100%;color:var(--muted);font-size:12px;letter-spacing:.07em;text-transform:uppercase;text-align:center;overflow-wrap:anywhere}
 .bk .pill{align-self:stretch;flex:none;display:block;text-align:center;font-size:15px;padding:9px 6px;white-space:normal}
 .grid3 .bk{padding:6px;gap:4px}
@@ -126,7 +126,7 @@ h3.sec::after,.grp::after{content:"";flex:1;height:12px;color:var(--muted);opaci
 .cover img{width:100%;height:100%;object-fit:cover;display:block}
 .spine{width:100%;height:100%;display:grid;place-items:center;color:#fff;font:600 26px var(--serif);border-left:6px solid rgba(0,0,0,.25)}
 .meta{display:grid;gap:2px;min-width:0}
-.meta .t{font:600 17px/1.25 var(--serif);overflow-wrap:anywhere}
+.meta .t{font:600 17px/1.25 var(--serif);overflow-wrap:break-word;hyphens:manual}
 .meta .a{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
 .meta .o,.head .o{color:var(--muted);font:italic 14px/1.3 var(--serif);overflow-wrap:anywhere}
 .meta .p{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
@@ -180,7 +180,7 @@ label.field input{min-height:44px;padding:10px 14px;border-radius:10px;border:1p
 .head2 .cover{width:132px;height:198px}
 .head2 .spine{font-size:48px}
 .ht{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;min-width:0;min-height:198px}
-.ht .bt{font:600 26px/1.12 "Cormorant Garamond",var(--serif);overflow-wrap:anywhere;text-wrap:balance}
+.ht .bt{font:600 26px/1.12 "Cormorant Garamond",var(--serif);overflow-wrap:break-word;hyphens:manual;text-wrap:balance}
 .ht .o{font:italic 600 17px/1.2 "Cormorant Garamond",var(--serif);color:var(--muted);overflow-wrap:anywhere}
 .ht .au{font:600 12px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.85;overflow-wrap:anywhere}
 .ht .tb,.ht .ab{display:grid;gap:4px;justify-items:center;width:100%}
@@ -996,7 +996,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-19 (кеш raft-v38)';
+const APP_VERSION = '2026-11-19 (кеш raft-v39)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -1114,7 +1114,7 @@ function renderRead() {
     html += '</div>';
   }
   if (part.length) {
-    html += '<h2 class="grp" id="yчаст">Частично прочетени · ' + part.length + '</h2><div class="rtab">' + part.map(b => '<button class="rrow" data-id="' + esc(b.id) + '"><span class="rd"></span><span class="rt"><b>' + esc(b.title) + '</b><span>' + esc(b.author) + '</span></span><span class="rs"></span></button>').join('') + '</div>';
+    html += '<h2 class="grp" id="yчаст">Частично прочетени · ' + part.length + '</h2><div class="rtab">' + part.map(b => '<button class="rrow" data-id="' + esc(b.id) + '"><span class="rd"></span><span class="rt"><b>' + esc(softHy(b.title)) + '</b><span>' + esc(b.author) + '</span></span><span class="rs"></span></button>').join('') + '</div>';
   }
   app.innerHTML = html;
   app.querySelector('#bBack').onclick = back;
@@ -1149,10 +1149,10 @@ function renderLibrary() {
       (nAct ? '<button class="btn sm" id="bClrF">Изчисти филтрите</button>' : '') + '</div></div>';
     const groupOf = b => filter.sort === 'title' ? ((b.title || '?').trim().charAt(0).toUpperCase() || '?') : filter.sort === 'author' ? (b.author || 'Без автор') : filter.sort === 'loc' ? (b.location || 'Без местоположение') : filter.sort === 'series' ? (b.series || 'Без поредица') : '';
     const rowHtml = b => '<button class="row" data-id="' + esc(b.id) + '">' + coverHtml(b) +
-      '<span class="meta"><span class="t">' + esc(b.title || 'Без заглавие') + '</span>' + (b.original_title ? '<span class="o">' + esc(b.original_title) + '</span>' : '') + '<span class="a">' + esc(b.author) + '</span>' +
+      '<span class="meta"><span class="t">' + esc(softHy(b.title || 'Без заглавие')) + '</span>' + (b.original_title ? '<span class="o">' + esc(b.original_title) + '</span>' : '') + '<span class="a">' + esc(b.author) + '</span>' +
       '<span class="p">' + esc([b.publisher, b.year].filter(Boolean).join(' · ')) + '</span></span>' +
       '<span class="pill pick s-' + esc(b.status || 'to_read') + '" data-pick="1" role="button" aria-label="Смени статуса">' + esc(STATUS[b.status || 'to_read'] || '') + ' ▾</span></button>';
-    const cardHtml = b => '<button class="bk" data-id="' + esc(b.id) + '">' + coverHtml(b) + '<span class="ct">' + esc(b.title || 'Без заглавие') + '</span>' +
+    const cardHtml = b => '<button class="bk" data-id="' + esc(b.id) + '">' + coverHtml(b) + '<span class="ct">' + esc(softHy(b.title || 'Без заглавие')) + '</span>' +
       (view === 'grid2' && b.author ? '<span class="ca">' + esc(b.author) + '</span>' : '') +
       '<span class="gap" aria-hidden="true"><svg class="orn"><use href="#orn"/></svg></span>' +
       (view === 'grid2' ? '<span class="pill pick s-' + esc(b.status || 'to_read') + '" data-pick="1" role="button" aria-label="Смени статуса">' + esc(STATUS[b.status || 'to_read'] || '') + ' ▾</span>' : '') + '</button>';
@@ -1978,6 +1978,33 @@ function ratingOf(b) {
 }
 const CARD_LABEL = { isbn: 'ISBN / ISSN', location: 'Местоположение' };
 const labelOf = ([k, l]) => CARD_LABEL[k] || l;
+/* Bulgarian word division (soft hyphens): V-CV and VC-CV, at least two letters on each side; the browser uses them only when a word does not fit. */
+const BG_V = 'аъоуеиюя';
+function softHy(t) {
+  return String(t || '').replace(/[А-Яа-я]{7,}/g, w => {
+    const l = w.toLowerCase(), v = i => BG_V.includes(l[i]); let out = '';
+    for (let i = 0; i < w.length; i++) {
+      out += w[i];
+      if (i < 1 || i > w.length - 3 || 'йь'.includes(l[i + 1])) continue;
+      const brk = (v(i) && !v(i + 1) && v(i + 2)) ||
+        (!v(i) && !v(i + 1) && v(i - 1) && !'йь'.includes(l[i]) && l[i] + l[i + 1] !== 'дж' && l[i] + l[i + 1] !== 'дз');
+      if (brk) out += '\u00AD';
+    }
+    return out;
+  });
+}
+/* Header title: the longest word should fit whole, so shrink the type a little (down to 19px); only then does it divide. */
+function fitTitle(el) {
+  try {
+    const w = el.clientWidth; if (!w) return;
+    const words = el.textContent.replace(/\u00AD/g, '').split(/\s+/), longest = words.sort((a, b) => b.length - a.length)[0] || '';
+    const m = document.createElement('span'); m.textContent = longest;
+    m.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:600 26px/1 "Cormorant Garamond",serif';
+    el.appendChild(m); const full = m.getBoundingClientRect().width; m.remove();
+    let size = 26; while (size > 19 && full * size / 26 > w - 2) size--;
+    el.style.fontSize = size + 'px';
+  } catch (e) { /* keep the default size */ }
+}
 /* Goodreads author pages (checked against the Goodreads search results of the matched books; also in data/goodreads-authors.json). The name in the "Автор" field picks the page. */
 const GRA = {"Дан Браун":"https://www.goodreads.com/author/show/630.Dan_Brown","Никълъс Спаркс":"https://www.goodreads.com/author/show/2345.Nicholas_Sparks","Дейвид Никълс":"https://www.goodreads.com/author/show/46118.David_Nicholls","Джон Грийн":"https://www.goodreads.com/author/show/1406384.John_Green","Ванеса Грийн":"https://www.goodreads.com/author/show/6424005.Vanessa_Greene","Вирджиния Улф":"https://www.goodreads.com/author/show/6765.Virginia_Woolf","М. Найт Шамалан":"https://www.goodreads.com/author/show/51170.M_Night_Shyamalan","Кърт Вонегът":"https://www.goodreads.com/author/show/2778055.Kurt_Vonnegut_Jr_","Никос Казандзакис":"https://www.goodreads.com/author/show/32543297.Nikos_Kazantzakis","Андре Жид":"https://www.goodreads.com/author/show/7617.Andr_Gide","Салман Рушди":"https://www.goodreads.com/author/show/3299.Salman_Rushdie","Жозе Сарамаго":"https://www.goodreads.com/author/show/1285555.Jos_Saramago","Стефан Цвайг":"https://www.goodreads.com/author/show/25573.Stefan_Zweig","Луи-Фердинан Селин":"https://www.goodreads.com/author/show/7869.Louis_Ferdinand_C_line","Ясунари Кавабата":"https://www.goodreads.com/author/show/8550.Yasunari_Kawabata","Борис Виан":"https://www.goodreads.com/author/show/15959.Boris_Vian","Карен Бликсен":"https://www.goodreads.com/author/show/7215049.Isak_Dinesen","Итало Калвино":"https://www.goodreads.com/author/show/155517.Italo_Calvino","Съмърсет Моъм":"https://www.goodreads.com/author/show/4176632.W_Somerset_Maugham","Гюнтер Грас":"https://www.goodreads.com/author/show/749461.G_nter_Grass","Иън Макюън":"https://www.goodreads.com/author/show/2408.Ian_McEwan","Уилям Текери":"https://www.goodreads.com/author/show/3953.William_Makepeace_Thackeray","Стендал":"https://www.goodreads.com/author/show/1481537.Stendhal","Джейн Остин":"https://www.goodreads.com/author/show/1265.Jane_Austen","Маргарет Мичъл":"https://www.goodreads.com/author/show/11081.Margaret_Mitchell","Ан Бронте":"https://www.goodreads.com/author/show/8249.Anne_Bront_","Емили Бронте":"https://www.goodreads.com/author/show/4191.Emily_Bront_","Шарлот Бронте":"https://www.goodreads.com/author/show/1036615.Charlotte_Bront_","Томас Харди":"https://www.goodreads.com/author/show/15905.Thomas_Hardy","Тадеуш Доленга-Мостович":"https://www.goodreads.com/author/show/962299.Tadeusz_Do_ga_Mostowicz","Владимир Короленко":"https://www.goodreads.com/author/show/4919787.Vladimir_Korolenko","Емел Лилиан Войнич":"https://www.goodreads.com/author/show/799335.Ethel_Lilian_Voynich","Гюстав Флобер":"https://www.goodreads.com/author/show/1461.Gustave_Flaubert","Хенрик Сенкевич":"https://www.goodreads.com/author/show/25619.Henryk_Sienkiewicz","Ф. Скот Фицджералд":"https://www.goodreads.com/author/show/3190.F_Scott_Fitzgerald","Елизабет Гилбърт":"https://www.goodreads.com/author/show/11679.Elizabeth_Gilbert","Виктор Пасков":"https://www.goodreads.com/author/show/1109736.Viktor_Paskov","Виктор Юго":"https://www.goodreads.com/author/show/13661.Victor_Hugo","Брам Стокър":"https://www.goodreads.com/author/show/6988.Bram_Stoker","Александър Дюма-син":"https://www.goodreads.com/author/show/3186713.Alexandre_Dumas_fils","Робърт Луи Стивънсън":"https://www.goodreads.com/author/show/854076.Robert_Louis_Stevenson","Луиза Мей Олкът":"https://www.goodreads.com/author/show/1315.Louisa_May_Alcott","Пол Остър":"https://www.goodreads.com/author/show/296961.Paul_Auster","Лев Толстой":"https://www.goodreads.com/author/show/128382.Leo_Tolstoy","Едит Уортън":"https://www.goodreads.com/author/show/16.Edith_Wharton","Натаниел Хоторн":"https://www.goodreads.com/author/show/7799.Nathaniel_Hawthorne","Оскар Уайлд":"https://www.goodreads.com/author/show/3565.Oscar_Wilde","Антон Чехов":"https://www.goodreads.com/author/show/5031025.Anton_Chekhov","Чарлз Дикенс":"https://www.goodreads.com/author/show/239579.Charles_Dickens","Иван Тургенев":"https://www.goodreads.com/author/show/410680.Ivan_Turgenev","Оноре дьо Балзак":"https://www.goodreads.com/author/show/228089.Honor_de_Balzac","Уолтър Скот":"https://www.goodreads.com/author/show/4345.Walter_Scott","Николай Гогол":"https://www.goodreads.com/author/show/232932.Nikolai_Gogol","Емил Зола":"https://www.goodreads.com/author/show/4750._mile_Zola","Захари Стоянов":"https://www.goodreads.com/author/show/4200372._","Александър Дюма":"https://www.goodreads.com/author/show/4785.Alexandre_Dumas","Фьодор Достоевски":"https://www.goodreads.com/author/show/3137322.Fyodor_Dostoevsky","Жорж Санд":"https://www.goodreads.com/author/show/1464.George_Sand","Маркиз дьо Сад":"https://www.goodreads.com/author/show/2885224.Marquis_de_Sade","Аугуст Стриндберг":"https://www.goodreads.com/author/show/6815.August_Strindberg","Александър Пушкин":"https://www.goodreads.com/author/show/16070.Alexander_Pushkin","Ги дьо Мопасан":"https://www.goodreads.com/author/show/18791.Guy_de_Maupassant","Сьорен Киркегор":"https://www.goodreads.com/author/show/6172.S_ren_Kierkegaard","Умберто Еко":"https://www.goodreads.com/author/show/1730.Umberto_Eco","Борис Пастернак":"https://www.goodreads.com/author/show/7902.Boris_Pasternak","Владимир Набоков":"https://www.goodreads.com/author/show/5152.Vladimir_Nabokov","Николай Хайтов":"https://www.goodreads.com/author/show/14438751.Nikolai_Haitov","Уилям Фокнър":"https://www.goodreads.com/author/show/3535.William_Faulkner","Джон Стайнбек":"https://www.goodreads.com/author/show/585.John_Steinbeck","Юкио Мишима":"https://www.goodreads.com/author/show/35258.Yukio_Mishima","Чарлз Буковски":"https://www.goodreads.com/author/show/13275.Charles_Bukowski","Ивайло Петров":"https://www.goodreads.com/author/show/15564330.Ivailo_Petrov","Пърл Бък":"https://www.goodreads.com/author/show/704.Pearl_S_Buck","Фредерик Форсайт":"https://www.goodreads.com/author/show/36714.Frederick_Forsyth","Томас Ман":"https://www.goodreads.com/author/show/19405.Thomas_Mann","Жузе Сарамагу":"https://www.goodreads.com/author/show/1285555.Jos_Saramago","Маргьорит Дюрас":"https://www.goodreads.com/author/show/163.Marguerite_Duras","Джек Керуак":"https://www.goodreads.com/author/show/1742.Jack_Kerouac","Джеймс Елрой":"https://www.goodreads.com/author/show/2887.James_Ellroy","Уилям Бъроуз":"https://www.goodreads.com/author/show/4462369.William_S_Burroughs","Д. Х. Лорънс":"https://www.goodreads.com/author/show/17623.D_H_Lawrence","Уилям Голдинг":"https://www.goodreads.com/author/show/306.William_Golding","Рей Бредбъри":"https://www.goodreads.com/author/show/1630.Ray_Bradbury","Марсел Пруст":"https://www.goodreads.com/author/show/233619.Marcel_Proust","Блага Димитрова":"https://www.goodreads.com/author/show/592300.Blaga_Dimitrova","Майкъл Ондатджи":"https://www.goodreads.com/author/show/4030.Michael_Ondaatje","Хенри Милър":"https://www.goodreads.com/author/show/147.Henry_Miller","Джоузеф Конрад":"https://www.goodreads.com/author/show/3345.Joseph_Conrad","Жан-Пол Сартър":"https://www.goodreads.com/author/show/1466.Jean_Paul_Sartre","Джон Дос Пасос":"https://www.goodreads.com/author/show/4778.John_Dos_Passos","Херман Хесе":"https://www.goodreads.com/author/show/1113469.Hermann_Hesse","Антон Дончев":"https://www.goodreads.com/author/show/15080725.Anton_Donchev","Агата Кристи":"https://www.goodreads.com/author/show/123715.Agatha_Christie","Казуо Ишигуро":"https://www.goodreads.com/author/show/4280.Kazuo_Ishiguro","Грейъм Грийн":"https://www.goodreads.com/author/show/2533.Graham_Greene","Йордан Радичков":"https://www.goodreads.com/author/show/7082608.Yordan_Radichkov","Йън Макюън":"https://www.goodreads.com/author/show/2408.Ian_McEwan","Е. Л. Доктороу":"https://www.goodreads.com/author/show/12584.E_L_Doctorow","Михаил Булгаков":"https://www.goodreads.com/author/show/3873.Mikhail_Bulgakov","Вера Мутафчиева":"https://www.goodreads.com/author/show/1826990._","Албер Камю":"https://www.goodreads.com/author/show/957894.Albert_Camus","Джордж Оруел":"https://www.goodreads.com/author/show/3706.George_Orwell","Йожен Сю":"https://www.goodreads.com/author/show/340712.Eug_ne_Sue","Ерих Мария Ремарк":"https://www.goodreads.com/author/show/4116.Erich_Maria_Remarque","Уилиам Шекспир":"https://www.goodreads.com/author/show/947.William_Shakespeare","Маргарет Атууд":"https://www.goodreads.com/author/show/3472.Margaret_Atwood","Александър Грин":"https://www.goodreads.com/author/show/797834.Alexander_Grin","Уди Алън":"https://www.goodreads.com/author/show/10356.Woody_Allen","Карло Колоди":"https://www.goodreads.com/author/show/15123.Carlo_Collodi","Сотир Гелев":"https://www.goodreads.com/author/show/6580552._","Братя Грим":"https://www.goodreads.com/author/show/22991883.Br_der_Grimm","Джани Родари":"https://www.goodreads.com/author/show/114467.Gianni_Rodari","Денис Джъд":"https://www.goodreads.com/author/show/89130.Denis_Judd","Лиса Айсату":"https://www.goodreads.com/author/show/4732204.Lisa_Aisato","Карл Май":"https://www.goodreads.com/author/show/45306.Karl_May","Жюл Верн":"https://www.goodreads.com/author/show/696805.Jules_Verne","Марк Твен":"https://www.goodreads.com/author/show/1244.Mark_Twain","Ран Босилек":"https://www.goodreads.com/author/show/2895053.Ran_Bosilek","Памела Травърз":"https://www.goodreads.com/author/show/6872556.P_L_Travers","Николай А. Кун":"https://www.goodreads.com/author/show/5847034.Nikolai_Kun","Антоан дьо Сент-Екзюпери":"https://www.goodreads.com/author/show/1020792.Antoine_de_Saint_Exup_ry","Валери Петров":"https://www.goodreads.com/author/show/4373604._","Астрид Линдгрен":"https://www.goodreads.com/author/show/410653.Astrid_Lindgren","Браян Хърбърт":"https://www.goodreads.com/author/show/56.Brian_Herbert","Кевин Дж. Андерсън":"https://www.goodreads.com/author/show/4845.Kevin_J_Anderson","Херман Мелвил":"https://www.goodreads.com/author/show/1624.Herman_Melville","Мери Шели":"https://www.goodreads.com/author/show/11139.Mary_Wollstonecraft_Shelley"};
 const GRA_KEY = n => String(n || '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -2069,7 +2096,7 @@ function renderCard() {
   const cvImg = coverHtml(Object.assign({}, b, { thumb: b.cover || b.thumb }));
   let html = '<div class="top"><button class="back" id="bBack">‹ ' + (isNew ? 'Отказ' : 'Библиотека') + '</button></div>' +
     '<div class="head2"><div class="hc"><span id="bZoom" class="zoomable">' + cvImg + '</span></div><div class="ht">' +
-    '<div class="tb"><div class="bt" id="hT">' + esc(b.title || 'Без заглавие') + '</div>' +
+    '<div class="tb"><div class="bt" id="hT">' + esc(softHy(b.title || 'Без заглавие')) + '</div>' +
     '<div class="o" id="hO"' + (b.original_title ? '' : ' hidden') + '>' + esc(b.original_title) + '</div></div>' +
     '<span class="gap" aria-hidden="true"><svg class="orn"><use href="#orn"/></svg></span>' +
     '<div class="ab"><div class="au" id="hA">' + esc(b.author) + '</div></div></div></div>' +
@@ -2142,9 +2169,10 @@ function renderCard() {
     (isNew ? '' : '<div class="delrow"><button class="btn tiny danger" id="bDel">Изтрий книгата</button></div>');
   app.innerHTML = html;
   const $ = s => app.querySelector(s);
+  if ($('#hT')) { fitTitle($('#hT')); if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { const h = $('#hT'); if (h) fitTitle(h); }); }
   const fit = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; };
   const HEADS = { title: ['hT', 'Без заглавие'], original_title: ['hO', ''], author: ['hA', ''] };
-  const syncHead = t => { const h = HEADS[t.dataset.k]; if (!h) return; const el = $('#' + h[0]); if (!el) return; const v = t.value.replace(/\s*\n\s*/g, ' ').trim(); el.textContent = v || h[1]; if (t.dataset.k === 'original_title') el.hidden = !v; };
+  const syncHead = t => { const h = HEADS[t.dataset.k]; if (!h) return; const el = $('#' + h[0]); if (!el) return; const v = t.value.replace(/\s*\n\s*/g, ' ').trim(); el.textContent = h[0] === 'hT' ? softHy(v || h[1]) : (v || h[1]); if (h[0] === 'hT') fitTitle(el); if (t.dataset.k === 'original_title') el.hidden = !v; };
   app.querySelectorAll('textarea.ac').forEach(t => { fit(t); t.oninput = () => { fit(t); syncHead(t); }; });
   $('#bBack').onclick = () => { if (editOpen === id && !isNew) editOpen = null; back(); };
   $('#bCamCover').onclick = () => $('#covFile').click();
