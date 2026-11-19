@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "fixes": [
   {
    "title": "Поп, дама, вале / Смях в тъмното",
@@ -96,6 +96,18 @@
    "author": "Жузе Сарамагу",
    "from": "Memorial do convento",
    "to": "Memorial do Convento"
+  },
+  {
+   "title": "Дарът на светулките",
+   "author": "Никълъс Спаркс",
+   "from": "At First Sight",
+   "to": "The Wish"
+  },
+  {
+   "title": "Историята на дългия Джон Силвър",
+   "author": "Денис Джъд",
+   "from": "Long John Silver",
+   "to": "The Adventures of Long John Silver"
   }
  ]
 }

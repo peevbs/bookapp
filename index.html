@@ -792,6 +792,7 @@ function cleanBook(raw) {
   o.status = Object.prototype.hasOwnProperty.call(STATUS, raw.status) ? raw.status : 'to_read';
   o.readDate = /^\d{4}-\d{2}-\d{2}$/.test(String(raw.readDate || '')) ? raw.readDate : '';
   o.rating = /^[1-5]$/.test(String(raw.rating || '')) ? String(raw.rating) : '';
+  o.grUrl = grUrlOk(raw.grUrl);
   o.sources = (Array.isArray(raw.sources) ? raw.sources : []).slice(0, 8)
     .map(x => ({ title: clip(x && x.title, 200), url: safeUrl(x && x.url) })).filter(x => x.url);
   o.confidence = ['high', 'medium', 'low'].includes(raw.confidence) ? raw.confidence : '';
@@ -995,7 +996,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v34)';
+const APP_VERSION = '2026-11-18 (кеш raft-v35)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -1755,8 +1756,14 @@ async function enrich() {
 /* ---------- Goodreads helpers ---------- */
 /* Goodreads searches in the order of trust: ISBN, ISSN, Bulgarian title + author, original title. The first is the link; the rest are offered if it finds nothing. */
 const GR = 'https://www.goodreads.com/search?q=';
+/* The exact Goodreads page the owner confirmed for a book (…/book/show/…); kept with the book and synced to GitHub with the rest. */
+function grUrlOk(u) {
+  const m = /^https:\/\/(?:www\.)?goodreads\.com\/((?:[a-z]{2}\/)?(?:book\/show|work)\/[^\s?#]+)/i.exec(String(u || '').trim());
+  return m ? 'https://www.goodreads.com/' + m[1] : '';
+}
 function goodreadsTries(b) {
   const t = [], isbn = normIsbn(b.isbn), issn = normIssn(b.isbn);
+  if (grUrlOk(b.grUrl)) t.push(['Запазена връзка', grUrlOk(b.grUrl)]);
   if (isbn) t.push(['ISBN ' + isbn, GR + encodeURIComponent(isbn)]);
   if (issn && !isbn) t.push(['ISSN ' + issn, GR + encodeURIComponent(issn)]);
   const bg = [b.title, b.author].filter(Boolean).join(' ').trim();
@@ -2114,7 +2121,8 @@ function renderCard() {
       (b.notes ? '<div class="f wide"><label>Бележки</label><div class="v">' + esc(b.notes) + '</div></div>' : '');
   }
   const rt = ratingOf(b);
-  if (!isNew) html += '<div class="f wide grb"><button class="btn" id="bGrOpen" type="button">Отвори в Goodreads</button>' + (rt ? starsHtml(rt) : '') + (goodreadsTries(b).length > 1 ? '<button class="btn tiny" id="bGrMore" type="button">Не го намира? Други търсения</button>' : '') + '</div>';
+  if (!isNew) html += '<div class="f wide grb"><button class="btn" id="bGrOpen" type="button">Отвори в Goodreads</button>' + (rt ? starsHtml(rt) : '') + (goodreadsTries(b).length > 1 ? '<button class="btn tiny" id="bGrMore" type="button">Не го намира? Други търсения</button>' : '') +
+    (grUrlOk(b.grUrl) ? '<div class="small">✓ Запазена е точната връзка. <button class="btn tiny" id="bGrDel" type="button">Махни</button></div>' : '<button class="btn tiny" id="bGrSave" type="button">Запази точната връзка</button>') + '</div>';
   html += '</div>';
   if ((b.sources || []).length) html += '<h3 class="sec">Източници</h3><div class="srcs">' +
     b.sources.map(s => '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + esc(s.title) + '</a>').join('') + '</div>';
@@ -2134,8 +2142,26 @@ function renderCard() {
     z.onclick = () => z.remove(); document.body.appendChild(z);
   };
   if ($('#bGrOpen')) $('#bGrOpen').onclick = () => { if (editing) readForm(); openUrl(goodreadsUrl(cur)); };
-  if ($('#bGrMore')) $('#bGrMore').onclick = () => { if (editing) readForm(); const tr = goodreadsTries(cur); pickSheet('Търси в Goodreads по', { options: tr.map((x, i) => [String(i), x[0]]), none: '', allowNew: false }, '', v => { if (v !== '') openUrl(tr[+v][1]); }); };
+  if ($('#bGrMore')) $('#bGrMore').onclick = () => { if (editing) readForm(); const tr = goodreadsTries(cur); pickSheet('Търси в Goodreads по (намери книгата, после „Запази точната връзка“)', { options: tr.map((x, i) => [String(i), x[0]]), none: '', allowNew: false }, '', v => { if (v !== '') openUrl(tr[+v][1]); }); };
   const stored = () => books.find(x => x.id === cur.id);
+  const putGr = async u => {
+    const st = stored(); if (!st) return;
+    if (editing) readForm();
+    await dbPut(Object.assign({}, st, { grUrl: u, updatedAt: Date.now() })); books = await dbAll(); cur.grUrl = u; renderCard();
+    toast(u ? 'Връзката е запазена и се качва в GitHub.' : 'Връзката е махната.');
+  };
+  if ($('#bGrDel')) $('#bGrDel').onclick = () => putGr('');
+  if ($('#bGrSave')) $('#bGrSave').onclick = () => {
+    const o = document.createElement('div'); o.className = 'sheet'; o.setAttribute('role', 'dialog');
+    o.innerHTML = '<div class="in"><div class="sh">Точна връзка в Goodreads</div><p class="small">Намери книгата в Goodreads, копирай адреса на нейната страница (…/book/show/…) и го постави тук. Оттук нататък заглавието и бутонът водят право там.</p>' +
+      '<div class="newrow"><input id="grIn" type="url" placeholder="https://www.goodreads.com/book/show/…" autocomplete="off" aria-label="Връзка към Goodreads"></div>' +
+      '<div class="newrow">' + (navigator.clipboard && navigator.clipboard.readText ? '<button class="btn" id="grClip">Постави от клипборда</button>' : '') + '<button class="btn primary" id="grOk">Запази</button></div></div>';
+    document.body.appendChild(o);
+    const inp = o.querySelector('#grIn'), done = async () => { const u = grUrlOk(inp.value); if (!u) { toast('Това не е връзка към страница на книга в Goodreads (goodreads.com/book/show/…).'); return; } o.remove(); await putGr(u); };
+    o.onclick = e => { if (e.target === o) o.remove(); };
+    o.querySelector('#grOk').onclick = done;
+    if (o.querySelector('#grClip')) o.querySelector('#grClip').onclick = async () => { try { inp.value = (await navigator.clipboard.readText()).trim(); } catch (e) { toast('Браузърът не позволи четене на клипборда. Задръж в полето и избери „Постави“.'); } };
+  };
   if ($('#bEdit')) $('#bEdit').onclick = () => {
     if (editing) { const o = stored(); if (o) cur = JSON.parse(JSON.stringify(o)); editOpen = null; } else editOpen = id;
     renderCard(); window.scrollTo(0, 0);
@@ -2500,7 +2526,7 @@ function renderSettings() {
         const m = local.find(b => b.id === t.id) || local.find(b => sameBook(b, t));
         if (!m) { await dbPut(Object.assign({}, t, { thumb: '', cover: '' })); added++; continue; }
         const patch = {};
-        for (const k of MERGE_KEYS.concat(['readDate', 'rating'])) if (!String(m[k] || '').trim() && String(t[k] || '').trim()) patch[k] = t[k];
+        for (const k of MERGE_KEYS.concat(['readDate', 'rating', 'grUrl'])) if (!String(m[k] || '').trim() && String(t[k] || '').trim()) patch[k] = t[k];
         if (m.status === 'to_read' && t.status !== 'to_read') patch.status = t.status;
         if (Object.keys(patch).length) { await dbPut(Object.assign({}, m, patch, { updatedAt: Date.now() })); upd++; }
       }
