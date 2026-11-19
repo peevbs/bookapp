@@ -251,7 +251,8 @@ a{color:var(--accent)}
 .acts2.tight{margin:10px 0}
 .zoomable{cursor:zoom-in}
 .zoom{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;cursor:zoom-out;background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(18px) saturate(1.15);backdrop-filter:blur(18px) saturate(1.15)}
-.zoom img{width:min(94vw,60vh);height:auto;max-height:92vh;object-fit:contain;border-radius:4px;box-shadow:0 12px 44px rgba(0,0,0,.38);filter:saturate(1.12) contrast(1.04)}
+.zoom img{max-width:97vw;max-height:94vh;width:auto;height:auto;object-fit:contain;border-radius:4px;box-shadow:0 12px 44px rgba(0,0,0,.38);filter:saturate(1.3) contrast(1.07) brightness(1.03);image-rendering:auto}
+.zoom .hint{position:absolute;left:16px;right:16px;bottom:max(14px,env(safe-area-inset-bottom,0px));padding:8px 12px;border-radius:10px;background:rgba(0,0,0,.55);color:#fff;font-size:13px;text-align:center}
 .zoom .x{position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:14px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:22px;line-height:40px;text-align:center}
 .acts2{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
 .acts2 .btn{flex:1 1 140px}
@@ -996,7 +997,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-19 (кеш raft-v39)';
+const APP_VERSION = '2026-11-19 (кеш raft-v40)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -1007,18 +1008,21 @@ function saveSettings(s) { try { localStorage.setItem('raft.settings', JSON.stri
 let dbp = null;
 function openDb() {
   if (!dbp) dbp = new Promise((res, rej) => {
-    const r = indexedDB.open('raft', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('books', { keyPath: 'id' });
+    const r = indexedDB.open('raft', 2);
+    r.onupgradeneeded = () => {
+      if (!r.result.objectStoreNames.contains('books')) r.result.createObjectStore('books', { keyPath: 'id' });
+      if (!r.result.objectStoreNames.contains('big')) r.result.createObjectStore('big', { keyPath: 'id' });   // the big (original-quality) cover photos
+    };
     r.onsuccess = () => res(r.result);
     r.onerror = () => rej(r.error);
   });
   return dbp;
 }
-async function tx(mode, fn) {
-  const db = await openDb();
+async function tx(mode, fn, store) {
+  const db = await openDb(); store = store || 'books';
   return new Promise((res, rej) => {
-    const t = db.transaction('books', mode);
-    const req = fn(t.objectStore('books'));
+    const t = db.transaction(store, mode);
+    const req = fn(t.objectStore(store));
     t.oncomplete = () => res(req && req.result);
     t.onerror = () => rej(t.error);
     t.onabort = () => rej(t.error);
@@ -1026,6 +1030,10 @@ async function tx(mode, fn) {
 }
 const dbAll = () => tx('readonly', s => s.getAll());
 const dbPut = b => tx('readwrite', s => s.put(b)).then(r => { ghMarkBooks(); return r; });
+/* The cover photo in near-original quality, kept only on this phone (too big for GitHub). */
+const bigPut = (id, blob) => blob ? tx('readwrite', s => s.put({ id, blob }), 'big') : Promise.resolve();
+const bigGet = id => id ? tx('readonly', s => s.get(id), 'big').then(r => (r && r.blob) || null).catch(() => null) : Promise.resolve(null);
+const bigDel = id => tx('readwrite', s => s.delete(id), 'big').catch(() => { /* nothing to remove */ });
 const dbDel = id => tx('readwrite', s => s.delete(id)).then(r => { ghMarkBooks(); return r; });
 
 /* ---------- state ---------- */
@@ -1262,6 +1270,16 @@ async function coverImages(bmp, turns) {
   };
   return { mid: out(COVER_W, COVER_H, 0.88), thumb: out(300, 450, 0.86) };
 }
+/* Near-original photo for full-screen viewing: the whole photo, long side up to 2600 px, JPEG 0.92 (turns = quarter turns clockwise). */
+async function bigBlob(bmp, turns) {
+  try {
+    const src = rotated(bmp, turns), k = Math.min(1, 2600 / Math.max(src.width, src.height));
+    const c = document.createElement('canvas'); c.width = Math.round(src.width * k); c.height = Math.round(src.height * k);
+    const g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(src, 0, 0, c.width, c.height);
+    return await new Promise(r => c.toBlob(b => r(b), 'image/jpeg', 0.92));
+  } catch (e) { return null; }
+}
+let newBig = null;   // big photo of the book being added, saved together with it
 function loadScript(src) {
   return new Promise((res, rej) => {
     const el = document.createElement('script');
@@ -1379,7 +1397,7 @@ async function takePhoto(slot, file) {
   try {
     const bmp = await loadBitmap(file);
     shot = { full: await scaled(bmp, 1600, 0.85), mid: await scaled(bmp, 800, 0.8), thumb: await scaled(bmp, 240, 0.8) };
-    if (slot === 'cover') { const cv = await coverImages(bmp, 0); shot.mid = cv.mid; shot.thumb = cv.thumb; }   // the saved cover: same shape as all others
+    if (slot === 'cover') { const cv = await coverImages(bmp, 0); shot.mid = cv.mid; shot.thumb = cv.thumb; shot.big = await bigBlob(bmp, 0); }   // the saved cover: same shape as all others
     isbn = await scanBarcode(bmp);
     bmp.close && bmp.close();
   } catch (e) { toast('Снимката не може да се отвори. Опитай с друга.'); return renderAdd(); }
@@ -1653,7 +1671,7 @@ function openNew(b) {
     id: uid(), createdAt: Date.now(), status: 'to_read', notes: '',
     thumb: draft.cover ? draft.cover.thumb : (draft.back ? draft.back.thumb : ''), cover: draft.cover ? draft.cover.mid || '' : '', _new: true
   }, carry || {});
-  carry = null;
+  carry = null; newBig = (draft.cover && draft.cover.big) || null;
   const dflt = getDefaults();
   for (const k of ['language', 'location']) if (!cur[k] && dflt[k]) cur[k] = dflt[k];
   if (!cur.isbn && draft.isbn) cur.isbn = draft.isbn;
@@ -1955,15 +1973,16 @@ async function ghFlush(quiet) {
 window.addEventListener('online', () => ghFlush(true));
 async function saveCoverPhoto(file) {
   try {
-    const bmp = await loadBitmap(file), cv = await coverImages(bmp, 0);
+    const bmp = await loadBitmap(file), cv = await coverImages(bmp, 0), big = await bigBlob(bmp, 0);
     cur.thumb = cv.thumb; cur.cover = cv.mid;
     const z = app.querySelector('#bZoom'); if (z) z.innerHTML = coverHtml(cur);
     if (!cur._new) {
       const stored = books.find(x => x.id === cur.id) || cur;
       await dbPut(Object.assign({}, stored, { thumb: cv.thumb, cover: cv.mid, updatedAt: Date.now() }));
+      await bigPut(cur.id, big);
       books = await dbAll(); ghEnqueue(cur.id); toast(getSettings().ghToken ? 'Корицата е запазена. Качвам в GitHub…' : 'Корицата е запазена на телефона.');
       ghFlush(false);
-    } else toast('Корицата е добавена. Запази книгата.');
+    } else { newBig = big; toast('Корицата е добавена. Запази книгата.'); }
   } catch (e) { toast('Снимката не се обработи. Опитай пак.'); }
 }
 /* ---- book card: view mode (locked) and edit mode ---- */
@@ -2177,10 +2196,14 @@ function renderCard() {
   $('#bBack').onclick = () => { if (editOpen === id && !isNew) editOpen = null; back(); };
   $('#bCamCover').onclick = () => $('#covFile').click();
   $('#covFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) saveCoverPhoto(f); };
-  $('#bZoom').onclick = () => {
-    const src = cur.cover || cur.thumb; if (!src) return;
-    const z = document.createElement('div'); z.className = 'zoom'; z.innerHTML = '<img alt=""><span class="x" aria-hidden="true">×</span>'; z.firstChild.src = src;
-    z.onclick = () => z.remove(); document.body.appendChild(z);
+  $('#bZoom').onclick = async () => {
+    const small = cur.cover || cur.thumb; if (!small) return;
+    const blob = cur._new ? newBig : await bigGet(cur.id);
+    const url = blob ? URL.createObjectURL(blob) : '';
+    const z = document.createElement('div'); z.className = 'zoom';
+    z.innerHTML = '<img alt="">' + (blob ? '' : '<span class="hint">Запазена е само умалена версия. Снимай корицата отново („✎ Корица“) за пълно качество.</span>') + '<span class="x" aria-hidden="true">×</span>';
+    z.firstChild.src = url || small;
+    z.onclick = () => { z.remove(); if (url) URL.revokeObjectURL(url); }; document.body.appendChild(z);
   };
   if ($('#bGrOpen')) $('#bGrOpen').onclick = () => { if (editing) readForm(); openUrl(goodreadsUrl(cur)); };
   if ($('#bGrMore')) $('#bGrMore').onclick = () => { if (editing) readForm(); const tr = goodreadsTries(cur); pickSheet('Търси в Goodreads по (намери книгата, после „Запази точната връзка“)', { options: tr.map((x, i) => [String(i), x[0]]), none: '', allowNew: false }, '', v => { if (v !== '') openUrl(tr[+v][1]); }); };
@@ -2258,6 +2281,7 @@ function renderCard() {
     if (isNew) setDefaults(rec); delete rec._new; delete rec._check; delete rec._lookup; delete rec.searches;
     try {
       await dbPut(rec);
+      if (isNew && newBig) { await bigPut(rec.id, newBig); newBig = null; }
       books = await dbAll();
       if (isNew && rec.thumb) ghEnqueue(rec.id);
       editOpen = null;
@@ -2271,7 +2295,7 @@ function renderCard() {
       setTimeout(() => { if (this.isConnected) { delete this.dataset.sure; this.textContent = 'Изтрий книгата'; } }, 4000);
       return;
     }
-    await dbDel(cur.id); books = await dbAll(); editOpen = null; toast('Книгата е изтрита.'); back();
+    await dbDel(cur.id); await bigDel(cur.id); books = await dbAll(); editOpen = null; toast('Книгата е изтрита.'); back();
   };
 }
 
@@ -2349,7 +2373,7 @@ async function importCovers(files, out) {
     try {
       const bmp = await loadBitmap(f);
       const cv = await coverImages(bmp, 0);
-      const it = { name: f.webkitRelativePath || f.name, thumb: cv.thumb, mid: cv.mid, raw: await scaled(bmp, 1600, 0.9), turns: 0 };
+      const it = { name: f.webkitRelativePath || f.name, thumb: cv.thumb, mid: cv.mid, raw: await scaled(bmp, 1600, 0.9), file: f, turns: 0 };
       bmp.close && bmp.close();
       items.push(Object.assign(it, coverMatch(f.name, books)));
     } catch (e) { items.push({ name: f.name, err: true, id: '' }); }
@@ -2389,7 +2413,8 @@ async function importCovers(files, out) {
           if (!it.id || it.err || seen.has(it.id)) continue;
           seen.add(it.id);
           const old = (await dbAll()).find(x => x.id === it.id); if (!old) continue;
-          await dbPut(Object.assign({}, old, { thumb: it.thumb, cover: it.mid, updatedAt: Date.now() })); done++;
+          await dbPut(Object.assign({}, old, { thumb: it.thumb, cover: it.mid, updatedAt: Date.now() })); try { const ob = await loadBitmap(it.file); await bigPut(it.id, await bigBlob(ob, it.turns)); ob.close && ob.close(); } catch (e) { /* the small cover is saved anyway */ }
+          done++;
         }
         books = await dbAll();
         out.innerHTML = '<div class="note ok">Готово: ' + done + (done === 1 ? ' корица е прикачена' : ' корици са прикачени') + '. Направи архив, за да са запазени и извън телефона.</div>';
