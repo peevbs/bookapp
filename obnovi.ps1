@@ -32,6 +32,34 @@ try {
       Copy-Item $f.FullName $dest -Force; $changed += $rel
     } else { $same++ }
   }
+  # Корици, качени от телефона (covers\new, covers\big): остават СЛЕД копирането на компютъра, а от публичното хранилище се трият.
+  # Трие се само ако в папката има файл .gh-token (токен на GitHub с право за запис) и само файлове, които вече са тук и са еднакви.
+  $removed = 0; $removeNote = ''
+  $tokenFile = Join-Path $dir '.gh-token'
+  if (Test-Path $tokenFile) {
+    try {
+      $tok = (Get-Content $tokenFile -Raw).Trim()
+      $H = @{ 'User-Agent' = 'raft-sync'; Authorization = ('Bearer ' + $tok); Accept = 'application/vnd.github+json' }
+      foreach ($sub in @('covers/new', 'covers/big')) {
+        $list = $null
+        try { $list = Invoke-RestMethod -UseBasicParsing -Uri ("https://api.github.com/repos/$repo/contents/$sub" + '?ref=main') -Headers $H } catch { continue }   # папката я няма: нищо за трите
+        foreach ($it in @($list)) {
+          if ($it.type -ne 'file') { continue }
+          $local = Join-Path $dir ($sub.Replace('/', '\') + '\' + $it.name)
+          if (-not (Test-Path $local)) { continue }
+          # git blob sha1 на локалния файл = sha от GitHub, така се уверяваме, че копието тук е същото
+          $bytes = [IO.File]::ReadAllBytes($local)
+          $hdr = [Text.Encoding]::ASCII.GetBytes('blob ' + $bytes.Length + [char]0)
+          $sha1 = [Security.Cryptography.SHA1]::Create().ComputeHash([byte[]]($hdr + $bytes))
+          $hex = -join ($sha1 | ForEach-Object { $_.ToString('x2') })
+          if ($hex -ne $it.sha) { continue }
+          $body = @{ message = ('Премахнато от публичното хранилище (копие на компютъра): ' + $it.name); sha = $it.sha; branch = 'main' } | ConvertTo-Json
+          Invoke-RestMethod -UseBasicParsing -Method Delete -Uri $it.url -Headers $H -Body $body -ContentType 'application/json' | Out-Null
+          $removed++
+        }
+      }
+    } catch { $removeNote = 'Не успях да изтрия корици от GitHub: ' + $_.Exception.Message }
+  }
   # какво е променено: последните промени от GitHub (записани от Claude)
   $stateFile = Join-Path $dir '.sync-sha'
   $last = ''; if (Test-Path $stateFile) { $last = (Get-Content $stateFile -Raw).Trim() }
@@ -50,6 +78,7 @@ try {
   $out += ('Нови файлове: ' + $new.Count + '; променени: ' + $changed.Count + '; същите: ' + $same)
   if ($new.Count) { $out += 'Нови:'; $out += ($new | ForEach-Object { '  ' + $_ }) }
   if ($changed.Count) { $out += ('Променени (старите са в ' + $backup + '):'); $out += ($changed | ForEach-Object { '  ' + $_ }) }
+  if (Test-Path $tokenFile) { $out += ('Премахнати от публичното хранилище (копията са на компютъра): ' + $removed); if ($removeNote) { $out += $removeNote } }
   if ($lines.Count) { $out += 'Какво е ново (промени от GitHub):'; $out += $lines } else { $out += 'Няма нови промени от последния път.' }
   $out | ForEach-Object { Write-Host $_ }
   Add-Content -Path (Join-Path $dir 'Promeni-ot-GitHub.txt') -Value ($out + '') -Encoding UTF8
