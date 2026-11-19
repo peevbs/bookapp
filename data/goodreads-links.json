@@ -1,0 +1,1553 @@
+{
+ "version": 1,
+ "source": "Goodreads search by original title (else Bulgarian title and author); title and author match, any edition",
+ "links": [
+  {
+   "id": "impmvgmo23p0",
+   "title": "Ад",
+   "author": "Дан Браун",
+   "isbn": "9789546554093",
+   "url": "https://www.goodreads.com/book/show/17212231"
+  },
+  {
+   "id": "impmvgmo23p1",
+   "title": "Виж ме",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543893683",
+   "url": "https://www.goodreads.com/book/show/24820165"
+  },
+  {
+   "id": "impmvgmo23p2",
+   "title": "Винаги в същия ден",
+   "author": "Дейвид Никълс",
+   "isbn": "9789543891238",
+   "url": "https://www.goodreads.com/book/show/6280118"
+  },
+  {
+   "id": "impmvgmo23p3",
+   "title": "Винаги двамата",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543894116",
+   "url": "https://www.goodreads.com/book/show/40669990"
+  },
+  {
+   "id": "impmvgmo23p4",
+   "title": "Вината в нашите звезди",
+   "author": "Джон Грийн",
+   "isbn": "9789542708261",
+   "url": "https://www.goodreads.com/book/show/25856606"
+  },
+  {
+   "id": "impmvgmo23p5",
+   "title": "Всеки мой дъх",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543894956",
+   "url": "https://www.goodreads.com/book/show/38212843"
+  },
+  {
+   "id": "impmvgmo23p6",
+   "title": "Дарът на светулките",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543892501",
+   "url": "https://www.goodreads.com/book/show/56625098"
+  },
+  {
+   "id": "impmvgmo23p7",
+   "title": "Завой на пътя",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543891160",
+   "url": "https://www.goodreads.com/book/show/3463"
+  },
+  {
+   "id": "impmvgmo23p8",
+   "title": "Завръщане",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543895977",
+   "url": "https://www.goodreads.com/book/show/49405179"
+  },
+  {
+   "id": "impmvgmo23p9",
+   "title": "Изборът",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543893423",
+   "url": "https://www.goodreads.com/book/show/25402194"
+  },
+  {
+   "id": "impmvgmo23pa",
+   "title": "Малки парченца от теб и мен",
+   "author": "Ванеса Грийн",
+   "isbn": "9786191912636",
+   "url": "https://www.goodreads.com/book/show/28594180"
+  },
+  {
+   "id": "impmvgmo23pb",
+   "title": "Мисис Далауей",
+   "author": "Вирджиния Улф",
+   "isbn": "9786192680077",
+   "url": "https://www.goodreads.com/book/show/14942"
+  },
+  {
+   "id": "impmvgmo23pd",
+   "title": "Най-дългото пътуване",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543892709",
+   "url": "https://www.goodreads.com/book/show/17407748"
+  },
+  {
+   "id": "impmvgmo23pe",
+   "title": "Незабравима разходка",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789546410092",
+   "url": "https://www.goodreads.com/book/show/35545737"
+  },
+  {
+   "id": "impmvgmo23pf",
+   "title": "Нощи в Роданте",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789549395631",
+   "url": "https://www.goodreads.com/book/show/15926"
+  },
+  {
+   "id": "impmvgmo23pg",
+   "title": "Остани",
+   "author": "Никълъс Спаркс, М. Найт Шамалан",
+   "isbn": "9789543898503",
+   "url": "https://www.goodreads.com/book/show/228691222"
+  },
+  {
+   "id": "impmvgmo23ph",
+   "title": "Писмо в бутилка",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789546410139",
+   "url": "https://www.goodreads.com/book/show/3478"
+  },
+  {
+   "id": "impmvgmo23pi",
+   "title": "Последна песен",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543890781",
+   "url": "https://www.goodreads.com/book/show/6400090"
+  },
+  {
+   "id": "impmvgmo23pj",
+   "title": "Пристан за двама",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543891429",
+   "url": "https://www.goodreads.com/book/show/40603730"
+  },
+  {
+   "id": "impmvgmo23pk",
+   "title": "Произход",
+   "author": "Дан Браун",
+   "isbn": "9789546558008",
+   "url": "https://www.goodreads.com/book/show/32307358"
+  },
+  {
+   "id": "impmvgmo23pl",
+   "title": "С дъх на канела",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789549395822",
+   "url": "https://www.goodreads.com/book/show/5526"
+  },
+  {
+   "id": "impmvgmo23pm",
+   "title": "Светлинка в нощта",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543892372",
+   "url": "https://www.goodreads.com/book/show/3464"
+  },
+  {
+   "id": "impmvgmo23po",
+   "title": "Тайната на тайните",
+   "author": "Дан Браун",
+   "isbn": "9786190303770",
+   "url": "https://www.goodreads.com/book/show/254123396"
+  },
+  {
+   "id": "impmvgmo23q10",
+   "title": "Синята брада",
+   "author": "Кърт Вонегът",
+   "isbn": "9786197625769",
+   "url": "https://www.goodreads.com/book/show/9601"
+  },
+  {
+   "id": "impmvgmo23q11",
+   "title": "Механично пиано",
+   "author": "Кърт Вонегът",
+   "isbn": "9786197596427",
+   "url": "https://www.goodreads.com/book/show/9597"
+  },
+  {
+   "id": "impmvgmo23q12",
+   "title": "Майка Нощ",
+   "author": "Кърт Вонегът",
+   "isbn": "9786197625387",
+   "url": "https://www.goodreads.com/book/show/9592"
+  },
+  {
+   "id": "impmvgmo23q13",
+   "title": "Закуска за шампиони",
+   "author": "Кърт Вонегът",
+   "isbn": "9786192650094",
+   "url": "https://www.goodreads.com/book/show/4980"
+  },
+  {
+   "id": "impmvgmo23q14",
+   "title": "Фарс, или никога вече самота",
+   "author": "Кърт Вонегът",
+   "isbn": "9786192650278",
+   "url": "https://www.goodreads.com/book/show/9595"
+  },
+  {
+   "id": "impmvgmo23q15",
+   "title": "Котешка люлка",
+   "author": "Кърт Вонегът",
+   "isbn": "9786197625608",
+   "url": "https://www.goodreads.com/book/show/135479"
+  },
+  {
+   "id": "impmvgmo23q17",
+   "title": "Уомпитър, фома, гранфалун",
+   "author": "Кърт Вонегът",
+   "isbn": "9786192650353",
+   "url": "https://www.goodreads.com/book/show/9591"
+  },
+  {
+   "id": "impmvgmo23q18",
+   "title": "Алексис Зорбас",
+   "author": "Никос Казандзакис",
+   "isbn": "9786191643998",
+   "url": "https://www.goodreads.com/book/show/8065146"
+  },
+  {
+   "id": "impmvgmo23q19",
+   "title": "Стръмнина",
+   "author": "Никос Казандзакис",
+   "isbn": "9786191644506",
+   "url": "https://www.goodreads.com/book/show/63080498"
+  },
+  {
+   "id": "impmvgmo23q1a",
+   "title": "Капитан Михалис",
+   "author": "Никос Казандзакис",
+   "isbn": "9786191644278",
+   "url": "https://www.goodreads.com/book/show/4612857"
+  },
+  {
+   "id": "impmvgmo23q1b",
+   "title": "Последното изкушение",
+   "author": "Никос Казандзакис",
+   "isbn": "9786191643981",
+   "url": "https://www.goodreads.com/book/show/20695709"
+  },
+  {
+   "id": "impmvgmo23q1c",
+   "title": "Христос отново разпнат",
+   "author": "Никос Казандзакис",
+   "isbn": "9786191644339",
+   "url": "https://www.goodreads.com/book/show/6616654"
+  },
+  {
+   "id": "impmvgmo23q1e",
+   "title": "Рапорт пред Ел Греко",
+   "author": "Никос Казандзакис",
+   "isbn": "9786191644216",
+   "url": "https://www.goodreads.com/book/show/13399312"
+  },
+  {
+   "id": "impmvgmo23q1f",
+   "title": "Фалшификаторите",
+   "author": "Андре Жид",
+   "isbn": "9786190218234",
+   "url": "https://www.goodreads.com/book/show/817280"
+  },
+  {
+   "id": "impmvgmo23q1g",
+   "title": "Родените в полунощ",
+   "author": "Салман Рушди",
+   "isbn": "9786190213215",
+   "url": "https://www.goodreads.com/book/show/14836"
+  },
+  {
+   "id": "impmvgmo23q1h",
+   "title": "Слепота",
+   "author": "Жозе Сарамаго",
+   "isbn": "9786190210917",
+   "url": "https://www.goodreads.com/book/show/27848882"
+  },
+  {
+   "id": "impmvgmo23q1i",
+   "title": "Звездни мигове на човечеството",
+   "author": "Стефан Цвайг",
+   "isbn": "9786190211167",
+   "url": "https://www.goodreads.com/book/show/1508971"
+  },
+  {
+   "id": "impmvgmo23q1l",
+   "title": "Пътешествие до края на нощта",
+   "author": "Луи-Фердинан Селин",
+   "isbn": "9786190211518",
+   "url": "https://www.goodreads.com/book/show/246644"
+  },
+  {
+   "id": "impmvgmo23q1m",
+   "title": "Гласът на планината",
+   "author": "Ясунари Кавабата",
+   "isbn": "9786190217725",
+   "url": "https://www.goodreads.com/book/show/1937449"
+  },
+  {
+   "id": "impmvgmo23q1o",
+   "title": "Към фара",
+   "author": "Вирджиния Улф",
+   "isbn": "9786190216049",
+   "url": "https://www.goodreads.com/book/show/59716"
+  },
+  {
+   "id": "impmvgmo23q1p",
+   "title": "Сърца за изтръгване",
+   "author": "Борис Виан",
+   "isbn": "9786190211570",
+   "url": "https://www.goodreads.com/book/show/447681"
+  },
+  {
+   "id": "impmvgmo23q1q",
+   "title": "Извън Африка",
+   "author": "Карен Бликсен",
+   "isbn": "9786190211006",
+   "url": "https://www.goodreads.com/book/show/3354711"
+  },
+  {
+   "id": "impmvgmo23q1t",
+   "title": "Ако пътник в зимна нощ",
+   "author": "Итало Калвино",
+   "isbn": "9786190212966",
+   "url": "https://www.goodreads.com/book/show/71608"
+  },
+  {
+   "id": "impmvgmo23q1u",
+   "title": "Далекоизточни разкази",
+   "author": "Съмърсет Моъм",
+   "isbn": "9786190213642",
+   "url": "https://www.goodreads.com/book/show/565359"
+  },
+  {
+   "id": "impmvgmo23q1x",
+   "title": "Кучешки години",
+   "author": "Гюнтер Грас",
+   "isbn": "9786190211099",
+   "url": "https://www.goodreads.com/book/show/1514971"
+  },
+  {
+   "id": "impmvgmo23q1z",
+   "title": "Изкупление",
+   "author": "Иън Макюън",
+   "isbn": "9786190216643",
+   "url": "https://www.goodreads.com/book/show/6867"
+  },
+  {
+   "id": "impmvgmo23q21",
+   "title": "Панаир на суетата",
+   "author": "Уилям Текери",
+   "isbn": "9786192510251",
+   "url": "https://www.goodreads.com/book/show/5797"
+  },
+  {
+   "id": "impmvgmo23q22",
+   "title": "Червено и черно",
+   "author": "Стендал",
+   "isbn": "9786192510763",
+   "url": "https://www.goodreads.com/book/show/1095776"
+  },
+  {
+   "id": "impmvgmo23q23",
+   "title": "Разум и чувства",
+   "author": "Джейн Остин",
+   "isbn": "9789542984597",
+   "url": "https://www.goodreads.com/book/show/14935"
+  },
+  {
+   "id": "impmvgmo23q2o",
+   "title": "Отнесени от вихъра Том 1",
+   "author": "Маргарет Мичъл",
+   "isbn": "9789542621706",
+   "url": "https://www.goodreads.com/book/show/34689759"
+  },
+  {
+   "id": "impmvgmo23q2q",
+   "title": "Ема",
+   "author": "Джейн Остин",
+   "isbn": "9789542618485",
+   "url": "https://www.goodreads.com/book/show/6969"
+  },
+  {
+   "id": "impmvgmo23q2r",
+   "title": "Гордост и предразсъдъци",
+   "author": "Джейн Остин",
+   "isbn": "9789542621584",
+   "url": "https://www.goodreads.com/book/show/129915654"
+  },
+  {
+   "id": "impmvgmo23q2s",
+   "title": "Въздействие",
+   "author": "Джейн Остин",
+   "isbn": "9789542617877",
+   "url": "https://www.goodreads.com/book/show/2156"
+  },
+  {
+   "id": "impmvgmo23q2t",
+   "title": "Тайнствената непозната",
+   "author": "Ан Бронте",
+   "isbn": "9789542619550",
+   "url": "https://www.goodreads.com/book/show/337113"
+  },
+  {
+   "id": "impmvgmo23q2u",
+   "title": "Брулени хълмове",
+   "author": "Емили Бронте",
+   "isbn": "9789542620440",
+   "url": "https://www.goodreads.com/book/show/32929156"
+  },
+  {
+   "id": "impmvgmo23q2v",
+   "title": "Джейн Еър",
+   "author": "Шарлот Бронте",
+   "isbn": "9789542618041",
+   "url": "https://www.goodreads.com/book/show/10210"
+  },
+  {
+   "id": "impmvgmo23q2w",
+   "title": "Тес от рода д'Ърбървил",
+   "author": "Томас Харди",
+   "isbn": "9789542619567",
+   "url": "https://www.goodreads.com/book/show/32261"
+  },
+  {
+   "id": "impmvgmo23q2x",
+   "title": "Далече от безумната тълпа",
+   "author": "Томас Харди",
+   "isbn": "9789542622819",
+   "url": "https://www.goodreads.com/book/show/31463"
+  },
+  {
+   "id": "impmvgmo23q2y",
+   "title": "Кметът на Кастърбридж",
+   "author": "Томас Харди",
+   "isbn": "9789542618256",
+   "url": "https://www.goodreads.com/book/show/56759"
+  },
+  {
+   "id": "impmvgmo23q2z",
+   "title": "Знахар",
+   "author": "Тадеуш Доленга-Мостович",
+   "isbn": "9789542620822",
+   "url": "https://www.goodreads.com/book/show/2112743"
+  },
+  {
+   "id": "impmvgmo23q30",
+   "title": "Морал",
+   "author": "Тадеуш Доленга-Мостович",
+   "isbn": "9789542621898",
+   "url": "https://www.goodreads.com/book/show/2161329"
+  },
+  {
+   "id": "impmvgmo23q31",
+   "title": "Слепият музикант",
+   "author": "Владимир Короленко",
+   "isbn": "9789542622055",
+   "url": "https://www.goodreads.com/book/show/29084904"
+  },
+  {
+   "id": "impmvgmo23q32",
+   "title": "Стършел",
+   "author": "Емел Лилиан Войнич",
+   "isbn": "9789542618881",
+   "url": "https://www.goodreads.com/book/show/9488435"
+  },
+  {
+   "id": "impmvgmo23q33",
+   "title": "Души в окови",
+   "author": "Съмърсет Моъм",
+   "isbn": "9789542621614",
+   "url": "https://www.goodreads.com/book/show/31548"
+  },
+  {
+   "id": "impmvgmo23q34",
+   "title": "Луна и грош",
+   "author": "Съмърсет Моъм",
+   "isbn": "9789542624868",
+   "url": "https://www.goodreads.com/book/show/44796"
+  },
+  {
+   "id": "impmvgmo23q36",
+   "title": "Мадам Бовари",
+   "author": "Гюстав Флобер",
+   "isbn": "9789542623854",
+   "url": "https://www.goodreads.com/book/show/2175"
+  },
+  {
+   "id": "impmvgmo23q37",
+   "title": "Кръстоносци",
+   "author": "Хенрик Сенкевич",
+   "isbn": "9789542624226",
+   "url": "https://www.goodreads.com/book/show/2413931"
+  },
+  {
+   "id": "impmvgmo23q38",
+   "title": "Бих умрял за теб и други изгубени истории",
+   "author": "Ф. Скот Фицджералд",
+   "isbn": "9789542618492",
+   "url": "https://www.goodreads.com/book/show/31572168"
+  },
+  {
+   "id": "impmvgmo23qp",
+   "title": "Талисманът",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543891856",
+   "url": "https://www.goodreads.com/book/show/3063499"
+  },
+  {
+   "id": "impmvgmo23qq",
+   "title": "Тетрадката",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543670284",
+   "url": "https://www.goodreads.com/book/show/33648131"
+  },
+  {
+   "id": "impmvgmo23qr",
+   "title": "Яж, моли се и обичай",
+   "author": "Елизабет Гилбърт",
+   "isbn": "9789547335578",
+   "url": "https://www.goodreads.com/book/show/19501"
+  },
+  {
+   "id": "impmvgmo23qs",
+   "title": "Алилуя",
+   "author": "Виктор Пасков",
+   "isbn": "9788498191127",
+   "url": "https://www.goodreads.com/book/show/5457173"
+  },
+  {
+   "id": "impmvgmo23qt",
+   "title": "Парижката света Богородица",
+   "author": "Виктор Юго",
+   "isbn": "9789549976014",
+   "url": "https://www.goodreads.com/book/show/30600"
+  },
+  {
+   "id": "impmvgmo23qu",
+   "title": "Пармският манастир",
+   "author": "Стендал",
+   "isbn": "9789549976069",
+   "url": "https://www.goodreads.com/book/show/1424158"
+  },
+  {
+   "id": "impmvgmo23qv",
+   "title": "Дракула",
+   "author": "Брам Стокър",
+   "isbn": "9789549976021",
+   "url": "https://www.goodreads.com/book/show/17245"
+  },
+  {
+   "id": "impmvgmo23qw",
+   "title": "Дамата с камелиите",
+   "author": "Александър Дюма-син",
+   "isbn": "9789549976045",
+   "url": "https://www.goodreads.com/book/show/7186"
+  },
+  {
+   "id": "impmvgmo23qx",
+   "title": "Островът на съкровищата",
+   "author": "Робърт Луи Стивънсън",
+   "isbn": "9789549976052",
+   "url": "https://www.goodreads.com/book/show/295"
+  },
+  {
+   "id": "impmvgmo23qy",
+   "title": "Бог да ви поживи, господин Роузуотър",
+   "author": "Кърт Вонегът",
+   "isbn": "9786192650667",
+   "url": "https://www.goodreads.com/book/show/33290408"
+  },
+  {
+   "id": "impmvgmo23qz",
+   "title": "Кланица пет",
+   "author": "Кърт Вонегът",
+   "isbn": "9786197625899",
+   "url": "https://www.goodreads.com/book/show/4981"
+  },
+  {
+   "id": "impmwlujjgu0",
+   "title": "Quo Vadis",
+   "author": "Хенрик Сенкевич",
+   "isbn": "9789542619543",
+   "url": "https://www.goodreads.com/book/show/538845"
+  },
+  {
+   "id": "impmwlujjgu1d",
+   "title": "Малки жени",
+   "author": "Луиза Мей Олкът",
+   "isbn": "9786192510107",
+   "url": "https://www.goodreads.com/book/show/1934"
+  },
+  {
+   "id": "impmwlujjgu1i",
+   "title": "Най-доброто в мен",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543892211",
+   "url": "https://www.goodreads.com/book/show/10766509"
+  },
+  {
+   "id": "impmwlujjgu1n",
+   "title": "Нюйоркска трилогия",
+   "author": "Пол Остър",
+   "isbn": "9786190212607",
+   "url": "https://www.goodreads.com/book/show/431"
+  },
+  {
+   "id": "impmwlujjgu2b",
+   "title": "Сирените от Титан",
+   "author": "Кърт Вонегът",
+   "isbn": "9786197625127",
+   "url": "https://www.goodreads.com/book/show/258132525"
+  },
+  {
+   "id": "impmwlujjgu2f",
+   "title": "Спасителят",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543894529",
+   "url": "https://www.goodreads.com/book/show/3462"
+  },
+  {
+   "id": "impmwlujjgu5",
+   "title": "Ана Каренина",
+   "author": "Лев Толстой",
+   "isbn": "9789542619529",
+   "url": "https://www.goodreads.com/book/show/597298"
+  },
+  {
+   "id": "impmwlujjgu6",
+   "title": "Бедняка Божи",
+   "author": "Никос Казандзакис",
+   "isbn": "9786191647569",
+   "url": "https://www.goodreads.com/book/show/55582764"
+  },
+  {
+   "id": "impmwlujjgv2u",
+   "title": "Отнесени от вихъра Том 2",
+   "author": "Маргарет Мичъл",
+   "isbn": "9789542621713",
+   "url": "https://www.goodreads.com/book/show/34689759"
+  },
+  {
+   "id": "impmwlujjgv2v",
+   "title": "Учителят",
+   "author": "Шарлот Бронте",
+   "isbn": "9788411649957",
+   "url": "https://www.goodreads.com/book/show/31175"
+  },
+  {
+   "id": "impmwlujjgv2w",
+   "title": "Невинни години",
+   "author": "Едит Уортън",
+   "isbn": "9788411649889",
+   "url": "https://www.goodreads.com/book/show/53835"
+  },
+  {
+   "id": "impmwlujjgv2x",
+   "title": "Абатството Нортангър",
+   "author": "Джейн Остин",
+   "isbn": "9791370441012",
+   "url": "https://www.goodreads.com/book/show/50398"
+  },
+  {
+   "id": "impmwlujjgv2y",
+   "title": "Гордост и предразсъдъци",
+   "author": "Джейн Остин",
+   "isbn": "9789549976038",
+   "url": "https://www.goodreads.com/book/show/129915654"
+  },
+  {
+   "id": "impmwlujjgv30",
+   "title": "Алената буква",
+   "author": "Натаниел Хоторн",
+   "isbn": "9789549976083",
+   "url": "https://www.goodreads.com/book/show/12296"
+  },
+  {
+   "id": "impmwlujjgv31",
+   "title": "Мадам Бовари",
+   "author": "Гюстав Флобер",
+   "isbn": "9789549976090",
+   "url": "https://www.goodreads.com/book/show/2175"
+  },
+  {
+   "id": "impmwlujjgv32",
+   "title": "Ана Каренина Том 1",
+   "author": "Лев Толстой",
+   "isbn": "9789549976106",
+   "url": "https://www.goodreads.com/book/show/597298"
+  },
+  {
+   "id": "impmwlujjgv33",
+   "title": "Ана Каренина Том 2",
+   "author": "Лев Толстой",
+   "isbn": "9789549976113",
+   "url": "https://www.goodreads.com/book/show/597298"
+  },
+  {
+   "id": "impmwlujjgv34",
+   "title": "Портретът на Дориан Грей",
+   "author": "Оскар Уайлд",
+   "isbn": "9789549976120",
+   "url": "https://www.goodreads.com/book/show/489732"
+  },
+  {
+   "id": "impmwlujjgv36",
+   "title": "Разкази",
+   "author": "Антон Чехов",
+   "isbn": "9789549976144",
+   "url": "https://www.goodreads.com/book/show/23950044"
+  },
+  {
+   "id": "impmwlujjgv37",
+   "title": "Дейвид Копърфийлд",
+   "author": "Чарлз Дикенс",
+   "isbn": "9789549976151",
+   "url": "https://www.goodreads.com/book/show/58696"
+  },
+  {
+   "id": "impmwlujjgv38",
+   "title": "Бащи и деца",
+   "author": "Иван Тургенев",
+   "isbn": "9789549976168",
+   "url": "https://www.goodreads.com/book/show/35890151"
+  },
+  {
+   "id": "impmwlujjgv39",
+   "title": "Брулени хълмове",
+   "author": "Емили Бронте",
+   "isbn": "9789549976175",
+   "url": "https://www.goodreads.com/book/show/32929156"
+  },
+  {
+   "id": "impmwlujjgv3a",
+   "title": "Дядо Горио",
+   "author": "Оноре дьо Балзак",
+   "isbn": "9789549976182",
+   "url": "https://www.goodreads.com/book/show/159977"
+  },
+  {
+   "id": "impmwlujjgv3c",
+   "title": "Айвънхоу",
+   "author": "Уолтър Скот",
+   "isbn": "9789549976205",
+   "url": "https://www.goodreads.com/book/show/6440"
+  },
+  {
+   "id": "impmwlujjgv3d",
+   "title": "Мъртви души",
+   "author": "Николай Гогол",
+   "isbn": "9789549976229",
+   "url": "https://www.goodreads.com/book/show/1546109"
+  },
+  {
+   "id": "impmwlujjgv3e",
+   "title": "Жерминал",
+   "author": "Емил Зола",
+   "isbn": "9789549976236",
+   "url": "https://www.goodreads.com/book/show/28407"
+  },
+  {
+   "id": "impmwlujjgv3f",
+   "title": "Записки по българските въстания Том 1",
+   "author": "Захари Стоянов",
+   "isbn": "9789549976243",
+   "url": "https://www.goodreads.com/book/show/8886060"
+  },
+  {
+   "id": "impmwlujjgv3g",
+   "title": "Записки по българските въстания Том 2",
+   "author": "Захари Стоянов",
+   "isbn": "9789549976250",
+   "url": "https://www.goodreads.com/book/show/8886060"
+  },
+  {
+   "id": "impmwlujjgv3i",
+   "title": "Тримата мускетари",
+   "author": "Александър Дюма",
+   "isbn": "9789549976274",
+   "url": "https://www.goodreads.com/book/show/956321"
+  },
+  {
+   "id": "impmwlujjgv3k",
+   "title": "Престъпление и наказание",
+   "author": "Фьодор Достоевски",
+   "isbn": "9789549976298",
+   "url": "https://www.goodreads.com/book/show/20922098"
+  },
+  {
+   "id": "impmwlujjgv3l",
+   "title": "Quo vadis",
+   "author": "Хенрик Сенкевич",
+   "isbn": "9789549976311",
+   "url": "https://www.goodreads.com/book/show/538845"
+  },
+  {
+   "id": "impmwlujjgv3m",
+   "title": "Мопра",
+   "author": "Жорж Санд",
+   "isbn": "9789549976328",
+   "url": "https://www.goodreads.com/book/show/919987"
+  },
+  {
+   "id": "impmwlujjgv3o",
+   "title": "Жустин, или Неволите на добродетелта",
+   "author": "Маркиз дьо Сад",
+   "isbn": "9789549976342",
+   "url": "https://www.goodreads.com/book/show/960525"
+  },
+  {
+   "id": "impmwlujjgv3p",
+   "title": "Джейн Еър",
+   "author": "Шарлот Бронте",
+   "isbn": "9789549976359",
+   "url": "https://www.goodreads.com/book/show/10210"
+  },
+  {
+   "id": "impmwlujjgv3q",
+   "title": "Червеният салон",
+   "author": "Аугуст Стриндберг",
+   "isbn": "9789549976366",
+   "url": "https://www.goodreads.com/book/show/1895696"
+  },
+  {
+   "id": "impmwlujjgv3r",
+   "title": "Капитанската дъщеря",
+   "author": "Александър Пушкин",
+   "isbn": "9789549976373",
+   "url": "https://www.goodreads.com/book/show/17192172"
+  },
+  {
+   "id": "impmwlujjgv3s",
+   "title": "Един живот",
+   "author": "Ги дьо Мопасан",
+   "isbn": "9789549976380",
+   "url": "https://www.goodreads.com/book/show/641851"
+  },
+  {
+   "id": "impmwlujjgv3u",
+   "title": "Дневник на прелъстителя",
+   "author": "Сьорен Киркегор",
+   "isbn": "9789549976403",
+   "url": "https://www.goodreads.com/book/show/50008520"
+  },
+  {
+   "id": "impmwlujjgv3v",
+   "title": "Името на розата",
+   "author": "Умберто Еко",
+   "isbn": "9788498190052",
+   "url": "https://www.goodreads.com/book/show/10522"
+  },
+  {
+   "id": "impmwlujjgv3w",
+   "title": "Доктор Живаго",
+   "author": "Борис Пастернак",
+   "isbn": "9788498190298",
+   "url": "https://www.goodreads.com/book/show/25767311"
+  },
+  {
+   "id": "impmwlujjgv3x",
+   "title": "Лолита",
+   "author": "Владимир Набоков",
+   "isbn": "9788498190861",
+   "url": "https://www.goodreads.com/book/show/9216051"
+  },
+  {
+   "id": "impmwlujjgv3y",
+   "title": "Диви разкази",
+   "author": "Николай Хайтов",
+   "isbn": "9788498190977",
+   "url": "https://www.goodreads.com/book/show/5328092"
+  },
+  {
+   "id": "impmwlujjgv3z",
+   "title": "Врява и безумство",
+   "author": "Уилям Фокнър",
+   "isbn": "9788498190984",
+   "url": "https://www.goodreads.com/book/show/10975"
+  },
+  {
+   "id": "impmwlujjgv40",
+   "title": "На изток от рая",
+   "author": "Джон Стайнбек",
+   "isbn": "9788498190991",
+   "url": "https://www.goodreads.com/book/show/4406"
+  },
+  {
+   "id": "impmwlujjgv41",
+   "title": "Златният храм",
+   "author": "Юкио Мишима",
+   "isbn": "9788498191004",
+   "url": "https://www.goodreads.com/book/show/1948057"
+  },
+  {
+   "id": "impmwlujjgv42",
+   "title": "Поща",
+   "author": "Чарлз Буковски",
+   "isbn": "9788498191011",
+   "url": "https://www.goodreads.com/book/show/40409718"
+  },
+  {
+   "id": "impmwlujjgv43",
+   "title": "Хайка за вълци",
+   "author": "Ивайло Петров",
+   "isbn": "9788498191028",
+   "url": "https://www.goodreads.com/book/show/5148661"
+  },
+  {
+   "id": "impmwlujjgv44",
+   "title": "Източен вятър, западен вятър",
+   "author": "Пърл Бък",
+   "isbn": "9788498191035",
+   "url": "https://www.goodreads.com/book/show/14648"
+  },
+  {
+   "id": "impmwlujjgv45",
+   "title": "Денят на Чакала",
+   "author": "Фредерик Форсайт",
+   "isbn": "9788498191042",
+   "url": "https://www.goodreads.com/book/show/540020"
+  },
+  {
+   "id": "impmwlujjgv46",
+   "title": "Йосиф в Египет",
+   "author": "Томас Ман",
+   "isbn": "9788498191059",
+   "url": "https://www.goodreads.com/book/show/2346313"
+  },
+  {
+   "id": "impmwlujjgv47",
+   "title": "Възпоминание за манастира",
+   "author": "Жузе Сарамагу",
+   "isbn": "9788498191066",
+   "url": "https://www.goodreads.com/book/show/879188"
+  },
+  {
+   "id": "impmwlujjgv48",
+   "title": "Любовникът",
+   "author": "Маргьорит Дюрас",
+   "isbn": "9788498191073",
+   "url": "https://www.goodreads.com/book/show/145542"
+  },
+  {
+   "id": "impmwlujjgv49",
+   "title": "По пътя",
+   "author": "Джек Керуак",
+   "isbn": "9788498191080",
+   "url": "https://www.goodreads.com/book/show/70401"
+  },
+  {
+   "id": "impmwlujjgv4a",
+   "title": "Черната Далия",
+   "author": "Джеймс Елрой",
+   "isbn": "9788498191097",
+   "url": "https://www.goodreads.com/book/show/21704"
+  },
+  {
+   "id": "impmwlujjgv4b",
+   "title": "Голият обяд",
+   "author": "Уилям Бъроуз",
+   "isbn": "9788498191103",
+   "url": "https://www.goodreads.com/book/show/7437"
+  },
+  {
+   "id": "impmwlujjgv4c",
+   "title": "Любовникът на лейди Чатърли",
+   "author": "Д. Х. Лорънс",
+   "isbn": "9788498191110",
+   "url": "https://www.goodreads.com/book/show/32049"
+  },
+  {
+   "id": "impmwlujjgv4d",
+   "title": "Повелителят на мухите",
+   "author": "Уилям Голдинг",
+   "isbn": "9788498191134",
+   "url": "https://www.goodreads.com/book/show/7624"
+  },
+  {
+   "id": "impmwlujjgv4e",
+   "title": "451 градуса по Фаренхайт",
+   "author": "Рей Бредбъри",
+   "isbn": "9788498191141",
+   "url": "https://www.goodreads.com/book/show/13079982"
+  },
+  {
+   "id": "impmwlujjgv4f",
+   "title": "Една любов на Суан",
+   "author": "Марсел Пруст",
+   "isbn": "9788498192636",
+   "url": "https://www.goodreads.com/book/show/945735"
+  },
+  {
+   "id": "impmwlujjgv4g",
+   "title": "Лавина",
+   "author": "Блага Димитрова",
+   "isbn": "9788498191165",
+   "url": "https://www.goodreads.com/book/show/6080071"
+  },
+  {
+   "id": "impmwlujjgv4h",
+   "title": "Английският пациент",
+   "author": "Майкъл Ондатджи",
+   "isbn": "9788498191172",
+   "url": "https://www.goodreads.com/book/show/11713"
+  },
+  {
+   "id": "impmwlujjgv4i",
+   "title": "Тропик на Рака",
+   "author": "Хенри Милър",
+   "isbn": "9788498191189",
+   "url": "https://www.goodreads.com/book/show/249"
+  },
+  {
+   "id": "impmwlujjgv4j",
+   "title": "Прагът на зрелостта",
+   "author": "Джоузеф Конрад",
+   "isbn": "9788498191196",
+   "url": "https://www.goodreads.com/book/show/273524"
+  },
+  {
+   "id": "impmwlujjgv4k",
+   "title": "Погнусата",
+   "author": "Жан-Пол Сартър",
+   "isbn": "9788498191202",
+   "url": "https://www.goodreads.com/book/show/87302"
+  },
+  {
+   "id": "impmwlujjgv4l",
+   "title": "Манхатън",
+   "author": "Джон Дос Пасос",
+   "isbn": "9788498191219",
+   "url": "https://www.goodreads.com/book/show/126587"
+  },
+  {
+   "id": "impmwlujjgv4m",
+   "title": "Сидхарта",
+   "author": "Херман Хесе",
+   "isbn": "9788498191226",
+   "url": "https://www.goodreads.com/book/show/52036"
+  },
+  {
+   "id": "impmwlujjgv4n",
+   "title": "Време разделно",
+   "author": "Антон Дончев",
+   "isbn": "9788498191233",
+   "url": "https://www.goodreads.com/book/show/6445325"
+  },
+  {
+   "id": "impmwlujjgv4o",
+   "title": "Десет малки негърчета",
+   "author": "Агата Кристи",
+   "isbn": "9788498194012",
+   "url": "https://www.goodreads.com/book/show/16299"
+  },
+  {
+   "id": "impmwlujjgv4p",
+   "title": "Остатъкът от деня",
+   "author": "Казуо Ишигуро",
+   "isbn": "9788498194029",
+   "url": "https://www.goodreads.com/book/show/28921"
+  },
+  {
+   "id": "impmwlujjgv4q",
+   "title": "Безнадежден случай",
+   "author": "Грейъм Грийн",
+   "isbn": "9788498194036",
+   "url": "https://www.goodreads.com/book/show/347629"
+  },
+  {
+   "id": "impmwlujjgv4r",
+   "title": "Акустичното гърне",
+   "author": "Йордан Радичков",
+   "isbn": "9788498194043",
+   "url": "https://www.goodreads.com/book/show/18163498"
+  },
+  {
+   "id": "impmwlujjgv4s",
+   "title": "Амстердам",
+   "author": "Йън Макюън",
+   "isbn": "9788498194050",
+   "url": "https://www.goodreads.com/book/show/6862"
+  },
+  {
+   "id": "impmwlujjgv4t",
+   "title": "Рагтайм",
+   "author": "Е. Л. Доктороу",
+   "isbn": "9788498194067",
+   "url": "https://www.goodreads.com/book/show/175675"
+  },
+  {
+   "id": "impmwlujjgv4u",
+   "title": "Театрален роман",
+   "author": "Михаил Булгаков",
+   "isbn": "9788498194074",
+   "url": "https://www.goodreads.com/book/show/52384459"
+  },
+  {
+   "id": "impmwlujjgv4v",
+   "title": "Случаят Джем",
+   "author": "Вера Мутафчиева",
+   "isbn": "9788498194081",
+   "url": "https://www.goodreads.com/book/show/4357092"
+  },
+  {
+   "id": "impmwlujjgv4w",
+   "title": "Чужденецът",
+   "author": "Албер Камю",
+   "isbn": "9788498194098",
+   "url": "https://www.goodreads.com/book/show/15688"
+  },
+  {
+   "id": "impmwlujjgv4x",
+   "title": "1984",
+   "author": "Джордж Оруел",
+   "isbn": "9788498194104",
+   "url": "https://www.goodreads.com/book/show/5471"
+  },
+  {
+   "id": "impmwlujjgv4y",
+   "title": "Деветдесет и трета година",
+   "author": "Виктор Юго",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/1829581"
+  },
+  {
+   "id": "impmwlujjgv4z",
+   "title": "Портретът на Дориан Грей",
+   "author": "Оскар Уайлд",
+   "isbn": "9789545972102",
+   "url": "https://www.goodreads.com/book/show/489732"
+  },
+  {
+   "id": "impmwlujjgv51",
+   "title": "Парижките потайности",
+   "author": "Йожен Сю",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/631010"
+  },
+  {
+   "id": "impmwlujjgv52",
+   "title": "Нощ в Лисабон",
+   "author": "Ерих Мария Ремарк",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/397525"
+  },
+  {
+   "id": "impmwlujjgv57",
+   "title": "Клетниците. Част първа–втора",
+   "author": "Виктор Юго",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/24280"
+  },
+  {
+   "id": "impmwlujjgv58",
+   "title": "Клетниците. Част трета–пета",
+   "author": "Виктор Юго",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/24280"
+  },
+  {
+   "id": "impmwlujjgv59",
+   "title": "Човекът, който се смее",
+   "author": "Виктор Юго",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/1669071"
+  },
+  {
+   "id": "impmwlujjgv5b",
+   "title": "Мъртви души",
+   "author": "Николай Гогол",
+   "isbn": "9789547394018",
+   "url": "https://www.goodreads.com/book/show/1546109"
+  },
+  {
+   "id": "impmwlujjgv5q",
+   "title": "Луиза дьо Ла Валиер, том I",
+   "author": "Александър Дюма",
+   "isbn": "9789543988013",
+   "url": "https://www.goodreads.com/book/show/369042"
+  },
+  {
+   "id": "impmwlujjgv5r",
+   "title": "Луиза дьо Ла Валиер, том II",
+   "author": "Александър Дюма",
+   "isbn": "9789543988020",
+   "url": "https://www.goodreads.com/book/show/369042"
+  },
+  {
+   "id": "impmwlujjgv5s",
+   "title": "На изток от рая",
+   "author": "Джон Стайнбек",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/4406"
+  },
+  {
+   "id": "impmwlujjgv5t",
+   "title": "В неравна борба",
+   "author": "Джон Стайнбек",
+   "isbn": "9789547310261",
+   "url": "https://www.goodreads.com/book/show/56083"
+  },
+  {
+   "id": "impmwlujjgv5u",
+   "title": "Безпътният автобус",
+   "author": "Джон Стайнбек",
+   "isbn": "9789547336742",
+   "url": "https://www.goodreads.com/book/show/78275"
+  },
+  {
+   "id": "impmwlujjgv5v",
+   "title": "Сонети",
+   "author": "Уилиам Шекспир",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/42038"
+  },
+  {
+   "id": "impmwlujjgv5w",
+   "title": "Каменното ложе",
+   "author": "Маргарет Атууд",
+   "isbn": "9786191710645",
+   "url": "https://www.goodreads.com/book/show/22642472"
+  },
+  {
+   "id": "impmwlujjgv5x",
+   "title": "Великият Гетсби",
+   "author": "Ф. Скот Фицджералд",
+   "isbn": "9786191610211",
+   "url": "https://www.goodreads.com/book/show/41733839"
+  },
+  {
+   "id": "impmwlujjgv5z",
+   "title": "Посмъртните записки на клуба „Пикуик“",
+   "author": "Чарлз Дикенс",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/21898732"
+  },
+  {
+   "id": "impmwlujjgv60",
+   "title": "Война и мир",
+   "author": "Лев Толстой",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/23902108"
+  },
+  {
+   "id": "impmwlujjgv67",
+   "title": "Терез Ракен",
+   "author": "Емил Зола",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/110871"
+  },
+  {
+   "id": "impmwlujjgv68",
+   "title": "Блестящият свят",
+   "author": "Александър Грин",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/9209112"
+  },
+  {
+   "id": "impmwlujjgv6a",
+   "title": "Бягаща по вълните",
+   "author": "Александър Грин",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/7086781"
+  },
+  {
+   "id": "impmwlujjgv6b",
+   "title": "Коменданта на пристанището",
+   "author": "Александър Грин",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/58643867"
+  },
+  {
+   "id": "impmwlujjgv6o",
+   "title": "Тримата мускетари",
+   "author": "Александър Дюма",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/956321"
+  },
+  {
+   "id": "impmwlujjgv6p",
+   "title": "Дейвид Копърфийлд",
+   "author": "Чарлз Дикенс",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/58696"
+  },
+  {
+   "id": "impmwlujjgv6r",
+   "title": "Мечтатели",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543897070",
+   "url": "https://www.goodreads.com/book/show/60279823"
+  },
+  {
+   "id": "impmwlujjgv6s",
+   "title": "Моят път към теб",
+   "author": "Никълъс Спаркс",
+   "isbn": "9789543892242",
+   "url": "https://www.goodreads.com/book/show/10766509"
+  },
+  {
+   "id": "impmwlujjgv6t",
+   "title": "Изгубеният символ",
+   "author": "Дан Браун",
+   "isbn": "9789546550644",
+   "url": "https://www.goodreads.com/book/show/6411961"
+  },
+  {
+   "id": "impmwlujjgv6u",
+   "title": "Шифърът на Леонардо",
+   "author": "Дан Браун",
+   "isbn": "9789545854330",
+   "url": "https://www.goodreads.com/book/show/55019161"
+  },
+  {
+   "id": "impmwlujjgv6x",
+   "title": "Замръзналото кралство",
+   "author": "",
+   "isbn": "3103-6813",
+   "url": "https://www.goodreads.com/book/show/245791340"
+  },
+  {
+   "id": "impmwlujjgv6y",
+   "title": "Красавицата и Звярът",
+   "author": "",
+   "isbn": "3103-6813",
+   "url": "https://www.goodreads.com/book/show/260606815"
+  },
+  {
+   "id": "impmwlujjgv6z",
+   "title": "Времетръс",
+   "author": "Кърт Вонегът",
+   "isbn": "9786192650742",
+   "url": "https://www.goodreads.com/book/show/33586715"
+  },
+  {
+   "id": "impmwlujjgv70",
+   "title": "Галапагос",
+   "author": "Кърт Вонегът",
+   "isbn": "9786192651183",
+   "url": "https://www.goodreads.com/book/show/9934441"
+  },
+  {
+   "id": "impmwlujjgv71",
+   "title": "Пълна анархия",
+   "author": "Уди Алън",
+   "isbn": "9786192650834",
+   "url": "https://www.goodreads.com/book/show/55382"
+  },
+  {
+   "id": "impmwlujjgv72",
+   "title": "Квит сме",
+   "author": "Уди Алън",
+   "isbn": "9786192650148",
+   "url": "https://www.goodreads.com/book/show/55386"
+  },
+  {
+   "id": "impmwlujjgv73",
+   "title": "Нулева гравитация",
+   "author": "Уди Алън",
+   "isbn": "9786197625967",
+   "url": "https://www.goodreads.com/book/show/60459377"
+  },
+  {
+   "id": "impmwlujjgv74",
+   "title": "Без перушина",
+   "author": "Уди Алън",
+   "isbn": "9786192650155",
+   "url": "https://www.goodreads.com/book/show/35503"
+  },
+  {
+   "id": "impmwlujjgv75",
+   "title": "Странични ефекти",
+   "author": "Уди Алън",
+   "isbn": "9786192650827",
+   "url": "https://www.goodreads.com/book/show/529701"
+  },
+  {
+   "id": "impmwlujjgw1",
+   "title": "Приключенията на Пинокио",
+   "author": "Карло Колоди",
+   "isbn": "9789549976410",
+   "url": "https://www.goodreads.com/book/show/10326637"
+  },
+  {
+   "id": "impmwlujjgw2",
+   "title": "Приключенията на господин Боровинка по вода и суша",
+   "author": "Сотир Гелев",
+   "isbn": "9786197172270",
+   "url": "https://www.goodreads.com/book/show/56126877"
+  },
+  {
+   "id": "impmwlujjgw3",
+   "title": "Избрани приказки",
+   "author": "Братя Грим",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/2180645"
+  },
+  {
+   "id": "impmwlujjgw4",
+   "title": "Приключенията на Пинокио",
+   "author": "Карло Колоди",
+   "isbn": "9786192403775",
+   "url": "https://www.goodreads.com/book/show/10326637"
+  },
+  {
+   "id": "impmwlujjgw5",
+   "title": "Приключенията на Лукчо",
+   "author": "Джани Родари",
+   "isbn": "9786192408480",
+   "url": "https://www.goodreads.com/book/show/6695519"
+  },
+  {
+   "id": "impmwlujjgw9",
+   "title": "Историята на дългия Джон Силвър",
+   "author": "Денис Джъд",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/2256662"
+  },
+  {
+   "id": "impmwlujjgwa",
+   "title": "Цветовете на живота",
+   "author": "Лиса Айсату",
+   "isbn": "9789542837374",
+   "url": "https://www.goodreads.com/book/show/52649481"
+  },
+  {
+   "id": "impmwlujjgwb",
+   "title": "Винету I",
+   "author": "Карл Май",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/32202557"
+  },
+  {
+   "id": "impmwlujjgwc",
+   "title": "Винету II",
+   "author": "Карл Май",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/41456776"
+  },
+  {
+   "id": "impmwlujjgwd",
+   "title": "Винету III",
+   "author": "Карл Май",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/43351091"
+  },
+  {
+   "id": "impmwlujjgwf",
+   "title": "Олд Шуърхенд I",
+   "author": "Карл Май",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/1115026"
+  },
+  {
+   "id": "impmwlujjgwg",
+   "title": "Капитан Немо",
+   "author": "Жюл Верн",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/355944"
+  },
+  {
+   "id": "impmwlujjgwh",
+   "title": "Приключенията на Том Сойер",
+   "author": "Марк Твен",
+   "isbn": "9786192404123",
+   "url": "https://www.goodreads.com/book/show/24583"
+  },
+  {
+   "id": "impmwlujjgwj",
+   "title": "Патиланци",
+   "author": "Ран Босилек",
+   "isbn": "9786192402679",
+   "url": "https://www.goodreads.com/book/show/6389675"
+  },
+  {
+   "id": "impmwlujjgwk",
+   "title": "Мери Попинз",
+   "author": "Памела Травърз",
+   "isbn": "9789546608475",
+   "url": "https://www.goodreads.com/book/show/152380"
+  },
+  {
+   "id": "impmwlujjgwl",
+   "title": "Старогръцки легенди и митове",
+   "author": "Николай А. Кун",
+   "isbn": "9786192401061",
+   "url": "https://www.goodreads.com/book/show/3038446"
+  },
+  {
+   "id": "impmwlujjgwq",
+   "title": "Малкият принц",
+   "author": "Антоан дьо Сент-Екзюпери",
+   "isbn": "9786192402259",
+   "url": "https://www.goodreads.com/book/show/70720"
+  },
+  {
+   "id": "impmwlujjgws",
+   "title": "Пет приказки",
+   "author": "Валери Петров",
+   "isbn": "9786192407506",
+   "url": "https://www.goodreads.com/book/show/4175515"
+  },
+  {
+   "id": "impmwlujjgwu",
+   "title": "Приказки по телефона",
+   "author": "Джани Родари",
+   "isbn": "9786192407674",
+   "url": "https://www.goodreads.com/book/show/1244452"
+  },
+  {
+   "id": "impmwlujjgwv",
+   "title": "Роня, дъщерята на разбойника",
+   "author": "Астрид Линдгрен",
+   "isbn": "9786192401597",
+   "url": "https://www.goodreads.com/book/show/469066"
+  },
+  {
+   "id": "impmwm75b7j56",
+   "title": "Парижката света Богородица",
+   "author": "Виктор Юго",
+   "isbn": "",
+   "url": "https://www.goodreads.com/book/show/30600"
+  },
+  {
+   "id": "impmwm75b7j76",
+   "title": "Дюн: Династията Атрейди",
+   "author": "Браян Хърбърт, Кевин Дж. Андерсън",
+   "isbn": "9786191935673",
+   "url": "https://www.goodreads.com/book/show/56079343"
+  },
+  {
+   "id": "impmwm75b7j77",
+   "title": "Дюн: Династията Харконен",
+   "author": "Браян Хърбърт, Кевин Дж. Андерсън",
+   "isbn": "9786191936465",
+   "url": "https://www.goodreads.com/book/show/101131024"
+  },
+  {
+   "id": "impmwlujjgv3n",
+   "title": "Моби Дик",
+   "author": "Херман Мелвил",
+   "isbn": "9789549976335",
+   "url": "https://www.goodreads.com/book/show/153747"
+  },
+  {
+   "id": "impmwlujjgv3b",
+   "title": "Франкенщайн",
+   "author": "Мери Шели",
+   "isbn": "9789549976199",
+   "url": "https://www.goodreads.com/book/show/35031085"
+  }
+ ]
+}

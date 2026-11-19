@@ -996,7 +996,7 @@ function coverMatch(name, list) {
 /* PURE:END */
 
 /* ---------- storage ---------- */
-const APP_VERSION = '2026-11-18 (кеш raft-v36)';
+const APP_VERSION = '2026-11-18 (кеш raft-v37)';
 const API = 'https://api.anthropic.com/v1/messages';
 const DEFAULTS = { key: '', model: 'claude-sonnet-5-5', maxSearches: 6, ocr: true, googleKey: '', ghToken: '', ghRepo: 'peevbs/bookapp' };
 function getSettings() {
@@ -2734,6 +2734,23 @@ function renderSettings() {
         for (const x of f.fixes) for (const b of books) if (b.original_title === x.from && keyT(b) === keyT({ title: x.title })) { await dbPut(Object.assign({}, b, { original_title: x.to, updatedAt: Date.now() })); n++; }
         localStorage.setItem('raft.fixv', String(f.version)); books = await dbAll();
         if (n) setTimeout(() => toast('Поправени оригинални заглавия: ' + n + '.'), 3300);
+      }
+    }
+  } catch (e) { /* offline: tried again next time */ }
+  try {   /* exact Goodreads pages found for the books (data/goodreads-links.json); added once per version, never over a link already saved */
+    const seen = +localStorage.getItem('raft.grv') || 0;
+    const r = await fetch('data/goodreads-links.json?t=' + Date.now(), { cache: 'no-store' });
+    if (r.ok) {
+      const f = await r.json();
+      if ((f.version || 0) > seen && Array.isArray(f.links)) {
+        let n = 0;
+        for (const x of f.links) {
+          const u = grUrlOk(x.url); if (!u) continue;
+          const m = books.find(b => b.id === x.id) || books.find(b => sameBook(b, x));
+          if (m && !grUrlOk(m.grUrl)) { await dbPut(Object.assign({}, m, { grUrl: u, updatedAt: Date.now() })); n++; }
+        }
+        localStorage.setItem('raft.grv', String(f.version)); books = await dbAll();
+        if (n) setTimeout(() => toast('Добавени са точни връзки към Goodreads: ' + n + '.'), 3300);
       }
     }
   } catch (e) { /* offline: tried again next time */ }
